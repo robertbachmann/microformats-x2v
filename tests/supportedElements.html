@@ -1,7 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xml:lang="en"
+	xml:base="http://example.com/blog/"
+	>
 
 <head profile="http://microformats.org/wiki/hcard-profile http://microformats.org/wiki/hatom#XMDP_Profile">
 <title>Html Title</title>
@@ -35,6 +38,13 @@ Features not tested:
 	- Feed author elements work (not currently defined by hAtom)
 	- Feed contributor elements work (not currently defined by hAtom)
 	- Multiple feeds within a single hAtom document
+	- Multiple summary and content elements within a single entry are
+	  not yet implemented. They should be collapsed into a single content
+	  and and a single summary node per entry.
+	- A single entry with no rel=bookmark link is not tested. It is supposed
+	  to take on the URI of the source document.
+	- Multiple published and updated entries in a single entry should be
+	  disambiguated by choosing the first one that appears of each.
 
 Scope of possible change:
 	- The output of this test case is not valid atom.

@@ -15,11 +15,14 @@ Features tested:
 	- Otherwise, if h? elements exist the first one is used
 	- h? and class=title elements outside of the feed do not interfere
 	  with processing
+	- Feeds and entries whose title elements appear after content nested
+	  within opaque child elements with title-like elements still have
+	  their appropriate title chosen
+	- Entries with no class=title or <h?> elements should have an empty
+	  title element.
 
 Features not tested:
-	- Possible title elements within content and summary fields. These
-	  will probably be a problem for the current code if they occur before
-	  the actual title element, as no opaque check is applied in code.
+	(none)
 
 Scope of possible change:
 	- The output of this test case is not valid atom.
@@ -42,6 +45,7 @@ Scope of possible change:
   <div class="entry">
   <h5>Feed One, Entry One H5</h5>
   <h6 class="title">Feed One, Entry One H6 + class=title</h6>
+  <address class="author">Joe Bloggs</address>
   <p class="updated">2005-12-25T00:00:00Z</p>
   <a rel="bookmark" href="http://example.com/entry"/>
   </div>
@@ -53,6 +57,30 @@ Scope of possible change:
   <div class="entry">
   <h5>Feed Two, Entry One H5</h5>
   <h6>Feed Two, Entry One H6</h6>
+  <address class="author">Joe Bloggs</address>
+  <p class="updated">2005-12-25T00:00:00Z</p>
+  <a rel="bookmark" href="http://example.com/entry"/>
+  </div>
+</div>
+
+<div class="feed">
+  <div class="entry">
+  <address class="author vcard"><span class="fn">Joe Bloggs</span> (<span class="title">Software Engineer</span>)</address>
+  <address class="contributor vcard"><span class="fn">Jane Bloggs</span> (<span class="title">Software Engineer</span>)</address>
+  <div class="content"><p class="title">Content Title</p></div>
+  <div class="summary"><p class="title">Summary Title</p></div>
+  <h5>Feed Three, Entry One H5</h5>
+  <h6>Feed Three, Entry One H6</h6>
+  <p class="updated">2005-12-25T00:00:00Z</p>
+  <a rel="bookmark" href="http://example.com/entry"/>
+  </div>
+<h3>Feed Three H3</h3>
+<h4>Feed Three H4</h4>
+</div>
+
+<div class="feed">
+  <div class="entry">
+  <address class="author">Joe Bloggs</address>
   <p class="updated">2005-12-25T00:00:00Z</p>
   <a rel="bookmark" href="http://example.com/entry"/>
   </div>

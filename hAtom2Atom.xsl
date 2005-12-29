@@ -18,7 +18,7 @@ benjamincarlyle@optusnet.com.au
 http://members.optusnet.com.au/benjamincarlyle/benjamin/blog/
 
 hAtom-2-Atom
-Version 0.0.6
+Version 0.0.6-BC-1
 2005-12-21
 
 Copyright 2005 Luke Arno
@@ -56,6 +56,8 @@ http://www.ietf.org/rfc/rfc4287
                xmlns="http://www.w3.org/2005/Atom"
                xmlns:xhtml="http://www.w3.org/1999/xhtml"
                xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+               xmlns:exsl="http://exslt.org/common"
+               extension-element-prefixes="exsl"
                exclude-result-prefixes="xhtml">
 
 <xsl:output method="xml" indent="yes"/>
@@ -103,15 +105,31 @@ http://www.ietf.org/rfc/rfc4287
   </xsl:choose>
 </xsl:template>
 
+<xsl:template name="feed-level-elements">
+  <xsl:choose>
+    <xsl:when test="contains(concat(' ',normalize-space(@class),' '),' entry ')"/>
+    <xsl:otherwise>
+      <xsl:copy>
+        <xsl:for-each select="@*|node()">
+          <xsl:call-template name="feed-level-elements"/>
+        </xsl:for-each>
+      </xsl:copy>
+    </xsl:otherwise>
+  </xsl:choose>
+</xsl:template>
+
 <xsl:template name="feed" match="xhtml:*[contains(concat(' ',normalize-space(@class),' '),' feed ')]">
 <feed>
   <!-- X --> <xsl:apply-templates select="." mode="get-lang" />
   <!--TODO: add required id and updated elements-->
+  <xsl:variable name="feedLevelElements">
+    <xsl:call-template name="feed-level-elements"/>
+  </xsl:variable>
   <xsl:variable name="classTitles"
-    select="descendant::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' title ')]"
+    select="exsl:node-set($feedLevelElements)/descendant-or-self::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' title ')]"
     />
   <xsl:variable name="headerTitles"
-    select="descendant::xhtml:h1|descendant::xhtml:h2|descendant::xhtml:h3|descendant::xhtml:h4|descendant::xhtml:h5|descendant::xhtml:h6"
+    select="exsl:node-set($feedLevelElements)/descendant-or-self::xhtml:h1|exsl:node-set($feedLevelElements)/descendant-or-self::xhtml:h2|exsl:node-set($feedLevelElements)/descendant-or-self::xhtml:h3|exsl:node-set($feedLevelElements)/descendant-or-self::xhtml:h4|exsl:node-set($feedLevelElements)/descendant-or-self::xhtml:h5|exsl:node-set($feedLevelElements)/descendant-or-self::xhtml:h6"
     />
   <xsl:choose>
   <xsl:when test="$classTitles">
@@ -124,11 +142,28 @@ http://www.ietf.org/rfc/rfc4287
     <title><xsl:call-template name="value-of"/></title>
   </xsl:for-each>
   </xsl:when>
+  <xsl:otherwise><title/></xsl:otherwise>
   </xsl:choose>
   <xsl:apply-templates select="node()|@*">
     <xsl:with-param name="where">feed</xsl:with-param>
   </xsl:apply-templates>
 </feed>
+</xsl:template>
+
+<xsl:template name="entry-level-elements">
+  <xsl:choose>
+    <xsl:when test="contains(concat(' ',normalize-space(@class),' '),' content ')"/>
+    <xsl:when test="contains(concat(' ',normalize-space(@class),' '),' summary ')"/>
+    <xsl:when test="contains(concat(' ',normalize-space(@class),' '),' author ')"/>
+    <xsl:when test="contains(concat(' ',normalize-space(@class),' '),' contributor ')"/>
+    <xsl:otherwise>
+      <xsl:copy>
+        <xsl:for-each select="@*|node()">
+          <xsl:call-template name="entry-level-elements"/>
+        </xsl:for-each>
+      </xsl:copy>
+    </xsl:otherwise>
+  </xsl:choose>
 </xsl:template>
 
 <xsl:template match="xhtml:*[contains(concat(' ',normalize-space(@class),' '),' entry ')]">
@@ -139,11 +174,14 @@ http://www.ietf.org/rfc/rfc4287
               <xsl:with-param name="end">feed</xsl:with-param>
             </xsl:apply-templates>
   <!-- Manually deal with the title attribute -->
+  <xsl:variable name="entryLevelElements">
+    <xsl:call-template name="entry-level-elements"/>
+  </xsl:variable>
   <xsl:variable name="classTitles"
-    select="descendant::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' title ')]"
+    select="exsl:node-set($entryLevelElements)/descendant-or-self::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' title ')]"
     />
   <xsl:variable name="headerTitles"
-    select="descendant::xhtml:h1|descendant::xhtml:h2|descendant::xhtml:h3|descendant::xhtml:h4|descendant::xhtml:h5|descendant::xhtml:h6"
+    select="exsl:node-set($entryLevelElements)/descendant-or-self::xhtml:h1|exsl:node-set($entryLevelElements)/descendant-or-self::xhtml:h2|exsl:node-set($entryLevelElements)/descendant-or-self::xhtml:h3|exsl:node-set($entryLevelElements)/descendant-or-self::xhtml:h4|exsl:node-set($entryLevelElements)/descendant-or-self::xhtml:h5|exsl:node-set($entryLevelElements)/descendant-or-self::xhtml:h6"
     />
   <xsl:choose>
   <xsl:when test="$classTitles">
@@ -156,6 +194,7 @@ http://www.ietf.org/rfc/rfc4287
     <title><xsl:call-template name="value-of"/></title>
   </xsl:for-each>
   </xsl:when>
+  <xsl:otherwise><title/></xsl:otherwise>
   </xsl:choose>
   <!--
   Ensure we have an author field, even if we have to go outside
@@ -178,7 +217,7 @@ http://www.ietf.org/rfc/rfc4287
 <xsl:template match="xhtml:a[contains(concat(' ',normalize-space(translate(@rel,'BOKMAR','bokmar')),' '),' bookmark ')]">
 <xsl:param name="where"/>
 <xsl:if test="$where = 'entry'">
-  <id><xsl:value-of select="normalize-space(@href)"/></id>
+  <id><xsl:value-of select="@href"/></id>
   <!-- permalink -->
   <link rel="alternate">
     <xsl:for-each select="@href|@type|@hreflang|@title|@length">
