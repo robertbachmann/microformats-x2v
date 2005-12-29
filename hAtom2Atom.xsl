@@ -107,12 +107,24 @@ http://www.ietf.org/rfc/rfc4287
 <feed>
   <!-- X --> <xsl:apply-templates select="." mode="get-lang" />
   <!--TODO: add required id and updated elements-->
-  <xsl:variable name="titles"
-    select="descendant::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' entry ')]|descendant::xhtml:h1|descendant::xhtml:h2|descendant::xhtml:h3|descendant::xhtml:h4|descendant::xhtml:h5|descendant::xhtml:h6"
+  <xsl:variable name="classTitles"
+    select="descendant::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' title ')]"
     />
-  <xsl:for-each select="$titles[1]">
+  <xsl:variable name="headerTitles"
+    select="descendant::xhtml:h1|descendant::xhtml:h2|descendant::xhtml:h3|descendant::xhtml:h4|descendant::xhtml:h5|descendant::xhtml:h6"
+    />
+  <xsl:choose>
+  <xsl:when test="$classTitles">
+  <xsl:for-each select="$classTitles[1]">
     <title><xsl:call-template name="value-of"/></title>
   </xsl:for-each>
+  </xsl:when>
+  <xsl:when test="$headerTitles">
+  <xsl:for-each select="$headerTitles[1]">
+    <title><xsl:call-template name="value-of"/></title>
+  </xsl:for-each>
+  </xsl:when>
+  </xsl:choose>
   <xsl:apply-templates select="node()|@*">
     <xsl:with-param name="where">feed</xsl:with-param>
   </xsl:apply-templates>
@@ -127,19 +139,31 @@ http://www.ietf.org/rfc/rfc4287
               <xsl:with-param name="end">feed</xsl:with-param>
             </xsl:apply-templates>
   <!-- Manually deal with the title attribute -->
-  <xsl:variable name="titles"
-    select="descendant::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' entry ')]|descendant::xhtml:h1|descendant::xhtml:h2|descendant::xhtml:h3|descendant::xhtml:h4|descendant::xhtml:h5|descendant::xhtml:h6"
+  <xsl:variable name="classTitles"
+    select="descendant::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' title ')]"
     />
-  <xsl:for-each select="$titles[1]">
+  <xsl:variable name="headerTitles"
+    select="descendant::xhtml:h1|descendant::xhtml:h2|descendant::xhtml:h3|descendant::xhtml:h4|descendant::xhtml:h5|descendant::xhtml:h6"
+    />
+  <xsl:choose>
+  <xsl:when test="$classTitles">
+  <xsl:for-each select="$classTitles[1]">
     <title><xsl:call-template name="value-of"/></title>
   </xsl:for-each>
+  </xsl:when>
+  <xsl:when test="$headerTitles">
+  <xsl:for-each select="$headerTitles[1]">
+    <title><xsl:call-template name="value-of"/></title>
+  </xsl:for-each>
+  </xsl:when>
+  </xsl:choose>
   <!--
   Ensure we have an author field, even if we have to go outside
   the entry to get it.
 
   Probably should just do feed level author
   -->
-  <xsl:if test="not(xhtml:*[contains(concat(' ',normalize-space(@class),' '),' author ')])">
+  <xsl:if test="not(descendant::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' author ')])">
     <xsl:for-each select="/descendant::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' author ')]">
       <xsl:call-template name="author"/>
     </xsl:for-each>
@@ -157,7 +181,7 @@ http://www.ietf.org/rfc/rfc4287
   <id><xsl:value-of select="normalize-space(@href)"/></id>
   <!-- permalink -->
   <link rel="alternate">
-    <xsl:for-each select="@*">
+    <xsl:for-each select="@href|@type|@hreflang|@title|@length">
       <xsl:copy/>
     </xsl:for-each>
     <xsl:if test="not(@type)">
@@ -168,17 +192,17 @@ http://www.ietf.org/rfc/rfc4287
 </xsl:template>
 
 <xsl:template name="vcard">
-  <name><xsl:value-of select="descendant::*[contains(concat(' ',normalize-space(@class),' '),' fn ')]"/></name>
+  <name><xsl:value-of select="normalize-space(descendant-or-self::*[contains(concat(' ',normalize-space(@class),' '),' fn ')])"/></name>
   <xsl:choose>
-    <xsl:when test="descendant::xhtml:a[contains(concat(' ',normalize-space(@class),' '),' url ')]">
-      <url><xsl:value-of select="descendant::xhtml:a[contains(concat(' ',normalize-space(@class),' '),' url ')]/@href"/></url>
+    <xsl:when test="descendant-or-self::xhtml:a[contains(concat(' ',normalize-space(@class),' '),' url ')]">
+      <uri><xsl:value-of select="descendant-or-self::xhtml:a[contains(concat(' ',normalize-space(@class),' '),' url ')]/@href"/></uri>
     </xsl:when>
-    <xsl:when test="descendant::*[contains(concat(' ',normalize-space(@class),' '),' url ')]">
-      <url><xsl:value-of select="descendant::*[contains(concat(' ',normalize-space(@class),' '),' url ')]"/></url>
+    <xsl:when test="descendant-or-self::*[contains(concat(' ',normalize-space(@class),' '),' url ')]">
+      <uri><xsl:value-of select="descendant-or-self::*[contains(concat(' ',normalize-space(@class),' '),' url ')]"/></uri>
     </xsl:when>
   </xsl:choose>
-  <xsl:if test="descendant::*[contains(concat(' ',normalize-space(@class),' '),' email ')]">
-    <email><xsl:value-of select="descendant::*[contains(concat(' ',normalize-space(@class),' '),' email ')]"/></email>
+  <xsl:if test="descendant-or-self::*[contains(concat(' ',normalize-space(@class),' '),' email ')]">
+    <email><xsl:value-of select="descendant-or-self::*[contains(concat(' ',normalize-space(@class),' '),' email ')]"/></email>
   </xsl:if>
 </xsl:template>
 
@@ -190,12 +214,12 @@ http://www.ietf.org/rfc/rfc4287
     </xsl:for-each>
   </xsl:when>
   <xsl:otherwise>
-    <author><xsl:call-template name="value-of"/></author>
+    <author><name><xsl:call-template name="value-of"/></name></author>
   </xsl:otherwise>
   </xsl:choose>
 </xsl:template>
 
-<xsl:template select="xhtml:*[contains(concat(' ',normalize-space(@class),' '),' contributor ')]">
+<xsl:template match="xhtml:*[contains(concat(' ',normalize-space(@class),' '),' contributor ')]">
   <xsl:choose>
   <xsl:when test="descendant-or-self::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' vcard ')]">
     <xsl:for-each select="descendant-or-self::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' vcard ')]">
@@ -203,13 +227,17 @@ http://www.ietf.org/rfc/rfc4287
     </xsl:for-each>
   </xsl:when>
   <xsl:otherwise>
-    <contributor><xsl:call-template name="value-of"/></contributor>
+    <contributor><name><xsl:call-template name="value-of"/></name></contributor>
   </xsl:otherwise>
   </xsl:choose>
 </xsl:template>
 
 <xsl:template match="xhtml:*[contains(concat(' ',normalize-space(@class),' '),' updated ')]">
   <updated><xsl:call-template name="value-of"/></updated>
+</xsl:template>
+
+<xsl:template match="xhtml:*[contains(concat(' ',normalize-space(@class),' '),' published ')]">
+  <published><xsl:call-template name="value-of"/></published>
 </xsl:template>
 
 <xsl:template match="xhtml:a[contains(concat(' ',normalize-space(translate(@rel,'TAG','tag')),' '),' tag ')]">
@@ -262,5 +290,4 @@ http://www.ietf.org/rfc/rfc4287
 </xsl:template>
 
 </xsl:transform>
-
 

@@ -1,0 +1,118 @@
+<?xml version="1.0"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>Feed Title</title>
+  <entry>
+    <title>Entry One Title</title>
+    <updated>2005-12-25T00:00:00Z</updated>
+    <id>http://example.com/entry</id>
+    <link rel="alternate" href="http://example.com/entry" type="text/xhtml"/>
+    <author>
+      <name>Entry One Author One</name>
+    </author>
+    <author>
+      <name>Entry One Author Two</name>
+    </author>
+    <contributor>
+      <name>Entry One Contributor One</name>
+    </contributor>
+    <contributor>
+      <name>Entry One Contributor Two</name>
+    </contributor>
+  </entry>
+  <entry>
+    <title>Entry Two Title</title>
+    <updated>2005-12-25T00:00:00Z</updated>
+    <id>http://example.com/entry</id>
+    <link rel="alternate" href="http://example.com/entry" type="text/xhtml"/>
+    <author>
+      <name>Entry Two Author One</name>
+    </author>
+    <author>
+      <name>Entry Two Author Two</name>
+    </author>
+    <contributor>
+      <name>Entry Two Contributor One</name>
+    </contributor>
+    <contributor>
+      <name>Entry Two Contributor Two</name>
+    </contributor>
+  </entry>
+  <entry>
+    <title>Entry Three Title</title>
+    <updated>2005-12-25T00:00:00Z</updated>
+    <id>http://example.com/entry</id>
+    <link rel="alternate" href="http://example.com/entry" type="text/xhtml"/>
+    <author>
+      <name>Entry Three Author One</name>
+      <uri>http://example.com/authorOne</uri>
+      <email>authorOne@example.com</email>
+    </author>
+    <author>
+      <name>Entry Three Author Two</name>
+      <uri>http://example.com/authorTwo</uri>
+      <email>authorTwo@example.com</email>
+    </author>
+    <contributor>
+      <name>Entry Three Contributor One</name>
+      <uri>http://example.com/contributorOne</uri>
+      <email>contributorOne@example.com</email>
+    </contributor>
+    <contributor>
+      <name>Entry Three Contributor Two</name>
+      <uri>http://example.com/contributorTwo</uri>
+      <email>contributorTwo@example.com</email>
+    </contributor>
+  </entry>
+  <entry>
+    <title>Entry Four Title</title>
+    <updated>2005-12-25T00:00:00Z</updated>
+    <id>http://example.com/entry</id>
+    <link rel="alternate" href="http://example.com/entry" type="text/xhtml"/>
+    <author>
+      <name>Entry Four Author One</name>
+      <uri>http://example.com/authorOne</uri>
+      <email>authorOne@example.com</email>
+    </author>
+    <author>
+      <name>Entry Four Author Two</name>
+      <uri>http://example.com/authorTwo</uri>
+      <email>authorTwo@example.com</email>
+    </author>
+    <contributor>
+      <name>Entry Four Contributor One</name>
+      <uri>http://example.com/contributorOne</uri>
+      <email>contributorOne@example.com</email>
+    </contributor>
+    <contributor>
+      <name>Entry Four Contributor Two</name>
+      <uri>http://example.com/contributorTwo</uri>
+      <email>contributorTwo@example.com</email>
+    </contributor>
+  </entry>
+  <entry>
+    <title>Entry Five Title</title>
+    <updated>2005-12-25T00:00:00Z</updated>
+    <id>http://example.com/entry</id>
+    <link rel="alternate" href="http://example.com/entry" type="text/xhtml"/>
+    <author>
+      <name>Entry Five Author One</name>
+      <uri>http://example.com/authorOne</uri>
+      <email>authorOne@example.com</email>
+    </author>
+    <author>
+      <name>Entry Five Author Two</name>
+      <uri>http://example.com/authorTwo</uri>
+      <email>authorTwo@example.com</email>
+    </author>
+    <contributor>
+      <name>Entry Five Contributor One</name>
+      <uri>http://example.com/contributorOne</uri>
+      <email>contributorOne@example.com</email>
+    </contributor>
+    <contributor>
+      <name>Entry Five Contributor Two</name>
+      <uri>http://example.com/contributorTwo</uri>
+      <email>contributorTwo@example.com</email>
+    </contributor>
+  </entry>
+</feed>

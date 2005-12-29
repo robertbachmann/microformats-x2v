@@ -1,0 +1,63 @@
+<?xml version="1.0"?>
+<!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.0 Transitional//EN'
+    'http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd'>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Page title</title>
+</head>
+<body>
+<!--
+This test is intended to that all variations of input for feed and entry titles
+are handled correctly, including the handling of disambiguation rules.
+
+Features tested:
+	- If class=title element exists, it is used as the title
+	- Otherwise, if h? elements exist the first one is used
+	- h? and class=title elements outside of the feed do not interfere
+	  with processing
+
+Features not tested:
+	- Possible title elements within content and summary fields. These
+	  will probably be a problem for the current code if they occur before
+	  the actual title element, as no opaque check is applied in code.
+
+Scope of possible change:
+	- The output of this test case is not valid atom.
+	  Notably, id and updated elements do not exist at the feed level.
+	- Changes in the hAtom specification may invalidate this test case
+	- Comparisons between actual and controlled test output should not
+	  take order into consideration, except where the atom specification
+	  indicates order is important.
+	- Comparisons between actual and controlled test output should not
+	  consider whitespace important, except where the atom specification
+	  indicates whitespace is important.
+
+-->
+<h1>Body H1</h1>
+<h2 class="title">Body H2 + class=title</h2>
+
+<div class="feed">
+<h3>Feed One H3</h3>
+<h4 class="title">Feed One H4 + class=title</h4>
+  <div class="entry">
+  <h5>Feed One, Entry One H5</h5>
+  <h6 class="title">Feed One, Entry One H6 + class=title</h6>
+  <p class="updated">2005-12-25T00:00:00Z</p>
+  <a rel="bookmark" href="http://example.com/entry"/>
+  </div>
+</div>
+
+<div class="feed">
+<h3>Feed Two H3</h3>
+<h4>Feed Two H4</h4>
+  <div class="entry">
+  <h5>Feed Two, Entry One H5</h5>
+  <h6>Feed Two, Entry One H6</h6>
+  <p class="updated">2005-12-25T00:00:00Z</p>
+  <a rel="bookmark" href="http://example.com/entry"/>
+  </div>
+</div>
+
+</body>
+</html>
+

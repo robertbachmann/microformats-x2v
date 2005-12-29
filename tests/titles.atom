@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>Feed One H4 + class=title</title>
+  <entry>
+    <title>Feed One, Entry One H6 + class=title</title>
+    <updated>2005-12-25T00:00:00Z</updated>
+    <id>http://example.com/entry</id>
+    <link rel="alternate" href="http://example.com/entry" type="text/xhtml"/>
+  </entry>
+</feed><feed xmlns="http://www.w3.org/2005/Atom">
+  <title>Feed Two H3</title>
+  <entry>
+    <title>Feed Two, Entry One H5</title>
+    <updated>2005-12-25T00:00:00Z</updated>
+    <id>http://example.com/entry</id>
+    <link rel="alternate" href="http://example.com/entry" type="text/xhtml"/>
+  </entry>
+</feed>
