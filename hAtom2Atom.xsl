@@ -1,0 +1,266 @@
+<?xml version="1.0"?>
+<!--
+
+Author:
+
+luke arno
+luke.arno@gmail.com
+http://lukearno.com/
+
+Contributors (in alphabetical order):
+
+Robert Bachmann (contributor)
+rbach@rbach.priv.at
+http://rbach.priv.at/
+
+Benjamin Carlyle (contributor)
+benjamincarlyle@optusnet.com.au
+http://members.optusnet.com.au/benjamincarlyle/benjamin/blog/
+
+hAtom-2-Atom
+Version 0.0.6
+2005-12-21
+
+Copyright 2005 Luke Arno
+This work is licensed under The W3C Open Source License
+http://www.w3.org/Consortium/Legal/copyright-software-19980720
+
+
+NOTES:
+This program and the hAtom spec are still works in progress. Use them at
+your own risk! In all likelihood you will have to play around to get 
+valid output. 
+
+Your XHTML document must have the namespace "http://w3.org/1999/xhtml"
+if it doesn't or if your input document is written in HTML filter it 
+through "htmltidy -asxhtml" <http://tidy.sourceforge.net/> before 
+processing it with hAtom2Atom.xsl.
+
+Updated is actually coming from published for now. 
+
+Template calls marked with "X" are undefined in the current hAtom draft.
+
+Structure of this comment and the multi-valued attribute selection trick
+taken from Brian Suda's XHTML-2-iCal here:
+http://suda.co.uk/projects/X2V/xhtml2vcal.xsl
+
+hAtom info here:
+http://microformats.org/wiki/hatom
+
+Atom info here:
+http://www.ietf.org/rfc/rfc4287
+
+-->
+
+<xsl:transform version="1.0"
+               xmlns="http://www.w3.org/2005/Atom"
+               xmlns:xhtml="http://www.w3.org/1999/xhtml"
+               xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+               exclude-result-prefixes="xhtml">
+
+<xsl:output method="xml" indent="yes"/>
+
+<xsl:template name="value-of">
+  <xsl:variable name="context" select="."/>
+  <xsl:choose>
+    <xsl:when test="name($context)='abbr'">
+      <xsl:value-of select="normalize-space($context/@title)"/>
+    </xsl:when>
+    <xsl:otherwise>
+      <xsl:value-of select="normalize-space($context)"/>
+    </xsl:otherwise>
+  </xsl:choose>
+</xsl:template>
+
+<xsl:template match="node()|@*">
+  <xsl:param name="where"/>
+  <!-- By default, do nothing -->
+  <xsl:apply-templates select="node()|@*">
+    <xsl:with-param name="where" select="$where"/>
+  </xsl:apply-templates>
+</xsl:template>
+
+<xsl:template match="/">
+  <!--
+  See if we can find feed elements within this document.
+  Entries that are part of a feed are processed when we
+  reach the feed element. If no feeds are found, the
+  whole document is a feed.
+  entry elements that do not occur within a feed when feed
+  elements are present are ignored. (TODO: Check, is this valid?)
+  Use modes throughout to determine context. Are we
+  * outside a feed (none),
+  * inside a feed (feed), or
+  * inside an entry (entry)?
+  -->
+  <xsl:choose>
+  <xsl:when test="descendant::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' feed ')]">
+    <xsl:apply-templates select="node()|@*"/>
+  </xsl:when>
+  <xsl:otherwise>
+    <xsl:call-template name="feed"/>
+  </xsl:otherwise>
+  </xsl:choose>
+</xsl:template>
+
+<xsl:template name="feed" match="xhtml:*[contains(concat(' ',normalize-space(@class),' '),' feed ')]">
+<feed>
+  <!-- X --> <xsl:apply-templates select="." mode="get-lang" />
+  <!--TODO: add required id and updated elements-->
+  <xsl:variable name="titles"
+    select="descendant::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' entry ')]|descendant::xhtml:h1|descendant::xhtml:h2|descendant::xhtml:h3|descendant::xhtml:h4|descendant::xhtml:h5|descendant::xhtml:h6"
+    />
+  <xsl:for-each select="$titles[1]">
+    <title><xsl:call-template name="value-of"/></title>
+  </xsl:for-each>
+  <xsl:apply-templates select="node()|@*">
+    <xsl:with-param name="where">feed</xsl:with-param>
+  </xsl:apply-templates>
+</feed>
+</xsl:template>
+
+<xsl:template match="xhtml:*[contains(concat(' ',normalize-space(@class),' '),' entry ')]">
+<xsl:param name="where"/>
+<xsl:if test="$where = 'feed'">
+<entry>
+  <!-- X --><xsl:apply-templates select="." mode="get-lang">
+              <xsl:with-param name="end">feed</xsl:with-param>
+            </xsl:apply-templates>
+  <!-- Manually deal with the title attribute -->
+  <xsl:variable name="titles"
+    select="descendant::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' entry ')]|descendant::xhtml:h1|descendant::xhtml:h2|descendant::xhtml:h3|descendant::xhtml:h4|descendant::xhtml:h5|descendant::xhtml:h6"
+    />
+  <xsl:for-each select="$titles[1]">
+    <title><xsl:call-template name="value-of"/></title>
+  </xsl:for-each>
+  <!--
+  Ensure we have an author field, even if we have to go outside
+  the entry to get it.
+
+  Probably should just do feed level author
+  -->
+  <xsl:if test="not(xhtml:*[contains(concat(' ',normalize-space(@class),' '),' author ')])">
+    <xsl:for-each select="/descendant::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' author ')]">
+      <xsl:call-template name="author"/>
+    </xsl:for-each>
+  </xsl:if>
+  <xsl:apply-templates select="node()|@*">
+    <xsl:with-param name="where">entry</xsl:with-param>
+  </xsl:apply-templates>
+</entry>
+</xsl:if>
+</xsl:template>
+
+<xsl:template match="xhtml:a[contains(concat(' ',normalize-space(translate(@rel,'BOKMAR','bokmar')),' '),' bookmark ')]">
+<xsl:param name="where"/>
+<xsl:if test="$where = 'entry'">
+  <id><xsl:value-of select="normalize-space(@href)"/></id>
+  <!-- permalink -->
+  <link rel="alternate">
+    <xsl:for-each select="@*">
+      <xsl:copy/>
+    </xsl:for-each>
+    <xsl:if test="not(@type)">
+      <xsl:attribute name="type">text/xhtml</xsl:attribute>
+    </xsl:if>
+  </link>
+</xsl:if>
+</xsl:template>
+
+<xsl:template name="vcard">
+  <name><xsl:value-of select="descendant::*[contains(concat(' ',normalize-space(@class),' '),' fn ')]"/></name>
+  <xsl:choose>
+    <xsl:when test="descendant::xhtml:a[contains(concat(' ',normalize-space(@class),' '),' url ')]">
+      <url><xsl:value-of select="descendant::xhtml:a[contains(concat(' ',normalize-space(@class),' '),' url ')]/@href"/></url>
+    </xsl:when>
+    <xsl:when test="descendant::*[contains(concat(' ',normalize-space(@class),' '),' url ')]">
+      <url><xsl:value-of select="descendant::*[contains(concat(' ',normalize-space(@class),' '),' url ')]"/></url>
+    </xsl:when>
+  </xsl:choose>
+  <xsl:if test="descendant::*[contains(concat(' ',normalize-space(@class),' '),' email ')]">
+    <email><xsl:value-of select="descendant::*[contains(concat(' ',normalize-space(@class),' '),' email ')]"/></email>
+  </xsl:if>
+</xsl:template>
+
+<xsl:template name="author" match="xhtml:*[contains(concat(' ',normalize-space(@class),' '),' author ')]">
+  <xsl:choose>
+  <xsl:when test="descendant-or-self::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' vcard ')]">
+    <xsl:for-each select="descendant-or-self::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' vcard ')]">
+      <author><xsl:call-template name="vcard"/></author>
+    </xsl:for-each>
+  </xsl:when>
+  <xsl:otherwise>
+    <author><xsl:call-template name="value-of"/></author>
+  </xsl:otherwise>
+  </xsl:choose>
+</xsl:template>
+
+<xsl:template select="xhtml:*[contains(concat(' ',normalize-space(@class),' '),' contributor ')]">
+  <xsl:choose>
+  <xsl:when test="descendant-or-self::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' vcard ')]">
+    <xsl:for-each select="descendant-or-self::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' vcard ')]">
+      <contributor><xsl:call-template name="vcard"/></contributor>
+    </xsl:for-each>
+  </xsl:when>
+  <xsl:otherwise>
+    <contributor><xsl:call-template name="value-of"/></contributor>
+  </xsl:otherwise>
+  </xsl:choose>
+</xsl:template>
+
+<xsl:template match="xhtml:*[contains(concat(' ',normalize-space(@class),' '),' updated ')]">
+  <updated><xsl:call-template name="value-of"/></updated>
+</xsl:template>
+
+<xsl:template match="xhtml:a[contains(concat(' ',normalize-space(translate(@rel,'TAG','tag')),' '),' tag ')]">
+  <category>
+    <xsl:attribute name="term"><xsl:value-of select="@href"/></xsl:attribute>
+    <xsl:attribute name="label"><xsl:value-of select="."/></xsl:attribute>
+  </category>
+</xsl:template>
+
+<xsl:template match="xhtml:*[contains(concat(' ',normalize-space(@class),' '),' summary ')]">
+<xsl:param name="where"/>
+<xsl:if test="$where = 'entry'">
+  <summary type="xhtml">
+    <!-- X --><xsl:apply-templates select="." mode="get-lang">
+                <xsl:with-param name="end" select="'entry'" />
+              </xsl:apply-templates><xsl:copy-of select="."/></summary>
+</xsl:if>
+</xsl:template>
+
+<xsl:template match="xhtml:*[contains(concat(' ',normalize-space(@class),' '),' content ')]">
+<xsl:param name="where"/>
+<xsl:if test="$where = 'entry'">
+  <content type="xhtml">
+    <!-- X --><xsl:apply-templates select="." mode="get-lang">
+                <xsl:with-param name="end" select="'entry'" />
+              </xsl:apply-templates><xsl:copy-of select="."/></content>
+</xsl:if>
+</xsl:template>
+
+<xsl:template match="xhtml:*" mode="get-lang">
+  <xsl:param name="end" />
+
+  <xsl:choose>
+    <xsl:when test="@xml:lang">
+      <xsl:attribute name="xml:lang"><xsl:value-of select="@xml:lang" /></xsl:attribute>
+    </xsl:when> 
+    <xsl:when test="not($end='')">
+      <xsl:if test="not(contains(concat(' ',normalize-space(@class),' '), concat(' ',$end,' ')))">
+        <xsl:apply-templates mode="get-lang" select="parent::*">
+          <xsl:with-param name="end" select="$end" />
+        </xsl:apply-templates>
+      </xsl:if>
+    </xsl:when>
+    <xsl:otherwise>
+      <xsl:apply-templates mode="get-lang" select="parent::*">
+        <xsl:with-param name="end" select="$end" />
+      </xsl:apply-templates>    
+    </xsl:otherwise>
+  </xsl:choose>
+</xsl:template>
+
+</xsl:transform>
+
+
