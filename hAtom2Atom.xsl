@@ -292,7 +292,11 @@ http://www.ietf.org/rfc/rfc4287
   <summary type="xhtml">
     <!-- X --><xsl:apply-templates select="." mode="get-lang">
                 <xsl:with-param name="end" select="'entry'" />
-              </xsl:apply-templates><xsl:copy-of select="."/></summary>
+              </xsl:apply-templates>
+  	<div xmlns="http://www.w3.org/1999/xhtml">
+		<xsl:copy-of select="child::*|text()" />
+	</div>
+  </summary>
 </xsl:if>
 </xsl:template>
 
@@ -302,7 +306,11 @@ http://www.ietf.org/rfc/rfc4287
   <content type="xhtml">
     <!-- X --><xsl:apply-templates select="." mode="get-lang">
                 <xsl:with-param name="end" select="'entry'" />
-              </xsl:apply-templates><xsl:copy-of select="."/></content>
+              </xsl:apply-templates>
+	<div xmlns="http://www.w3.org/1999/xhtml">
+		<xsl:copy-of select="child::*|text()" />
+	</div>
+  </content>
 </xsl:if>
 </xsl:template>
 

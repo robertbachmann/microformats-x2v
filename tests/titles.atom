@@ -32,12 +32,12 @@
       <name>Jane Bloggs</name>
     </contributor>
     <content type="xhtml">
-      <div xmlns="http://www.w3.org/1999/xhtml" class="content">
+      <div xmlns="http://www.w3.org/1999/xhtml">
         <p class="title">Content Title</p>
       </div>
     </content>
     <summary type="xhtml">
-      <div xmlns="http://www.w3.org/1999/xhtml" class="summary">
+      <div xmlns="http://www.w3.org/1999/xhtml">
         <p class="title">Summary Title</p>
       </div>
     </summary>

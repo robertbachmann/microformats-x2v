@@ -6,14 +6,14 @@
     <published>2005-12-22T10:34:00+10:00</published>
     <updated>2005-12-22T10:35:00+10:00</updated>
     <content type="xhtml">
-      <div xmlns="http://www.w3.org/1999/xhtml" class="content">
+      <div xmlns="http://www.w3.org/1999/xhtml">
 <p>Entry One, Paragraph One</p>
 <p>Entry One, Paragraph Two</p>
 </div>
     </content>
     <summary type="xhtml">
-      <div xmlns="http://www.w3.org/1999/xhtml" class="summary">
-<p>Entry One, Summary</p>
+      <div xmlns="http://www.w3.org/1999/xhtml">
+Entry One, Summary
 </div>
     </summary>
     <id>http://example.com/entryOne</id>
@@ -44,13 +44,13 @@
     <published>2005-12-21T10:34:00+10:00</published>
     <updated>2005-12-21T10:35:00+10:00</updated>
     <content type="xhtml">
-      <div xmlns="http://www.w3.org/1999/xhtml" class="content">
+      <div xmlns="http://www.w3.org/1999/xhtml">
 <p>Entry Two, Paragraph One</p>
 <p>Entry Two, Paragraph Two</p>
 </div>
     </content>
     <summary type="xhtml">
-      <div xmlns="http://www.w3.org/1999/xhtml" class="summary">
+      <div xmlns="http://www.w3.org/1999/xhtml">
 <p>Entry Two, Summary</p>
 </div>
     </summary>
