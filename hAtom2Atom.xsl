@@ -274,6 +274,9 @@ http://www.ietf.org/rfc/rfc4287
     <xsl:when test="@xml:lang">
       <xsl:attribute name="xml:lang"><xsl:value-of select="@xml:lang" /></xsl:attribute>
     </xsl:when> 
+    <xsl:when test="@lang">
+      <xsl:attribute name="xml:lang"><xsl:value-of select="@lang" /></xsl:attribute>
+    </xsl:when>
     <xsl:when test="not($end='')">
       <xsl:if test="not(contains(concat(' ',normalize-space(@class),' '), concat(' ',$end,' ')))">
         <xsl:apply-templates mode="get-lang" select="parent::*">
