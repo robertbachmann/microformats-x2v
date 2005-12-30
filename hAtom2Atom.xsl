@@ -27,6 +27,15 @@ http://www.w3.org/Consortium/Legal/copyright-software-19980720
 
 
 NOTES:
+
+To use this programm your XSLT engine must support the node-set()
+extension function.
+If your XSLT engine supports EXSLT it will most likely support
+node-set().
+If you are using Micrsoft's XML, .net's System.xml or Oracles XDK
+you must change the value of xmlns:extension.
+See the comment located bellow <xsl:transform> for instructions.
+
 This program and the hAtom spec are still works in progress. Use them at
 your own risk! In all likelihood you will have to play around to get 
 valid output. 
@@ -56,9 +65,24 @@ http://www.ietf.org/rfc/rfc4287
                xmlns="http://www.w3.org/2005/Atom"
                xmlns:xhtml="http://www.w3.org/1999/xhtml"
                xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-               xmlns:exsl="http://exslt.org/common"
-               extension-element-prefixes="exsl"
+               xmlns:extension="http://exslt.org/common"
+               extension-element-prefixes="extension"
                exclude-result-prefixes="xhtml">
+<!-- 
+    node-set() for Micrsoft's XML, .net's System.xml and Oracle's XDK
+
+
+    Micrsoft users should replace 
+        xmlns:extension="http://exslt.org/common"
+    with
+        xmlns:extension="urn:schemas-microsoft-com:xslt"
+
+
+    Oracle users should replace
+        xmlns:extension="http://exslt.org/common"
+    with
+        xmlns:extension="http://www.oracle.com/XSL/Transform/java"
+-->
 
 <xsl:output method="xml" indent="yes"/>
 
@@ -118,7 +142,7 @@ http://www.ietf.org/rfc/rfc4287
   </xsl:choose>
 </xsl:template>
 
-<xsl:template name="feed" match="xhtml:*[contains(concat(' ',normalize-space(@class),' '),' feed ')]">
+<xsl:template name="feed" match="xhtml:*[contains(concat(' ',normalize-space(@class),' '),' feed ')][1]">
 <feed>
   <!-- X --> <xsl:apply-templates select="." mode="get-lang" />
   <!--TODO: add required id and updated elements-->
@@ -126,10 +150,10 @@ http://www.ietf.org/rfc/rfc4287
     <xsl:call-template name="feed-level-elements"/>
   </xsl:variable>
   <xsl:variable name="classTitles"
-    select="exsl:node-set($feedLevelElements)/descendant-or-self::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' title ')]"
+    select="extension:node-set($feedLevelElements)/descendant-or-self::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' title ')]"
     />
   <xsl:variable name="headerTitles"
-    select="exsl:node-set($feedLevelElements)/descendant-or-self::xhtml:h1|exsl:node-set($feedLevelElements)/descendant-or-self::xhtml:h2|exsl:node-set($feedLevelElements)/descendant-or-self::xhtml:h3|exsl:node-set($feedLevelElements)/descendant-or-self::xhtml:h4|exsl:node-set($feedLevelElements)/descendant-or-self::xhtml:h5|exsl:node-set($feedLevelElements)/descendant-or-self::xhtml:h6"
+    select="extension:node-set($feedLevelElements)/descendant-or-self::xhtml:h1|extension:node-set($feedLevelElements)/descendant-or-self::xhtml:h2|extension:node-set($feedLevelElements)/descendant-or-self::xhtml:h3|extension:node-set($feedLevelElements)/descendant-or-self::xhtml:h4|extension:node-set($feedLevelElements)/descendant-or-self::xhtml:h5|extension:node-set($feedLevelElements)/descendant-or-self::xhtml:h6"
     />
   <xsl:choose>
   <xsl:when test="$classTitles">
@@ -178,10 +202,10 @@ http://www.ietf.org/rfc/rfc4287
     <xsl:call-template name="entry-level-elements"/>
   </xsl:variable>
   <xsl:variable name="classTitles"
-    select="exsl:node-set($entryLevelElements)/descendant-or-self::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' title ')]"
+    select="extension:node-set($entryLevelElements)/descendant-or-self::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' title ')]"
     />
   <xsl:variable name="headerTitles"
-    select="exsl:node-set($entryLevelElements)/descendant-or-self::xhtml:h1|exsl:node-set($entryLevelElements)/descendant-or-self::xhtml:h2|exsl:node-set($entryLevelElements)/descendant-or-self::xhtml:h3|exsl:node-set($entryLevelElements)/descendant-or-self::xhtml:h4|exsl:node-set($entryLevelElements)/descendant-or-self::xhtml:h5|exsl:node-set($entryLevelElements)/descendant-or-self::xhtml:h6"
+    select="extension:node-set($entryLevelElements)/descendant-or-self::xhtml:h1|extension:node-set($entryLevelElements)/descendant-or-self::xhtml:h2|extension:node-set($entryLevelElements)/descendant-or-self::xhtml:h3|extension:node-set($entryLevelElements)/descendant-or-self::xhtml:h4|extension:node-set($entryLevelElements)/descendant-or-self::xhtml:h5|extension:node-set($entryLevelElements)/descendant-or-self::xhtml:h6"
     />
   <xsl:choose>
   <xsl:when test="$classTitles">
