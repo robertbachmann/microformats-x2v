@@ -120,8 +120,10 @@ http://www.ietf.org/rfc/rfc4287
   * inside an entry (entry)?
   -->
   <xsl:choose>
-  <xsl:when test="descendant::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' feed ')][1]">
-    <xsl:apply-templates select="node()|@*"/>
+  <xsl:when test="descendant::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' feed ')]">
+	<xsl:for-each select="descendant::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' feed ')][1]">
+		<xsl:apply-templates select="."/>
+	</xsl:for-each>
   </xsl:when>
   <xsl:otherwise>
     <xsl:call-template name="feed"/>
@@ -130,7 +132,7 @@ http://www.ietf.org/rfc/rfc4287
 </xsl:template>
 
 <xsl:template name="feed-level-elements">
-  <xsl:choose>
+  <xsl:choose> 
     <xsl:when test="contains(concat(' ',normalize-space(@class),' '),' entry ')"/>
     <xsl:otherwise>
       <xsl:copy>
