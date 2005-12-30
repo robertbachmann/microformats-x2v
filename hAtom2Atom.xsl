@@ -120,7 +120,7 @@ http://www.ietf.org/rfc/rfc4287
   * inside an entry (entry)?
   -->
   <xsl:choose>
-  <xsl:when test="descendant::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' feed ')]">
+  <xsl:when test="descendant::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' feed ')][1]">
     <xsl:apply-templates select="node()|@*"/>
   </xsl:when>
   <xsl:otherwise>

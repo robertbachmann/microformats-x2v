@@ -10,7 +10,7 @@
     <id>http://example.com/entry</id>
     <link rel="alternate" href="http://example.com/entry" type="text/xhtml"/>
   </entry>
-</feed><feed xmlns="http://www.w3.org/2005/Atom">
+</feed><!--<feed xmlns="http://www.w3.org/2005/Atom">
   <title>Feed Two H3</title>
   <entry>
     <title>Feed Two, Entry One H5</title>
@@ -56,4 +56,4 @@
     <id>http://example.com/entry</id>
     <link rel="alternate" href="http://example.com/entry" type="text/xhtml"/>
   </entry>
-</feed>
+</feed>-->
