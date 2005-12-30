@@ -142,7 +142,7 @@ http://www.ietf.org/rfc/rfc4287
   </xsl:choose>
 </xsl:template>
 
-<xsl:template name="feed" match="xhtml:*[contains(concat(' ',normalize-space(@class),' '),' feed ')][1]">
+<xsl:template name="feed" match="xhtml:*[contains(concat(' ',normalize-space(@class),' '),' feed ')]">
 <feed>
   <!-- X --> <xsl:apply-templates select="." mode="get-lang" />
   <!--TODO: add required id and updated elements-->
