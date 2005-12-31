@@ -252,6 +252,12 @@ http://www.ietf.org/rfc/rfc4287
   <id><xsl:value-of select="@href"/></id>
   <!-- permalink -->
   <link rel="alternate">
+    <!-- X --><xsl:apply-templates select="." mode="get-base">
+      <xsl:with-param name="end" select="'entry'" />
+    </xsl:apply-templates>
+    <!-- X --><xsl:apply-templates select="." mode="get-lang">
+      <xsl:with-param name="end" select="'entry'" />
+    </xsl:apply-templates>
     <xsl:for-each select="@href|@type|@hreflang|@title|@length">
       <xsl:copy/>
     </xsl:for-each>
@@ -263,13 +269,28 @@ http://www.ietf.org/rfc/rfc4287
 </xsl:template>
 
 <xsl:template name="vcard">
-  <name><xsl:value-of select="normalize-space(descendant-or-self::*[contains(concat(' ',normalize-space(@class),' '),' fn ')])"/></name>
+  <name>
+    <!-- X --><xsl:apply-templates select="descendant-or-self::*[contains(concat(' ',normalize-space(@class),' '),' fn ')]" mode="get-lang">
+      <xsl:with-param name="end" select="'entry'" />
+    </xsl:apply-templates>
+    <xsl:value-of select="normalize-space(descendant-or-self::*[contains(concat(' ',normalize-space(@class),' '),' fn ')])"/>
+  </name>
   <xsl:choose>
     <xsl:when test="descendant-or-self::xhtml:a[contains(concat(' ',normalize-space(@class),' '),' url ')]">
-      <uri><xsl:value-of select="descendant-or-self::xhtml:a[contains(concat(' ',normalize-space(@class),' '),' url ')]/@href"/></uri>
+      <uri>
+        <!-- X --><xsl:apply-templates select="descendant-or-self::xhtml:a[contains(concat(' ',normalize-space(@class),' '),' url ')]" mode="get-base">
+                    <xsl:with-param name="end" select="'entry'" />
+                  </xsl:apply-templates>
+        <xsl:value-of select="descendant-or-self::xhtml:a[contains(concat(' ',normalize-space(@class),' '),' url ')]/@href"/>
+      </uri>
     </xsl:when>
     <xsl:when test="descendant-or-self::*[contains(concat(' ',normalize-space(@class),' '),' url ')]">
-      <uri><xsl:value-of select="descendant-or-self::*[contains(concat(' ',normalize-space(@class),' '),' url ')]"/></uri>
+      <uri>
+        <!-- X --><xsl:apply-templates select="descendant-or-self::*[contains(concat(' ',normalize-space(@class),' '),' url ')]" mode="get-base">
+                    <xsl:with-param name="end" select="'entry'" />
+                  </xsl:apply-templates>
+        <xsl:value-of select="descendant-or-self::*[contains(concat(' ',normalize-space(@class),' '),' url ')]"/>
+      </uri>
     </xsl:when>
   </xsl:choose>
   <xsl:if test="descendant-or-self::*[contains(concat(' ',normalize-space(@class),' '),' email ')]">

@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en" xml:base="http://example.com/blog/">
+  <title>Feed Title</title>
+  <entry>
+    <title>Entry One Title</title>
+    <updated>2005-12-22T10:35:00+10:00</updated>
+    <content type="xhtml" xml:lang="fr" xml:base="http://example.com/blog/">
+      <div xmlns="http://www.w3.org/1999/xhtml">
+<p>Entry One, Paragraph One</p>
+<p xml:base="http://example.com/blog/2/" xml:lang="en-GB">Entry One, Paragraph Two</p>
+</div>
+    </content>
+    <summary type="xhtml" xml:lang="fr" xml:base="http://example.com/blog/">
+      <div xmlns="http://www.w3.org/1999/xhtml">
+<p>Entry One, Paragraph One</p>
+<p xml:base="http://example.com/blog/2/" xml:lang="en-GB">Entry One, Paragraph Two</p>
+</div>
+    </summary>
+    <id>entryOne</id>
+    <link rel="alternate" xml:base="http://example.com/" xml:lang="jp" href="entryOne" type="text/xhtml"/>
+    <author>
+      <name xml:lang="zh">Author One</name>
+      <uri xml:base="http://example.com/">authorOne</uri>
+      <email>authorOne@example.com</email>
+    </author>
+  </entry>
+</feed>
