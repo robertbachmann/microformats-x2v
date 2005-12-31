@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>Feed Title</title>
+  <entry>
+    <title>Entry One Title</title>
+    <updated>2005-12-25T00:00:00Z</updated>
+    <id>http://example.com/entry</id>
+    <link rel="alternate" href="http://example.com/entry" type="text/xhtml"/>
+    <category term="ipod" label="iPod"/>
+    <category term="Gravity" label="Gravity"/>
+    <category term="chihuahua" label="Chihuahua"/>
+    <category term="foo+bar" label="bar+baz"/>
+    <category term="bar" label="bar/baz"/>
+  </entry>
+</feed>

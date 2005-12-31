@@ -1,0 +1,52 @@
+<?xml version="1.0"?>
+<!--DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.0 Transitional//EN'
+    'http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd'-->
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Page title</title>
+</head>
+<body>
+<!--
+This test is intended to test rel=tag handling for category generation.
+
+Features tested:
+	- tag with final href segment that agrees with text content
+	- tag with final href segment that disagrees with text content
+
+Features not tested:
+	- Handling of tag encodings. URI percent-encoding and space-as-plus
+	  are both specified by rel=tag. These are not supported by the
+	  current hAtom2Atom.xsl.
+
+Scope of possible change:
+	- The output of this test case is not valid atom.
+	  Notably, id and updated elements do not exist at the feed level.
+	- Changes in the hAtom specification may invalidate this test case
+	- Comparisons between actual and controlled test output should not
+	  take order into consideration, except where the atom specification
+	  indicates order is important.
+	- Comparisons between actual and controlled test output should not
+	  consider whitespace important, except where the atom specification
+	  indicates whitespace is important.
+
+-->
+
+<div class="feed">
+<h2 class="title">Feed Title</h2>
+  <div class="entry">
+  <h3>Entry One Title</h3>
+  <p class="updated">2005-12-25T00:00:00Z</p>
+  <a rel="bookmark" href="http://example.com/entry"/>
+  <!-- Lifted from http://technorati.com/help/tags.html -->
+  <a href="http://apple.com/ipod" rel="tag">iPod</a>
+  <a href="http://en.wikipedia.org/wiki/Gravity" rel="tag">Gravity</a>
+  <a href="http://flickr.com/photos/tags/chihuahua" rel="tag">Chihuahua</a>
+  <!-- Hit some more obscure cases -->
+  <a href="http://example.com/foo+bar" rel="tag">bar+baz</a>
+  <a href="http://example.com/foo/bar" rel="tag">bar/baz</a>
+  </div>
+</div>
+
+</body>
+</html>
+

@@ -121,9 +121,9 @@ http://www.ietf.org/rfc/rfc4287
   -->
   <xsl:choose>
   <xsl:when test="descendant::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' feed ')]">
-	<xsl:for-each select="descendant::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' feed ')][1]">
-		<xsl:apply-templates select="."/>
-	</xsl:for-each>
+    <xsl:for-each select="descendant::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' feed ')][1]">
+      <xsl:apply-templates select="."/>
+    </xsl:for-each>
   </xsl:when>
   <xsl:otherwise>
     <xsl:call-template name="feed"/>
@@ -305,9 +305,34 @@ http://www.ietf.org/rfc/rfc4287
   <published><xsl:call-template name="value-of"/></published>
 </xsl:template>
 
+<xsl:template name="extract-tag">
+  <xsl:param name="in"/>
+  <xsl:param name="out"/>
+  <xsl:choose>
+    <xsl:when test="string-length($in) = 0">
+      <xsl:value-of select="$out"/>
+    </xsl:when>
+    <xsl:when test="substring($in,1,1) = '/'">
+      <xsl:call-template name="extract-tag">
+        <xsl:with-param name="in" select="substring($in,2)"/>
+      </xsl:call-template>
+    </xsl:when>
+    <xsl:otherwise>
+      <xsl:call-template name="extract-tag">
+        <xsl:with-param name="in" select="substring($in,2)"/>
+        <xsl:with-param name="out" select="concat($out,substring($in,1,1))"/>
+      </xsl:call-template>
+    </xsl:otherwise>
+  </xsl:choose>
+</xsl:template>
+
 <xsl:template match="xhtml:a[contains(concat(' ',normalize-space(translate(@rel,'TAG','tag')),' '),' tag ')]">
   <category>
-    <xsl:attribute name="term"><xsl:value-of select="@href"/></xsl:attribute>
+    <xsl:attribute name="term">
+      <xsl:call-template name="extract-tag">
+        <xsl:with-param name="in" select="@href"/>
+      </xsl:call-template>
+    </xsl:attribute>
     <xsl:attribute name="label"><xsl:value-of select="."/></xsl:attribute>
   </category>
 </xsl:template>
@@ -319,9 +344,9 @@ http://www.ietf.org/rfc/rfc4287
     <!-- X --><xsl:apply-templates select="." mode="get-lang">
                 <xsl:with-param name="end" select="'entry'" />
               </xsl:apply-templates>
-  	<div xmlns="http://www.w3.org/1999/xhtml">
-		<xsl:copy-of select="child::*|text()" />
-	</div>
+  <div xmlns="http://www.w3.org/1999/xhtml">
+    <xsl:copy-of select="child::*|text()" />
+  </div>
   </summary>
 </xsl:if>
 </xsl:template>
@@ -333,9 +358,9 @@ http://www.ietf.org/rfc/rfc4287
     <!-- X --><xsl:apply-templates select="." mode="get-lang">
                 <xsl:with-param name="end" select="'entry'" />
               </xsl:apply-templates>
-	<div xmlns="http://www.w3.org/1999/xhtml">
-		<xsl:copy-of select="child::*|text()" />
-	</div>
+  <div xmlns="http://www.w3.org/1999/xhtml">
+    <xsl:copy-of select="child::*|text()" />
+  </div>
   </content>
 </xsl:if>
 </xsl:template>
