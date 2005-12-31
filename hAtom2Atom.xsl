@@ -147,6 +147,9 @@ http://www.ietf.org/rfc/rfc4287
 <xsl:template name="feed" match="xhtml:*[contains(concat(' ',normalize-space(@class),' '),' feed ')]">
 <feed>
   <!-- X --> <xsl:apply-templates select="." mode="get-lang" />
+  <!-- X --> <xsl:apply-templates select="." mode="get-base">
+				  <xsl:with-param name="for-feed" select="true()"/>
+			 </xsl:apply-templates>
   <!--TODO: add required id and updated elements-->
   <xsl:variable name="feedLevelElements">
     <xsl:call-template name="feed-level-elements"/>
@@ -197,7 +200,10 @@ http://www.ietf.org/rfc/rfc4287
 <xsl:if test="$where = 'feed'">
 <entry>
   <!-- X --><xsl:apply-templates select="." mode="get-lang">
-              <xsl:with-param name="end">feed</xsl:with-param>
+                <xsl:with-param name="end" select="'feed'" />
+            </xsl:apply-templates>
+  <!-- X --><xsl:apply-templates select="." mode="get-base">
+                <xsl:with-param name="end" select="'feed'" />
             </xsl:apply-templates>
   <!-- Manually deal with the title attribute -->
   <xsl:variable name="entryLevelElements">
@@ -344,9 +350,12 @@ http://www.ietf.org/rfc/rfc4287
     <!-- X --><xsl:apply-templates select="." mode="get-lang">
                 <xsl:with-param name="end" select="'entry'" />
               </xsl:apply-templates>
-  <div xmlns="http://www.w3.org/1999/xhtml">
-    <xsl:copy-of select="child::*|text()" />
-  </div>
+    <!-- X --><xsl:apply-templates select="." mode="get-base">
+                <xsl:with-param name="end" select="'entry'" />
+              </xsl:apply-templates>
+  	<div xmlns="http://www.w3.org/1999/xhtml">
+		<xsl:copy-of select="child::*|text()" />
+	</div>
   </summary>
 </xsl:if>
 </xsl:template>
@@ -358,9 +367,12 @@ http://www.ietf.org/rfc/rfc4287
     <!-- X --><xsl:apply-templates select="." mode="get-lang">
                 <xsl:with-param name="end" select="'entry'" />
               </xsl:apply-templates>
-  <div xmlns="http://www.w3.org/1999/xhtml">
-    <xsl:copy-of select="child::*|text()" />
-  </div>
+    <!-- X --><xsl:apply-templates select="." mode="get-base">
+                <xsl:with-param name="end" select="'entry'" />
+              </xsl:apply-templates>
+	<div xmlns="http://www.w3.org/1999/xhtml">
+		<xsl:copy-of select="child::*|text()" />
+	</div>
   </content>
 </xsl:if>
 </xsl:template>
@@ -386,6 +398,54 @@ http://www.ietf.org/rfc/rfc4287
       <xsl:apply-templates mode="get-lang" select="parent::*">
         <xsl:with-param name="end" select="$end" />
       </xsl:apply-templates>    
+    </xsl:otherwise>
+  </xsl:choose>
+</xsl:template>
+
+<!-- 
+	Walk the tree upwards to find
+	a suitable xml:base
+	If none is found and $for-feed = true()
+	we'll try to use HTML's <base> 
+-->
+<xsl:template match="xhtml:*" mode="get-base">
+  <xsl:param name="for-feed" />
+  <xsl:param name="end" />
+
+  <xsl:choose>
+    <xsl:when test="@xml:base">
+      <xsl:attribute name="xml:base"><xsl:value-of select="@xml:base" /></xsl:attribute>
+    </xsl:when> 
+    <!-- 
+		Are we trying to find the xml:base for <feed>
+		and are we already at the root element?
+	-->
+	<xsl:when test="local-name(.)='html' and $for-feed">
+		<!-- Try to use HTML's <base> -->
+		<xsl:choose>
+			<xsl:when test="/xhtml:html/xhtml:head/xhtml:base[@href]">
+			  <xsl:attribute name="xml:base">
+				  <xsl:value-of select="/xhtml:html/xhtml:head/xhtml:base/@href" />
+			  </xsl:attribute>
+			</xsl:when>		
+			<xsl:otherwise>
+				<!-- TODO: Use source-uri param -->
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:when>
+    <xsl:when test="not($end='')">
+      <xsl:if test="not(contains(concat(' ',normalize-space(@class),' '), concat(' ',$end,' ')))">
+        <xsl:apply-templates mode="get-base" select="parent::*">
+          <xsl:with-param name="end" select="$end" />
+          <xsl:with-param name="for-feed" select="$for-feed" />
+        </xsl:apply-templates>
+      </xsl:if>
+    </xsl:when>
+    <xsl:otherwise>
+        <xsl:apply-templates mode="get-base" select="parent::*">
+          <xsl:with-param name="end" select="$end" />
+          <xsl:with-param name="for-feed" select="$for-feed" />
+        </xsl:apply-templates>
     </xsl:otherwise>
   </xsl:choose>
 </xsl:template>

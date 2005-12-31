@@ -1,16 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"-->
-<html xmlns="http://www.w3.org/1999/xhtml"
-	xml:lang="en"
-	xml:base="http://example.com/blog/"
-	>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 
 <head profile="http://microformats.org/wiki/hcard-profile http://microformats.org/wiki/hatom#XMDP_Profile">
 <title>Html Title</title>
+<base href="http://example.com/acme/" />
 </head>
 
-<body>
+<body xml:base="http://example.com/blog/">
 <!--
 This test is intended to verify that a document containing all supported hAtom
 elements has all such elements correctly translated into atom. It additionally
@@ -116,7 +114,7 @@ Entry One, Summary
 </div>
 
 </div>
-
+<div class="some-wrapper" xml:base="http://example.org/news/2005/12/21">
 <div class="entry" id="entry2">
 <p>Published, <abbr class="published" title="2005-12-21T10:34:00+10:00">Thu, 2005-Dec-21</abbr></p>
 <p>Updated, <abbr class="updated" title="2005-12-21T10:35:00+10:00">Thu, 2005-Dec-21</abbr></p>
@@ -166,6 +164,7 @@ Two</h2>
 	Four</a></dd>
 	<dt>Email</dt> <dd><span class="email">contributorFour@example.com</span></dd>
    </dl>
+</div>
 </div>
 </div>
 </div>
