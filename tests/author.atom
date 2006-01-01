@@ -78,6 +78,11 @@
       <uri>http://example.com/authorTwo</uri>
       <email>authorTwo@example.com</email>
     </author>
+    <author>
+      <name>Entry Four Author Three</name>
+      <uri>http://example.com/authorThree</uri>
+      <email>authorThree@example.com</email>
+    </author>
     <contributor>
       <name>Entry Four Contributor One</name>
       <uri>http://example.com/contributorOne</uri>
@@ -87,6 +92,11 @@
       <name>Entry Four Contributor Two</name>
       <uri>http://example.com/contributorTwo</uri>
       <email>contributorTwo@example.com</email>
+    </contributor>
+    <contributor>
+      <name>Entry Four Contributor Three</name>
+      <uri>http://example.com/contributorThree</uri>
+      <email>contributorThree@example.com</email>
     </contributor>
   </entry>
   <entry>

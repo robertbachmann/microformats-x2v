@@ -294,7 +294,31 @@ http://www.ietf.org/rfc/rfc4287
     </xsl:when>
   </xsl:choose>
   <xsl:if test="descendant-or-self::*[contains(concat(' ',normalize-space(@class),' '),' email ')]">
-    <email><xsl:value-of select="descendant-or-self::*[contains(concat(' ',normalize-space(@class),' '),' email ')]"/></email>
+   <xsl:variable name="context" select="descendant-or-self::*[contains(concat(' ',normalize-space(@class),' '),' email ')][1]"/>
+   <email>
+	    <xsl:choose>
+			<xsl:when test="name($context) = 'a'">		
+				<xsl:choose>
+					<xsl:when test="contains($context/@href,'?')">
+							<xsl:value-of select="
+								substring-before(
+									substring-after($context/@href,'mailto:'),
+									'?')" />
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:value-of select="substring-after($context/@href,'mailto:')" />
+					</xsl:otherwise>
+				</xsl:choose>
+			</xsl:when>
+			<xsl:when test="name($context) = 'img'">
+				<xsl:value-of select="$context/@alt"/>
+			</xsl:when>
+			<xsl:when test="name($context) = 'abbr'">
+				<xsl:value-of select="$context/@title"/>
+			</xsl:when>
+			<xsl:otherwise><xsl:value-of select="$context"/></xsl:otherwise>
+		</xsl:choose>
+   </email>
   </xsl:if>
 </xsl:template>
 

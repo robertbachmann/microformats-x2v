@@ -85,11 +85,15 @@ Scope of possible change:
   <a rel="bookmark" href="http://example.com/entry"/>
   <span class="author vcard">
     <a class="fn url" href="http://example.com/authorOne">Entry Four Author One</a>
-    <span class="email">authorOne@example.com</span>
+    <abbr class="email" title="authorOne@example.com">...</abbr>
   </span>
   <span class="author vcard">
     <a class="fn url" href="http://example.com/authorTwo">Entry Four Author Two</a>
-    <span class="email">authorTwo@example.com</span>
+    <a href="mailto:authorTwo@example.com" class="email">...</a>
+  </span>
+  <span class="author vcard">
+    <a class="fn url" href="http://example.com/authorThree">Entry Four Author Three</a>
+    <a href="mailto:authorThree@example.com?Subject=test" class="email">...</a>
   </span>
   <span class="contributor vcard">
     <a class="fn url" href="http://example.com/contributorOne">Entry Four Contributor One</a>
@@ -98,6 +102,10 @@ Scope of possible change:
   <span class="contributor vcard">
     <a class="fn url" href="http://example.com/contributorTwo">Entry Four Contributor Two</a>
     <span class="email">contributorTwo@example.com</span>
+  </span>
+  <span class="contributor vcard">
+    <a class="fn url" href="http://example.com/contributorThree">Entry Four Contributor Three</a>
+    <img class="email" src="" alt="contributorThree@example.com" />
   </span>
   </div>
 
