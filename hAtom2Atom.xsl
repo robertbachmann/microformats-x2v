@@ -87,16 +87,72 @@ http://www.ietf.org/rfc/rfc4287
 <xsl:output method="xml" indent="yes"/>
 
 <xsl:template name="value-of">
-  <xsl:variable name="context" select="."/>
+  <xsl:param name="context" select="."/>
   <xsl:choose>
     <xsl:when test="name($context)='abbr'">
       <xsl:value-of select="normalize-space($context/@title)"/>
     </xsl:when>
-    <xsl:when test="name($context)='img'">
-      <xsl:value-of select="$context/@alt"/>
+    <xsl:when test="$context/xhtml:*[contains(concat(' ',normalize-space(@class),' '),' value ')]">
+      <xsl:value-of select="normalize-space($context/xhtml:*[contains(concat(' ',normalize-space(@class),' '),' value ')])"/>
     </xsl:when>
     <xsl:otherwise>
       <xsl:value-of select="normalize-space($context)"/>
+    </xsl:otherwise>
+  </xsl:choose>
+</xsl:template>
+
+<xsl:template name="text-value-of">
+  <xsl:param name="context" select="."/>
+  <xsl:choose>
+    <xsl:when test="name($context) = 'img' and $context/@alt">
+      <xsl:value-of select="normalize-space($context/@alt)"/>
+    </xsl:when>
+    <xsl:otherwise>
+      <xsl:call-template name="value-of">
+        <xsl:with-param name="context" select="$context"/>
+      </xsl:call-template>
+    </xsl:otherwise>
+  </xsl:choose>
+</xsl:template>
+
+<xsl:template name="uri-value-of">
+  <xsl:param name="context" select="."/>
+  <xsl:choose>
+    <xsl:when test="name($context) = 'a' and $context/@href">
+      <xsl:value-of select="normalize-space($context/@href)"/>
+    </xsl:when>
+    <xsl:when test="name($context) = 'img' and $context/@src">
+      <xsl:value-of select="normalize-space($context/@src)"/>
+    </xsl:when>
+    <xsl:when test="name($context) = 'object' and $context/@data">
+      <xsl:value-of select="normalize-space($context/@data)"/>
+    </xsl:when>
+    <xsl:otherwise>
+      <xsl:call-template name="value-of">
+        <xsl:with-param name="context" select="$context"/>
+      </xsl:call-template>
+    </xsl:otherwise>
+  </xsl:choose>
+</xsl:template>
+
+<xsl:template name="email-value-of">
+  <xsl:param name="context" select="."/>
+  <xsl:choose>
+    <xsl:when test="name($context) = 'a' and starts-with($context/@href,'mailto:')">
+      <xsl:choose>
+      <xsl:when test="contains($context/@href,'?')">
+        <xsl:value-of select="
+          substring-before(substring-after($context/@href,'mailto:'), '?')"/>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="substring-after($context/@href,'mailto:')"/>
+      </xsl:otherwise>
+      </xsl:choose>
+    </xsl:when>
+    <xsl:otherwise>
+      <xsl:call-template name="text-value-of">
+        <xsl:with-param name="context" select="$context"/>
+      </xsl:call-template>
     </xsl:otherwise>
   </xsl:choose>
 </xsl:template>
@@ -166,12 +222,12 @@ http://www.ietf.org/rfc/rfc4287
   <xsl:choose>
   <xsl:when test="$classTitles">
   <xsl:for-each select="$classTitles[1]">
-    <title><xsl:call-template name="value-of"/></title>
+    <title><xsl:call-template name="text-value-of"/></title>
   </xsl:for-each>
   </xsl:when>
   <xsl:when test="$headerTitles">
   <xsl:for-each select="$headerTitles[1]">
-    <title><xsl:call-template name="value-of"/></title>
+    <title><xsl:call-template name="text-value-of"/></title>
   </xsl:for-each>
   </xsl:when>
   <xsl:otherwise><title/></xsl:otherwise>
@@ -221,12 +277,12 @@ http://www.ietf.org/rfc/rfc4287
   <xsl:choose>
   <xsl:when test="$classTitles">
   <xsl:for-each select="$classTitles[1]">
-    <title><xsl:call-template name="value-of"/></title>
+    <title><xsl:call-template name="text-value-of"/></title>
   </xsl:for-each>
   </xsl:when>
   <xsl:when test="$headerTitles">
   <xsl:for-each select="$headerTitles[1]">
-    <title><xsl:call-template name="value-of"/></title>
+    <title><xsl:call-template name="text-value-of"/></title>
   </xsl:for-each>
   </xsl:when>
   <xsl:otherwise><title/></xsl:otherwise>
@@ -297,31 +353,11 @@ http://www.ietf.org/rfc/rfc4287
     </xsl:when>
   </xsl:choose>
   <xsl:if test="descendant-or-self::*[contains(concat(' ',normalize-space(@class),' '),' email ')]">
-   <xsl:variable name="context" select="descendant-or-self::*[contains(concat(' ',normalize-space(@class),' '),' email ')][1]"/>
-   <email>
-	    <xsl:choose>
-			<xsl:when test="name($context) = 'a'">		
-				<xsl:choose>
-					<xsl:when test="contains($context/@href,'?')">
-							<xsl:value-of select="
-								substring-before(
-									substring-after($context/@href,'mailto:'),
-									'?')" />
-					</xsl:when>
-					<xsl:otherwise>
-						<xsl:value-of select="substring-after($context/@href,'mailto:')" />
-					</xsl:otherwise>
-				</xsl:choose>
-			</xsl:when>
-			<xsl:when test="name($context) = 'img'">
-				<xsl:value-of select="$context/@alt"/>
-			</xsl:when>
-			<xsl:when test="name($context) = 'abbr'">
-				<xsl:value-of select="$context/@title"/>
-			</xsl:when>
-			<xsl:otherwise><xsl:value-of select="$context"/></xsl:otherwise>
-		</xsl:choose>
-   </email>
+  <email>
+  <xsl:call-template name="email-value-of">
+    <xsl:with-param name="context" select="descendant-or-self::*[contains(concat(' ',normalize-space(@class),' '),' email ')][1]"/>
+  </xsl:call-template>
+  </email>
   </xsl:if>
 </xsl:template>
 
@@ -333,7 +369,7 @@ http://www.ietf.org/rfc/rfc4287
     </xsl:for-each>
   </xsl:when>
   <xsl:otherwise>
-    <author><name><xsl:call-template name="value-of"/></name></author>
+    <author><name><xsl:call-template name="text-value-of"/></name></author>
   </xsl:otherwise>
   </xsl:choose>
 </xsl:template>
@@ -346,17 +382,17 @@ http://www.ietf.org/rfc/rfc4287
     </xsl:for-each>
   </xsl:when>
   <xsl:otherwise>
-    <contributor><name><xsl:call-template name="value-of"/></name></contributor>
+    <contributor><name><xsl:call-template name="text-value-of"/></name></contributor>
   </xsl:otherwise>
   </xsl:choose>
 </xsl:template>
 
 <xsl:template match="xhtml:*[contains(concat(' ',normalize-space(@class),' '),' updated ')]">
-  <updated><xsl:call-template name="value-of"/></updated>
+  <updated><xsl:call-template name="text-value-of"/></updated>
 </xsl:template>
 
 <xsl:template match="xhtml:*[contains(concat(' ',normalize-space(@class),' '),' published ')]">
-  <published><xsl:call-template name="value-of"/></published>
+  <published><xsl:call-template name="text-value-of"/></published>
 </xsl:template>
 
 <xsl:template name="extract-tag">
