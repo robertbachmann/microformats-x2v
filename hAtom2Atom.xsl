@@ -92,6 +92,9 @@ http://www.ietf.org/rfc/rfc4287
     <xsl:when test="name($context)='abbr'">
       <xsl:value-of select="normalize-space($context/@title)"/>
     </xsl:when>
+    <xsl:when test="name($context)='img'">
+      <xsl:value-of select="$context/@alt"/>
+    </xsl:when>
     <xsl:otherwise>
       <xsl:value-of select="normalize-space($context)"/>
     </xsl:otherwise>
