@@ -287,17 +287,6 @@ http://www.ietf.org/rfc/rfc4287
   </xsl:when>
   <xsl:otherwise><title/></xsl:otherwise>
   </xsl:choose>
-  <!--
-  Ensure we have an author field, even if we have to go outside
-  the entry to get it.
-
-  Probably should just do feed level author
-  -->
-  <xsl:if test="not(descendant::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' author ')])">
-    <xsl:for-each select="/descendant::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' author ')]">
-      <xsl:call-template name="author"/>
-    </xsl:for-each>
-  </xsl:if>
   <xsl:apply-templates select="node()|@*">
     <xsl:with-param name="where">entry</xsl:with-param>
   </xsl:apply-templates>
