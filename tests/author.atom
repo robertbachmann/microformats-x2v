@@ -5,7 +5,7 @@
     <title>Entry One Title</title>
     <updated>2005-12-25T00:00:00Z</updated>
     <id>http://example.com/entry</id>
-    <link rel="alternate" href="http://example.com/entry" type="text/xhtml"/>
+    <link rel="alternate" href="http://example.com/entry" type="text/html"/>
     <author>
       <name>Entry One Author One</name>
     </author>
@@ -23,7 +23,7 @@
     <title>Entry Two Title</title>
     <updated>2005-12-25T00:00:00Z</updated>
     <id>http://example.com/entry</id>
-    <link rel="alternate" href="http://example.com/entry" type="text/xhtml"/>
+    <link rel="alternate" href="http://example.com/entry" type="text/html"/>
     <author>
       <name>Entry Two Author One</name>
     </author>
@@ -41,7 +41,7 @@
     <title>Entry Three Title</title>
     <updated>2005-12-25T00:00:00Z</updated>
     <id>http://example.com/entry</id>
-    <link rel="alternate" href="http://example.com/entry" type="text/xhtml"/>
+    <link rel="alternate" href="http://example.com/entry" type="text/html"/>
     <author>
       <name>Entry Three Author One</name>
       <uri>http://example.com/authorOne</uri>
@@ -67,7 +67,7 @@
     <title>Entry Four Title</title>
     <updated>2005-12-25T00:00:00Z</updated>
     <id>http://example.com/entry</id>
-    <link rel="alternate" href="http://example.com/entry" type="text/xhtml"/>
+    <link rel="alternate" href="http://example.com/entry" type="text/html"/>
     <author>
       <name>Entry Four Author One</name>
       <uri>http://example.com/authorOne</uri>
@@ -103,7 +103,7 @@
     <title>Entry Five Title</title>
     <updated>2005-12-25T00:00:00Z</updated>
     <id>http://example.com/entry</id>
-    <link rel="alternate" href="http://example.com/entry" type="text/xhtml"/>
+    <link rel="alternate" href="http://example.com/entry" type="text/html"/>
     <author>
       <name>Entry Five Author One</name>
       <uri>http://example.com/authorOne</uri>

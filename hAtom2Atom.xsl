@@ -310,7 +310,7 @@ http://www.ietf.org/rfc/rfc4287
       <xsl:copy/>
     </xsl:for-each>
     <xsl:if test="not(@type)">
-      <xsl:attribute name="type">text/xhtml</xsl:attribute>
+      <xsl:attribute name="type">text/html</xsl:attribute>
     </xsl:if>
   </link>
 </xsl:if>

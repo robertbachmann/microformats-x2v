@@ -17,7 +17,7 @@
 </div>
     </summary>
     <id>entryOne</id>
-    <link rel="alternate" xml:base="http://example.com/" xml:lang="jp" href="entryOne" type="text/xhtml"/>
+    <link rel="alternate" xml:base="http://example.com/" xml:lang="jp" href="entryOne" type="text/html"/>
     <author>
       <name xml:lang="zh">Author One</name>
       <uri xml:base="http://example.com/">authorOne</uri>

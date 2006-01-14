@@ -5,7 +5,7 @@
     <title>Entry One Title</title>
     <updated>2005-12-25T00:00:00Z</updated>
     <id>http://example.com/entry</id>
-    <link rel="alternate" href="http://example.com/entry" type="text/xhtml"/>
+    <link rel="alternate" href="http://example.com/entry" type="text/html"/>
     <category term="ipod" label="iPod"/>
     <category term="Gravity" label="Gravity"/>
     <category term="chihuahua" label="Chihuahua"/>
