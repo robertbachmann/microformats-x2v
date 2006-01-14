@@ -179,8 +179,8 @@ http://www.ietf.org/rfc/rfc4287
   * inside an entry (entry)?
   -->
   <xsl:choose>
-  <xsl:when test="descendant::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' feed ')]">
-    <xsl:for-each select="descendant::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' feed ')][1]">
+  <xsl:when test="descendant::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' hfeed ')]">
+    <xsl:for-each select="descendant::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' hfeed ')][1]">
       <xsl:apply-templates select="."/>
     </xsl:for-each>
   </xsl:when>
@@ -192,7 +192,7 @@ http://www.ietf.org/rfc/rfc4287
 
 <xsl:template name="feed-level-elements">
   <xsl:choose> 
-    <xsl:when test="contains(concat(' ',normalize-space(@class),' '),' entry ')"/>
+    <xsl:when test="contains(concat(' ',normalize-space(@class),' '),' hentry ')"/>
     <xsl:otherwise>
       <xsl:copy>
         <xsl:for-each select="@*|node()">
@@ -203,7 +203,7 @@ http://www.ietf.org/rfc/rfc4287
   </xsl:choose>
 </xsl:template>
 
-<xsl:template name="feed" match="xhtml:*[contains(concat(' ',normalize-space(@class),' '),' feed ')]">
+<xsl:template name="feed" match="xhtml:*[contains(concat(' ',normalize-space(@class),' '),' hfeed ')]">
 <feed>
   <!-- X --> <xsl:apply-templates select="." mode="get-lang" />
   <!-- X --> <xsl:apply-templates select="." mode="get-base">
@@ -254,22 +254,22 @@ http://www.ietf.org/rfc/rfc4287
   </xsl:choose>
 </xsl:template>
 
-<xsl:template match="xhtml:*[contains(concat(' ',normalize-space(@class),' '),' entry ')]">
+<xsl:template match="xhtml:*[contains(concat(' ',normalize-space(@class),' '),' hentry ')]">
 <xsl:param name="where"/>
 <xsl:if test="$where = 'feed'">
 <entry>
   <!-- X --><xsl:apply-templates select="." mode="get-lang">
-                <xsl:with-param name="end" select="'feed'" />
+                <xsl:with-param name="end" select="'hfeed'" />
             </xsl:apply-templates>
   <!-- X --><xsl:apply-templates select="." mode="get-base">
-                <xsl:with-param name="end" select="'feed'" />
+                <xsl:with-param name="end" select="'hfeed'" />
             </xsl:apply-templates>
   <!-- Manually deal with the title attribute -->
   <xsl:variable name="entryLevelElements">
     <xsl:call-template name="entry-level-elements"/>
   </xsl:variable>
   <xsl:variable name="classTitles"
-    select="extension:node-set($entryLevelElements)/descendant-or-self::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' title ')]"
+    select="extension:node-set($entryLevelElements)/descendant-or-self::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' headline ')]"
     />
   <xsl:variable name="headerTitles"
     select="extension:node-set($entryLevelElements)/descendant-or-self::xhtml:h1|extension:node-set($entryLevelElements)/descendant-or-self::xhtml:h2|extension:node-set($entryLevelElements)/descendant-or-self::xhtml:h3|extension:node-set($entryLevelElements)/descendant-or-self::xhtml:h4|extension:node-set($entryLevelElements)/descendant-or-self::xhtml:h5|extension:node-set($entryLevelElements)/descendant-or-self::xhtml:h6"
@@ -301,10 +301,10 @@ http://www.ietf.org/rfc/rfc4287
   <!-- permalink -->
   <link rel="alternate">
     <!-- X --><xsl:apply-templates select="." mode="get-base">
-      <xsl:with-param name="end" select="'entry'" />
+      <xsl:with-param name="end" select="'hentry'" />
     </xsl:apply-templates>
     <!-- X --><xsl:apply-templates select="." mode="get-lang">
-      <xsl:with-param name="end" select="'entry'" />
+      <xsl:with-param name="end" select="'hentry'" />
     </xsl:apply-templates>
     <xsl:for-each select="@href|@type|@hreflang|@title|@length">
       <xsl:copy/>
@@ -319,7 +319,7 @@ http://www.ietf.org/rfc/rfc4287
 <xsl:template name="vcard">
   <name>
     <!-- X --><xsl:apply-templates select="descendant-or-self::*[contains(concat(' ',normalize-space(@class),' '),' fn ')]" mode="get-lang">
-      <xsl:with-param name="end" select="'entry'" />
+      <xsl:with-param name="end" select="'hentry'" />
     </xsl:apply-templates>
     <xsl:value-of select="normalize-space(descendant-or-self::*[contains(concat(' ',normalize-space(@class),' '),' fn ')])"/>
   </name>
@@ -327,7 +327,7 @@ http://www.ietf.org/rfc/rfc4287
     <xsl:when test="descendant-or-self::xhtml:a[contains(concat(' ',normalize-space(@class),' '),' url ')]">
       <uri>
         <!-- X --><xsl:apply-templates select="descendant-or-self::xhtml:a[contains(concat(' ',normalize-space(@class),' '),' url ')]" mode="get-base">
-                    <xsl:with-param name="end" select="'entry'" />
+                    <xsl:with-param name="end" select="'hentry'" />
                   </xsl:apply-templates>
         <xsl:value-of select="descendant-or-self::xhtml:a[contains(concat(' ',normalize-space(@class),' '),' url ')]/@href"/>
       </uri>
@@ -335,7 +335,7 @@ http://www.ietf.org/rfc/rfc4287
     <xsl:when test="descendant-or-self::*[contains(concat(' ',normalize-space(@class),' '),' url ')]">
       <uri>
         <!-- X --><xsl:apply-templates select="descendant-or-self::*[contains(concat(' ',normalize-space(@class),' '),' url ')]" mode="get-base">
-                    <xsl:with-param name="end" select="'entry'" />
+                    <xsl:with-param name="end" select="'hentry'" />
                   </xsl:apply-templates>
         <xsl:value-of select="descendant-or-self::*[contains(concat(' ',normalize-space(@class),' '),' url ')]"/>
       </uri>
@@ -421,10 +421,10 @@ http://www.ietf.org/rfc/rfc4287
 <xsl:if test="$where = 'entry'">
   <summary type="xhtml">
     <!-- X --><xsl:apply-templates select="." mode="get-lang">
-                <xsl:with-param name="end" select="'entry'" />
+                <xsl:with-param name="end" select="'hentry'" />
               </xsl:apply-templates>
     <!-- X --><xsl:apply-templates select="." mode="get-base">
-                <xsl:with-param name="end" select="'entry'" />
+                <xsl:with-param name="end" select="'hentry'" />
               </xsl:apply-templates>
   	<div xmlns="http://www.w3.org/1999/xhtml">
 		<xsl:copy-of select="child::*|text()" />
@@ -438,10 +438,10 @@ http://www.ietf.org/rfc/rfc4287
 <xsl:if test="$where = 'entry'">
   <content type="xhtml">
     <!-- X --><xsl:apply-templates select="." mode="get-lang">
-                <xsl:with-param name="end" select="'entry'" />
+                <xsl:with-param name="end" select="'hentry'" />
               </xsl:apply-templates>
     <!-- X --><xsl:apply-templates select="." mode="get-base">
-                <xsl:with-param name="end" select="'entry'" />
+                <xsl:with-param name="end" select="'hentry'" />
               </xsl:apply-templates>
 	<div xmlns="http://www.w3.org/1999/xhtml">
 		<xsl:copy-of select="child::*|text()" />
