@@ -213,10 +213,10 @@ http://www.ietf.org/rfc/rfc4287
   <xsl:variable name="feedLevelElements">
     <xsl:call-template name="feed-level-elements"/>
   </xsl:variable>
-  <xsl:variable name="classTitles"
+  <!-- X --> <xsl:variable name="classTitles"
     select="extension:node-set($feedLevelElements)/descendant-or-self::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' title ')]"
     />
-  <xsl:variable name="headerTitles"
+  <!-- X --> <xsl:variable name="headerTitles"
     select="extension:node-set($feedLevelElements)/descendant-or-self::xhtml:h1|extension:node-set($feedLevelElements)/descendant-or-self::xhtml:h2|extension:node-set($feedLevelElements)/descendant-or-self::xhtml:h3|extension:node-set($feedLevelElements)/descendant-or-self::xhtml:h4|extension:node-set($feedLevelElements)/descendant-or-self::xhtml:h5|extension:node-set($feedLevelElements)/descendant-or-self::xhtml:h6"
     />
   <xsl:choose>
