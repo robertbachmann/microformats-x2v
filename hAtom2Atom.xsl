@@ -2,7 +2,7 @@
                                 hAtom2Atom.xsl
    An XSLT stylesheet for transforming hAtom documents into Atom documents.
 
-            $Id: hAtom2Atom.xsl 22 2006-02-06 22:06:43Z RobertBachmann $
+            $Id: hAtom2Atom.xsl 23 2006-02-07 17:06:12Z RobertBachmann $
 
                                     LICENSE
 
@@ -267,8 +267,7 @@ This work is based on hAtom2Atom.xsl version 0.0.6 from
 </xsl:template>
 
 <!-- FIX: Implement concatenation rules as specified in hAtom -->
-<!-- FIX: Change class="summary" to class="excerpt" -->
-<xsl:template match="xhtml:*[contains(concat(' ',normalize-space(@class),' '),' summary ')]">
+<xsl:template match="xhtml:*[contains(concat(' ',normalize-space(@class),' '),' excerpt ')]">
   <xsl:param name="where"/>
   <xsl:if test="$where = 'entry'">
     <summary type="xhtml">
@@ -383,7 +382,7 @@ This work is based on hAtom2Atom.xsl version 0.0.6 from
   <xsl:choose>
     <!-- ignore these elements -->
     <xsl:when test="contains(concat(' ',normalize-space(@class),' '),' content ')"/>
-    <xsl:when test="contains(concat(' ',normalize-space(@class),' '),' summary ')"/>
+    <xsl:when test="contains(concat(' ',normalize-space(@class),' '),' excerpt ')"/>
     <xsl:when test="contains(concat(' ',normalize-space(@class),' '),' author ')"/>
     <!--FIX: "contributor" was removed from the hAtom specification -->
     <xsl:when test="contains(concat(' ',normalize-space(@class),' '),' contributor ')"/>
