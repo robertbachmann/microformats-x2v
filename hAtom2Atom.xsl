@@ -2,7 +2,7 @@
                                 hAtom2Atom.xsl
    An XSLT stylesheet for transforming hAtom documents into Atom documents.
 
-            $Id: hAtom2Atom.xsl 23 2006-02-07 17:06:12Z RobertBachmann $
+            $Id: hAtom2Atom.xsl 24 2006-02-07 23:01:05Z RobertBachmann $
 
                                     LICENSE
 
@@ -206,6 +206,47 @@ This work is based on hAtom2Atom.xsl version 0.0.6 from
         <xsl:otherwise><title/></xsl:otherwise>
       </xsl:choose>
 
+      <!--  Manually deal with the "published" element -->
+      <xsl:if test="extension:node-set($entryLevelElements)/descendant::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' published ')]">
+        <published>
+          <!-- 
+            Use the value of the 
+            first element with class="published" 
+            as per hAtom specification 
+          -->
+          <xsl:for-each select="extension:node-set($entryLevelElements)/descendant::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' published ')][1]">
+            <xsl:call-template name="text-value-of" />
+          </xsl:for-each>
+        </published>
+      </xsl:if>
+
+      <!--  Manually deal with the "updated" element -->
+      <updated>
+        <xsl:choose>
+          <xsl:when test="extension:node-set($entryLevelElements)/descendant::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' updated ')]">
+            <!-- 
+              Use the value of the 
+              first element with class="updated" 
+              as per hAtom specification 
+            -->
+            <xsl:for-each select="extension:node-set($entryLevelElements)/descendant::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' updated ')][1]">
+              <xsl:call-template name="text-value-of" />
+            </xsl:for-each>
+          </xsl:when>
+          <!--[extension]-->
+            <!-- If no "updated" is present use the value of the first "published" -->
+            <xsl:when test="extension:node-set($entryLevelElements)/descendant::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' published ')]">				
+              <xsl:for-each select="extension:node-set($entryLevelElements)/descendant::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' published ')][1]">
+                <xsl:call-template name="text-value-of" />
+              </xsl:for-each>
+            </xsl:when>
+          <!--[/extension]-->
+          <xsl:otherwise>
+            <!--ERROR: <updated> is mandatory -->
+          </xsl:otherwise>
+        </xsl:choose>
+      </updated>
+
       <xsl:apply-templates select="node()|@*">
         <xsl:with-param name="where">entry</xsl:with-param>
       </xsl:apply-templates>
@@ -236,14 +277,6 @@ This work is based on hAtom2Atom.xsl version 0.0.6 from
     </link>
     
   </xsl:if>
-</xsl:template>
-
-<xsl:template match="xhtml:*[contains(concat(' ',normalize-space(@class),' '),' updated ')]">
-  <updated><xsl:call-template name="text-value-of"/></updated>
-</xsl:template>
-
-<xsl:template match="xhtml:*[contains(concat(' ',normalize-space(@class),' '),' published ')]">
-  <published><xsl:call-template name="text-value-of"/></published>
 </xsl:template>
 
 <!-- FIX: Implement concatenation rules as specified in hAtom -->

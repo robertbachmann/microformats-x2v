@@ -3,10 +3,10 @@
   <title>Feed One H4 + class=title</title>
   <entry>
     <title>Feed One, Entry One H6 + class=title</title>
+    <updated>2005-12-25T00:00:00Z</updated>
     <author>
       <name>Joe Bloggs</name>
     </author>
-    <updated>2005-12-25T00:00:00Z</updated>
     <id>http://example.com/entry</id>
     <link rel="alternate" href="http://example.com/entry" type="text/html"/>
   </entry>
