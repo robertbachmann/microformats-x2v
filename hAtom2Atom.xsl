@@ -2,7 +2,7 @@
                                 hAtom2Atom.xsl
    An XSLT stylesheet for transforming hAtom documents into Atom documents.
 
-            $Id: hAtom2Atom.xsl 24 2006-02-07 23:01:05Z RobertBachmann $
+            $Id: hAtom2Atom.xsl 25 2006-02-11 22:34:36Z RobertBachmann $
 
                                     LICENSE
 
@@ -417,8 +417,6 @@ This work is based on hAtom2Atom.xsl version 0.0.6 from
     <xsl:when test="contains(concat(' ',normalize-space(@class),' '),' content ')"/>
     <xsl:when test="contains(concat(' ',normalize-space(@class),' '),' excerpt ')"/>
     <xsl:when test="contains(concat(' ',normalize-space(@class),' '),' author ')"/>
-    <!--FIX: "contributor" was removed from the hAtom specification -->
-    <xsl:when test="contains(concat(' ',normalize-space(@class),' '),' contributor ')"/>
     <xsl:otherwise>
       <xsl:copy>
         <xsl:for-each select="@*|node()">
@@ -485,21 +483,6 @@ This work is based on hAtom2Atom.xsl version 0.0.6 from
   </xsl:otherwise>
   </xsl:choose>
 </xsl:template>
-
-<!-- FIX: "contributor" was removed from the hAtom specification -->
-<xsl:template match="xhtml:*[contains(concat(' ',normalize-space(@class),' '),' contributor ')]">
-  <xsl:choose>
-  <xsl:when test="descendant-or-self::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' vcard ')]">
-    <xsl:for-each select="descendant-or-self::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' vcard ')]">
-      <contributor><xsl:call-template name="vcard"/></contributor>
-    </xsl:for-each>
-  </xsl:when>
-  <xsl:otherwise>
-    <contributor><name><xsl:call-template name="text-value-of"/></name></contributor>
-  </xsl:otherwise>
-  </xsl:choose>
-</xsl:template>
-
 
 <!--                      
       Templates for handling rel-tag

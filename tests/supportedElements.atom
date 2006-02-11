@@ -28,16 +28,6 @@ Entry One, Summary
       <uri>http://example.com/authorTwo</uri>
       <email>authorTwo@example.com</email>
     </author>
-    <contributor>
-      <name>Contributor One</name>
-      <uri>http://example.com/contributorOne</uri>
-      <email>contributorOne@example.com</email>
-    </contributor>
-    <contributor>
-      <name>Contributor Two</name>
-      <uri>http://example.com/contributorTwo</uri>
-      <email>contributorTwo@example.com</email>
-    </contributor>
   </entry>
   <entry xml:base="http://example.org/news/2005/12/21">
     <title>Entry Two</title>
@@ -66,15 +56,5 @@ Entry One, Summary
       <uri>http://example.com/authorFour</uri>
       <email>authorFour@example.com</email>
     </author>
-    <contributor>
-      <name>Contributor Three</name>
-      <uri>http://example.com/contributorThree</uri>
-      <email>contributorThree@example.com</email>
-    </contributor>
-    <contributor>
-      <name>Contributor Four</name>
-      <uri>http://example.com/contributorFour</uri>
-      <email>contributorFour@example.com</email>
-    </contributor>
   </entry>
 </feed>

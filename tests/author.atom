@@ -12,12 +12,6 @@
     <author>
       <name>Entry One Author Two</name>
     </author>
-    <contributor>
-      <name>Entry One Contributor One</name>
-    </contributor>
-    <contributor>
-      <name>Entry One Contributor Two</name>
-    </contributor>
   </entry>
   <entry>
     <title>Entry Two Title</title>
@@ -30,12 +24,6 @@
     <author>
       <name>Entry Two Author Two</name>
     </author>
-    <contributor>
-      <name>Entry Two Contributor One</name>
-    </contributor>
-    <contributor>
-      <name>Entry Two Contributor Two</name>
-    </contributor>
   </entry>
   <entry>
     <title>Entry Three Title</title>
@@ -52,16 +40,6 @@
       <uri>http://example.com/authorTwo</uri>
       <email>authorTwo@example.com</email>
     </author>
-    <contributor>
-      <name>Entry Three Contributor One</name>
-      <uri>http://example.com/contributorOne</uri>
-      <email>contributorOne@example.com</email>
-    </contributor>
-    <contributor>
-      <name>Entry Three Contributor Two</name>
-      <uri>http://example.com/contributorTwo</uri>
-      <email>contributorTwo@example.com</email>
-    </contributor>
   </entry>
   <entry>
     <title>Entry Four Title</title>
@@ -83,21 +61,6 @@
       <uri>http://example.com/authorThree</uri>
       <email>authorThree@example.com</email>
     </author>
-    <contributor>
-      <name>Entry Four Contributor One</name>
-      <uri>http://example.com/contributorOne</uri>
-      <email>contributorOne@example.com</email>
-    </contributor>
-    <contributor>
-      <name>Entry Four Contributor Two</name>
-      <uri>http://example.com/contributorTwo</uri>
-      <email>contributorTwo@example.com</email>
-    </contributor>
-    <contributor>
-      <name>Entry Four Contributor Three</name>
-      <uri>http://example.com/contributorThree</uri>
-      <email>contributorThree@example.com</email>
-    </contributor>
   </entry>
   <entry>
     <title>Entry Five Title</title>
@@ -114,15 +77,5 @@
       <uri>http://example.com/authorTwo</uri>
       <email>authorTwo@example.com</email>
     </author>
-    <contributor>
-      <name>Entry Five Contributor One</name>
-      <uri>http://example.com/contributorOne</uri>
-      <email>contributorOne@example.com</email>
-    </contributor>
-    <contributor>
-      <name>Entry Five Contributor Two</name>
-      <uri>http://example.com/contributorTwo</uri>
-      <email>contributorTwo@example.com</email>
-    </contributor>
   </entry>
 </feed>
