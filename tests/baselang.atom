@@ -21,7 +21,7 @@
 </div>
     </summary>
     <author>
-      <name xml:lang="zh">Author One</name>
+      <name>Author One</name>
       <uri>http://example.com/authorOne</uri>
       <email>authorOne@example.com</email>
     </author>

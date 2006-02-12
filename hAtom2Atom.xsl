@@ -2,7 +2,7 @@
                                 hAtom2Atom.xsl
    An XSLT stylesheet for transforming hAtom documents into Atom documents.
 
-            $Id: hAtom2Atom.xsl 26 2006-02-12 19:51:51Z RobertBachmann $
+            $Id: hAtom2Atom.xsl 28 2006-02-12 20:23:19Z RobertBachmann $
 
                                     LICENSE
 
@@ -542,12 +542,6 @@ This work is based on hAtom2Atom.xsl version 0.0.6 from
     </xsl:apply-templates>
   </xsl:variable>    
   <name>
-    <!--[extension]-->
-      <!-- FIX: xml:lang not allowed for <name> -->
-      <xsl:apply-templates select="descendant-or-self::*[contains(concat(' ',normalize-space(@class),' '),' fn ')]" mode="add-lang-attribute">
-        <xsl:with-param name="end" select="'hentry'" />
-      </xsl:apply-templates>
-    <!--[/extension]-->
     <xsl:value-of select="normalize-space(descendant-or-self::*[contains(concat(' ',normalize-space(@class),' '),' fn ')])"/>
   </name>
   <xsl:choose>
