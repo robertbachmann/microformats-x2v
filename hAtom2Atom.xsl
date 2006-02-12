@@ -2,7 +2,7 @@
                                 hAtom2Atom.xsl
    An XSLT stylesheet for transforming hAtom documents into Atom documents.
 
-            $Id: hAtom2Atom.xsl 25 2006-02-11 22:34:36Z RobertBachmann $
+            $Id: hAtom2Atom.xsl 26 2006-02-12 19:51:51Z RobertBachmann $
 
                                     LICENSE
 
@@ -63,8 +63,9 @@ This work is based on hAtom2Atom.xsl version 0.0.6 from
                xmlns:xhtml="http://www.w3.org/1999/xhtml"
                xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                xmlns:extension="http://exslt.org/common"
+               xmlns:uri ="http://www.w3.org/2000/07/uri43/uri.xsl?template="
                extension-element-prefixes="extension"
-               exclude-result-prefixes="xhtml">
+               exclude-result-prefixes="xhtml uri">
 <!-- 
     node-set() for Microsoft's XML, .net's System.xml and Oracle's XDK
 
@@ -80,6 +81,13 @@ This work is based on hAtom2Atom.xsl version 0.0.6 from
     with
         xmlns:extension="http://www.oracle.com/XSL/Transform/java"
 -->
+
+
+<!-- Downloaded from http://www.w3.org/2000/07/uri43/uri.xsl -->
+<xsl:import href="uri.xsl" />
+
+<xsl:param name="source-uri">http://example.org/Only-used-for-testing/</xsl:param>
+<xsl:param name="content-type">text/html</xsl:param>
 
 <xsl:output method="xml" indent="yes"/>
 
@@ -118,20 +126,77 @@ This work is based on hAtom2Atom.xsl version 0.0.6 from
 
 <xsl:template name="feed" match="xhtml:*[contains(concat(' ',normalize-space(@class),' '),' hfeed ')]">
   <feed>
-    <!--[extension]--> 
-      <xsl:apply-templates select="." mode="get-lang" />
+    <xsl:variable name="feed-base">
       <xsl:apply-templates select="." mode="get-base">
+        <xsl:with-param name="fallback" select="/xhtml:html/xhtml:head/xhtml:base[1]/@href" />
+      </xsl:apply-templates>
+    </xsl:variable>    
+
+  <!--[extension]--> 
+      <xsl:apply-templates select="." mode="add-lang-attribute" />
+      <xsl:apply-templates select="." mode="add-base-attribute">
         <xsl:with-param name="for-feed" select="true()" />
       </xsl:apply-templates>
     <!--[/extension]--> 
     
-    <!-- TODO: add required id and updated elements -->
-    
+    <!-- TODO: add required updated element -->
+
     <xsl:variable name="feedLevelElements">
       <xsl:call-template name="feed-level-elements"/>
     </xsl:variable>
     
-    <!--    Extract feed title    -->
+    <!-- Extract feed id and link -->
+    <!--[extension]-->
+      <xsl:choose>
+        <!-- If there is an element with class="bookmark" at the feed level use it -->
+        <xsl:when test="extension:node-set($feedLevelElements)/descendant::xhtml:a[
+            contains(concat(' ',normalize-space(translate(@rel,'BOKMAR','bokmar')),' '),' bookmark ')
+            ][1]">
+          <xsl:variable name="uri">
+            <xsl:call-template name="uri:expand">
+              <xsl:with-param name="base">
+                <xsl:apply-templates select="extension:node-set($feedLevelElements)/descendant::xhtml:a[
+                    contains(concat(' ',normalize-space(translate(@rel,'BOKMAR','bokmar')),' '),' bookmark ')][1]" 
+                    mode="get-base">
+                   <xsl:with-param name="fallback" select="$feed-base" />
+                 </xsl:apply-templates>
+               </xsl:with-param>
+               <xsl:with-param name="there">
+                 <xsl:value-of select="extension:node-set($feedLevelElements)/descendant::xhtml:a[
+                   contains(concat(' ',normalize-space(translate(@rel,'BOKMAR','bokmar')),' '),' bookmark ')
+                 ][1]/@href" />
+               </xsl:with-param>
+             </xsl:call-template>
+          </xsl:variable>
+          <id><xsl:value-of select="$uri" /></id>
+          <link rel="alternate" href="{$uri}">
+            <xsl:for-each select="extension:node-set($feedLevelElements)/descendant::xhtml:a[
+              contains(concat(' ',normalize-space(translate(@rel,'BOKMAR','bokmar')),' '),' bookmark ')][1]">
+              <xsl:for-each select="@type|@hreflang|@title|@length">
+                <xsl:copy />
+              </xsl:for-each>
+              <xsl:if test="not(@type)">
+                <xsl:attribute name="type"><xsl:value-of select="$content-type" /></xsl:attribute>
+              </xsl:if>
+            </xsl:for-each>
+          </link>
+        </xsl:when>
+        <!-- If the feed has an ID attribute use it thogether with $source-uri -->
+        <xsl:when test="@id">
+          <xsl:variable name="uri" select="concat($source-uri,'#',@id)"/>
+          <id><xsl:value-of select="$uri"/></id>
+          <link rel="alternate" href="{$uri}" type="{$content-type}"/>
+        </xsl:when>
+        <!-- Use the $source-uri of the feed -->
+        <xsl:otherwise>
+          <xsl:variable name="uri" select="$source-uri"/>
+          <id><xsl:value-of select="$uri"/></id>
+          <link rel="alternate" href="{$uri}" type="{$content-type}"/>
+        </xsl:otherwise>
+      </xsl:choose>
+    <!--[/extension]-->
+    
+    <!-- Extract feed title    -->
     
     <!--[extension]--> 
       <xsl:variable name="classTitles"
@@ -168,12 +233,17 @@ This work is based on hAtom2Atom.xsl version 0.0.6 from
 <xsl:template match="xhtml:*[contains(concat(' ',normalize-space(@class),' '),' hentry ')]">
   <xsl:param name="where"/>
   <xsl:if test="$where = 'feed'">
+  <xsl:variable name="entry-base">
+    <xsl:apply-templates select="." mode="get-base">
+      <xsl:with-param name="fallback" select="/xhtml:html/xhtml:head/xhtml:base[1]/@href" />
+    </xsl:apply-templates>
+  </xsl:variable>
     <entry>
       <!--[extension]-->
-        <xsl:apply-templates select="." mode="get-lang">
+        <xsl:apply-templates select="." mode="add-lang-attribute">
           <xsl:with-param name="end" select="'hfeed'" />
         </xsl:apply-templates>
-        <xsl:apply-templates select="." mode="get-base">
+        <xsl:apply-templates select="." mode="add-base-attribute">
           <xsl:with-param name="end" select="'hfeed'" />
         </xsl:apply-templates>
       <!--[/extension]-->
@@ -206,6 +276,69 @@ This work is based on hAtom2Atom.xsl version 0.0.6 from
         <xsl:otherwise><title/></xsl:otherwise>
       </xsl:choose>
 
+      <!--  Manually deal with the "id" and the "link" element -->
+      <xsl:choose>
+        <xsl:when test="extension:node-set($entryLevelElements)/descendant::xhtml:a[contains(concat(' ',normalize-space(translate(@rel,'BOKMAR','bokmar')),' '),' bookmark ')]">
+          <!-- Convert to absolute URI -->
+          <xsl:variable name="uri">
+            <xsl:call-template name="uri:expand">
+              <xsl:with-param name="base">
+                <xsl:apply-templates select="extension:node-set($entryLevelElements)/descendant::xhtml:a[
+                  contains(concat(' ',normalize-space(translate(@rel,'BOKMAR','bokmar')),' '),' bookmark ')][1]" 
+                  mode="get-base">
+                  <xsl:with-param name="fallback" select="$entry-base" />
+                </xsl:apply-templates>
+              </xsl:with-param>
+              <xsl:with-param name="there">
+                <xsl:value-of select="extension:node-set($entryLevelElements)/descendant::xhtml:a[
+                  contains(concat(' ',normalize-space(translate(@rel,'BOKMAR','bokmar')),' '),' bookmark ')
+                  ][1]/@href" />
+              </xsl:with-param>
+            </xsl:call-template>
+          </xsl:variable>
+          <id><xsl:value-of select="$uri" /></id>
+          <link rel="alternate" href="{$uri}">
+            <xsl:for-each select="extension:node-set($entryLevelElements)/descendant::xhtml:a[
+            contains(concat(' ',normalize-space(translate(@rel,'BOKMAR','bokmar')),' '),' bookmark ')][1]
+            ">
+              <xsl:for-each select="@type|@hreflang|@title|@length">
+                <xsl:copy />
+              </xsl:for-each>
+              <xsl:if test="not(@type)">
+                <xsl:attribute name="type"><xsl:value-of select="$content-type" /></xsl:attribute>
+              </xsl:if>
+            </xsl:for-each>
+          </link>
+        </xsl:when>
+      <!--[extension]-->
+        <!-- Try to use the entry's id attribute as ID -->
+        <xsl:when test="@id != ''">
+          <id>
+            <!-- Convert to absolute URI -->
+            <xsl:call-template name="uri:expand">
+              <xsl:with-param name="base" select="$entry-base" />
+              <xsl:with-param name="there" select="concat('#',@id)" />
+            </xsl:call-template>
+          </id>
+        </xsl:when>
+        <!-- Try to use the entry's name attribute as ID -->
+        <xsl:when test="@name != ''">
+          <id>
+            <!-- Convert to absolute URI -->
+            <xsl:call-template name="uri:expand">
+              <xsl:with-param name="base" select="$entry-base" />
+              <xsl:with-param name="there" select="concat('#',@name)" />
+            </xsl:call-template>
+          </id>
+        </xsl:when>
+      <!--[/extension]-->
+        <xsl:otherwise>
+          <!--ERROR: <id> is mandatory -->
+          <id/>
+        </xsl:otherwise>
+      </xsl:choose>
+
+
       <!--  Manually deal with the "published" element -->
       <xsl:if test="extension:node-set($entryLevelElements)/descendant::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' published ')]">
         <published>
@@ -235,7 +368,7 @@ This work is based on hAtom2Atom.xsl version 0.0.6 from
           </xsl:when>
           <!--[extension]-->
             <!-- If no "updated" is present use the value of the first "published" -->
-            <xsl:when test="extension:node-set($entryLevelElements)/descendant::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' published ')]">				
+            <xsl:when test="extension:node-set($entryLevelElements)/descendant::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' published ')]">
               <xsl:for-each select="extension:node-set($entryLevelElements)/descendant::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' published ')][1]">
                 <xsl:call-template name="text-value-of" />
               </xsl:for-each>
@@ -254,41 +387,16 @@ This work is based on hAtom2Atom.xsl version 0.0.6 from
   </xsl:if>
 </xsl:template>
 
-<xsl:template match="xhtml:a[contains(concat(' ',normalize-space(translate(@rel,'BOKMAR','bokmar')),' '),' bookmark ')]">
-  <xsl:param name="where"/>
-  <xsl:if test="$where = 'entry'">
-    
-    <!-- TODO: Make @href absolute -->
-    <id><xsl:value-of select="@href"/></id>
-    
-    <link rel="alternate">
-      <!-- X --><xsl:apply-templates select="." mode="get-base">
-        <xsl:with-param name="end" select="'hentry'" />
-      </xsl:apply-templates>
-      <!-- X --><xsl:apply-templates select="." mode="get-lang">
-        <xsl:with-param name="end" select="'hentry'" />
-      </xsl:apply-templates>
-      <xsl:for-each select="@href|@type|@hreflang|@title|@length">
-        <xsl:copy/>
-      </xsl:for-each>
-      <xsl:if test="not(@type)">
-        <xsl:attribute name="type">text/html</xsl:attribute>
-      </xsl:if>
-    </link>
-    
-  </xsl:if>
-</xsl:template>
-
 <!-- FIX: Implement concatenation rules as specified in hAtom -->
 <xsl:template match="xhtml:*[contains(concat(' ',normalize-space(@class),' '),' content ')]">
   <xsl:param name="where"/>
   <xsl:if test="$where = 'entry'">
     <content type="xhtml">
       <!--[extension]-->
-        <xsl:apply-templates select="." mode="get-lang">
+        <xsl:apply-templates select="." mode="add-lang-attribute">
           <xsl:with-param name="end" select="'hentry'" />
         </xsl:apply-templates>
-        <xsl:apply-templates select="." mode="get-base">
+        <xsl:apply-templates select="." mode="add-base-attribute">
           <xsl:with-param name="end" select="'hentry'" />
         </xsl:apply-templates>
       <!--[/extension]-->
@@ -305,10 +413,10 @@ This work is based on hAtom2Atom.xsl version 0.0.6 from
   <xsl:if test="$where = 'entry'">
     <summary type="xhtml">
       <!--[extension]-->
-        <xsl:apply-templates select="." mode="get-lang">
+        <xsl:apply-templates select="." mode="add-lang-attribute">
           <xsl:with-param name="end" select="'hentry'" />
         </xsl:apply-templates>
-        <xsl:apply-templates select="." mode="get-base">
+        <xsl:apply-templates select="." mode="add-base-attribute">
           <xsl:with-param name="end" select="'hentry'" />
         </xsl:apply-templates>
       <!--[/extension]-->
@@ -428,37 +536,53 @@ This work is based on hAtom2Atom.xsl version 0.0.6 from
 </xsl:template>
 
 <xsl:template name="vcard">
+  <xsl:variable name="vcard-base">
+    <xsl:apply-templates select="." mode="get-base">
+      <xsl:with-param name="fallback" select="/xhtml:html/xhtml:head/xhtml:base[1]/@href" />
+    </xsl:apply-templates>
+  </xsl:variable>    
   <name>
     <!--[extension]-->
       <!-- FIX: xml:lang not allowed for <name> -->
-      <xsl:apply-templates select="descendant-or-self::*[contains(concat(' ',normalize-space(@class),' '),' fn ')]" mode="get-lang">
+      <xsl:apply-templates select="descendant-or-self::*[contains(concat(' ',normalize-space(@class),' '),' fn ')]" mode="add-lang-attribute">
         <xsl:with-param name="end" select="'hentry'" />
       </xsl:apply-templates>
     <!--[/extension]-->
     <xsl:value-of select="normalize-space(descendant-or-self::*[contains(concat(' ',normalize-space(@class),' '),' fn ')])"/>
   </name>
-  <!-- FIX: need to use absolute URI here because xml:base is not allowed for <uri> -->
   <xsl:choose>
     <xsl:when test="descendant-or-self::xhtml:a[contains(concat(' ',normalize-space(@class),' '),' url ')]">
       <uri>
-        <!--[extension]-->
-          <!-- FIX: xml:base not allowed for <uri> -->
-          <xsl:apply-templates select="descendant-or-self::xhtml:a[contains(concat(' ',normalize-space(@class),' '),' url ')]" mode="get-base">
-            <xsl:with-param name="end" select="'hentry'" />
-          </xsl:apply-templates>
-          <xsl:value-of select="descendant-or-self::xhtml:a[contains(concat(' ',normalize-space(@class),' '),' url ')]/@href"/>
-        <!--[/extension]-->
+        <xsl:call-template name="uri:expand">
+          <xsl:with-param name="base">
+            <xsl:apply-templates select="descendant-or-self::xhtml:a[
+              contains(concat(' ',normalize-space(@class),' '),' url ')]" 
+              mode="get-base">
+              <xsl:with-param name="fallback" select="$vcard-base" />
+            </xsl:apply-templates>
+          </xsl:with-param>
+          <xsl:with-param name="there">
+            <xsl:value-of select="descendant-or-self::xhtml:a[
+              contains(concat(' ',normalize-space(@class),' '),' url ')]/@href" />
+          </xsl:with-param>
+        </xsl:call-template>
       </uri>
     </xsl:when>
     <xsl:when test="descendant-or-self::*[contains(concat(' ',normalize-space(@class),' '),' url ')]">
       <uri>
-        <!--[extension]-->
-          <!-- FIX: xml:base not allowed for <uri> -->
-            <xsl:apply-templates select="descendant-or-self::*[contains(concat(' ',normalize-space(@class),' '),' url ')]" mode="get-base">
-              <xsl:with-param name="end" select="'hentry'" />
+        <xsl:call-template name="uri:expand">
+          <xsl:with-param name="base">
+            <xsl:apply-templates select="descendant-or-self::xhtml:*[
+              contains(concat(' ',normalize-space(@class),' '),' url ')]" 
+              mode="get-base">
+              <xsl:with-param name="fallback" select="$vcard-base" />
             </xsl:apply-templates>
-         <!--[/extension]-->
-         <xsl:value-of select="descendant-or-self::*[contains(concat(' ',normalize-space(@class),' '),' url ')]"/>
+          </xsl:with-param>
+          <xsl:with-param name="there">
+            <xsl:value-of select="descendant-or-self::xhtml:*[
+              contains(concat(' ',normalize-space(@class),' '),' url ')]" />
+          </xsl:with-param>
+        </xsl:call-template>
       </uri>
     </xsl:when>
   </xsl:choose>
@@ -528,7 +652,7 @@ This work is based on hAtom2Atom.xsl version 0.0.6 from
   TODO: If no one was found and $for-feed is true try to
   use the $source-lang stylesheet parameter.
 -->
-<xsl:template match="xhtml:*" mode="get-lang">
+<xsl:template match="xhtml:*" mode="add-lang-attribute">
   <xsl:param name="end" />
   <xsl:choose>
     <xsl:when test="@xml:lang">
@@ -539,13 +663,13 @@ This work is based on hAtom2Atom.xsl version 0.0.6 from
     </xsl:when>
     <xsl:when test="not($end='')">
       <xsl:if test="not(contains(concat(' ',normalize-space(@class),' '), concat(' ',$end,' ')))">
-        <xsl:apply-templates mode="get-lang" select="parent::*">
+        <xsl:apply-templates mode="add-lang-attribute" select="parent::*">
           <xsl:with-param name="end" select="$end" />
         </xsl:apply-templates>
       </xsl:if>
     </xsl:when>
     <xsl:otherwise>
-      <xsl:apply-templates mode="get-lang" select="parent::*">
+      <xsl:apply-templates mode="add-lang-attribute" select="parent::*">
         <xsl:with-param name="end" select="$end" />
       </xsl:apply-templates>    
     </xsl:otherwise>
@@ -556,11 +680,10 @@ This work is based on hAtom2Atom.xsl version 0.0.6 from
   Walk the tree upwards to find
   a suitable xml:base.
   If none is found and $for-feed = true()
-  try to use HTML's <base>.
-  TODO: If no HTML <base> is present try to use
-  use the $source-base stylesheet parameter.
+  try to use HTML's <base>. (If no HTML <base> is present try to use
+  use the $source-uri stylesheet parameter.)
 -->
-<xsl:template match="xhtml:*" mode="get-base">
+<xsl:template match="xhtml:*" mode="add-base-attribute">
   <xsl:param name="for-feed" />
   <xsl:param name="end" />
   <xsl:choose>
@@ -580,26 +703,60 @@ This work is based on hAtom2Atom.xsl version 0.0.6 from
           </xsl:attribute>
         </xsl:when>    
         <xsl:otherwise>
-          <!-- TODO: Use $source-uri param -->
+          <xsl:attribute name="xml:base">
+            <xsl:value-of select="$source-uri" />
+          </xsl:attribute>
         </xsl:otherwise>
       </xsl:choose>
     </xsl:when>
     <xsl:when test="not($end='')">
       <xsl:if test="not(contains(concat(' ',normalize-space(@class),' '), concat(' ',$end,' ')))">
-        <xsl:apply-templates mode="get-base" select="parent::*">
+        <xsl:apply-templates mode="add-base-attribute" select="parent::*">
           <xsl:with-param name="end" select="$end" />
           <xsl:with-param name="for-feed" select="$for-feed" />
         </xsl:apply-templates>
       </xsl:if>
     </xsl:when>
     <xsl:otherwise>
-      <xsl:apply-templates mode="get-base" select="parent::*">
+      <xsl:apply-templates mode="add-base-attribute" select="parent::*">
         <xsl:with-param name="end" select="$end" />
         <xsl:with-param name="for-feed" select="$for-feed" />
       </xsl:apply-templates>
     </xsl:otherwise>
   </xsl:choose>
 </xsl:template>
+
+
+<!-- 
+  Get the xml:base for the current element 
+  If no xml:base is present use the value of $fallback.
+  If $fallback = "" then use the value of $source-uri
+-->
+<xsl:template match="*" mode="get-base">
+  <xsl:param name="fallback" />
+
+  <xsl:choose>
+    <xsl:when test="@xml:base">
+      <xsl:value-of select="@xml:base" />
+    </xsl:when> 
+    <!-- 
+      Are we trying to find the xml:base for <feed>
+      and are we already at the root element?
+    -->
+    <xsl:when test="not(parent::*)">
+      <xsl:choose>
+        <xsl:when test="$fallback != ''"><xsl:value-of select="$fallback" /></xsl:when>
+        <xsl:otherwise><xsl:value-of select="$source-uri" /></xsl:otherwise>
+      </xsl:choose>
+    </xsl:when>
+    <xsl:otherwise>
+      <xsl:apply-templates mode="get-base" select="parent::*">
+        <xsl:with-param name="fallback" select="$fallback" />
+      </xsl:apply-templates>
+    </xsl:otherwise>
+  </xsl:choose>
+</xsl:template>
+
 
 </xsl:transform>
 

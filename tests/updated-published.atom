@@ -1,12 +1,16 @@
 <?xml version="1.0"?>
-<feed xmlns="http://www.w3.org/2005/Atom">
+<feed xmlns="http://www.w3.org/2005/Atom" xml:base="http://example.org/Only-used-for-testing/">
+  <id>http://example.org/Only-used-for-testing/</id>
+  <link rel="alternate" href="http://example.org/Only-used-for-testing/" type="text/html"/>
   <title>Feed Title</title>
   <entry>
     <title>Title ...</title>
+    <id/>
     <updated>2006-02-07T01:02:03Z</updated>
   </entry>
   <entry>
     <title>Title ...</title>
+    <id/>
     <updated>2006-02-07T04:05:06Z</updated>
     <content type="xhtml">
       <div xmlns="http://www.w3.org/1999/xhtml">
@@ -16,16 +20,19 @@
   </entry>
   <entry>
     <title>Title ...</title>
+    <id/>
     <published>2006-02-07T04:07:07Z</published>
     <updated>2006-02-07T04:07:07Z</updated>
   </entry>
   <entry>
     <title>Title ...</title>
+    <id/>
     <published>2006-02-07T04:07:07Z</published>
     <updated>2006-02-07T04:08:50Z</updated>
   </entry>
   <entry>
     <title>Title ...</title>
+    <id/>
     <published>2006-02-07T08:09:10Z</published>
     <updated>2006-02-07T08:09:10Z</updated>
   </entry>
