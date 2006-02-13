@@ -1,5 +1,6 @@
 <?xml version="1.0"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en" xml:base="http://example.com/blog/">
+  <updated>2006-02-13T22:21:55+0100</updated>
   <id>http://example.org/Only-used-for-testing/</id>
   <link rel="alternate" href="http://example.org/Only-used-for-testing/" type="text/html"/>
   <title>Blog Title</title>

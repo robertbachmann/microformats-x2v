@@ -1,5 +1,6 @@
 <?xml version="1.0"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xml:base="http://example.org/foo/">
+  <updated/>
   <id>http://example.org/foo/feedlink</id>
   <link rel="alternate" href="http://example.org/foo/feedlink" type="text/html"/>
   <title>Feed Title</title>

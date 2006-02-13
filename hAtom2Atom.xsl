@@ -2,7 +2,7 @@
                                 hAtom2Atom.xsl
    An XSLT stylesheet for transforming hAtom documents into Atom documents.
 
-            $Id: hAtom2Atom.xsl 28 2006-02-12 20:23:19Z RobertBachmann $
+            $Id: hAtom2Atom.xsl 29 2006-02-13 21:43:44Z RobertBachmann $
 
                                     LICENSE
 
@@ -132,19 +132,39 @@ This work is based on hAtom2Atom.xsl version 0.0.6 from
       </xsl:apply-templates>
     </xsl:variable>    
 
-  <!--[extension]--> 
+    <!--[extension]--> 
       <xsl:apply-templates select="." mode="add-lang-attribute" />
       <xsl:apply-templates select="." mode="add-base-attribute">
         <xsl:with-param name="for-feed" select="true()" />
       </xsl:apply-templates>
     <!--[/extension]--> 
     
-    <!-- TODO: add required updated element -->
 
     <xsl:variable name="feedLevelElements">
       <xsl:call-template name="feed-level-elements"/>
     </xsl:variable>
-    
+
+    <!-- Extract feed updated -->    
+    <!--[extension]-->
+      <updated>
+        <xsl:choose >
+          <!-- Try to use the first element with class="updated" at the feed level -->
+          <xsl:when test="extension:node-set($feedLevelElements)/descendant::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' updated ')]">
+            <xsl:for-each select="extension:node-set($feedLevelElements)/descendant::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' updated ')][1]">
+              <xsl:call-template name="text-value-of" />
+            </xsl:for-each>
+          </xsl:when>
+          <!-- TODO: When there is no element with class="updated" at the feed level 
+               We might want to try to use the element from the entry level
+               with the greatest (newest) date-time 
+          -->
+          <xsl:otherwise>
+            <!--ERROR: <updated> is required for feed -->
+          </xsl:otherwise>
+        </xsl:choose>
+      </updated>
+    <!--[/extension]-->    
+
     <!-- Extract feed id and link -->
     <!--[extension]-->
       <xsl:choose>
