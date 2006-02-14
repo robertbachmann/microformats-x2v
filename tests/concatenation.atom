@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en-UK" xml:base="http://example.com/abc">
+  <updated/>
+  <id>http://example.org/Only-used-for-testing/</id>
+  <link rel="alternate" href="http://example.org/Only-used-for-testing/" type="text/html"/>
+  <title>Feed Title</title>
+  <entry xml:lang="en-UK" xml:base="http://example.com/abc">
+    <title>Title ...</title>
+    <id/>
+    <published>2006-02-07T01:02:03Z</published>
+    <updated>2006-02-07T01:02:03Z</updated>
+    <summary type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">Summary #1 Summary #2 Summary #3 Summary #4 Summary <strong>#5</strong></div>
+    </summary>
+    <content type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">Content <b>#1</b> Content #2 Content <b>#3</b>Content #4Content <b>#5</b></div>
+    </content>
+  </entry>
+  <entry xml:lang="de" xml:base="http://example.com/abc">
+    <title>Title ...</title>
+    <id/>
+    <published>2006-02-07T02:03:03Z</published>
+    <updated>2006-02-07T02:03:03Z</updated>
+    <summary type="xhtml" xml:lang="fr" xml:base="http://example.com/">
+      <div xmlns="http://www.w3.org/1999/xhtml">Content #1 and Summary #1 Summary <a href="./">#2</a> Summary #3 Summary #4 Summary #5</div>
+    </summary>
+    <content type="xhtml" xml:lang="fr" xml:base="http://example.com/">
+      <div xmlns="http://www.w3.org/1999/xhtml">Content #1 and Summary #1 Content #2 Content <b>#3</b> Content #4 Content <b>#5</b></div>
+    </content>
+  </entry>
+  <entry xml:lang="en-UK" xml:base="http://example.com/abc">
+    <title>Title ...</title>
+    <id/>
+    <published>2006-02-07T02:03:03Z</published>
+    <updated>2006-02-07T02:03:03Z</updated>
+    <summary type="xhtml" xml:lang="de">
+      <div xmlns="http://www.w3.org/1999/xhtml">Content #1 and Summary #1 Summary <a href="./">#2</a> Summary #3 Summary #4</div>
+    </summary>
+    <content type="xhtml" xml:lang="de">
+      <div xmlns="http://www.w3.org/1999/xhtml">Content #1 and Summary #1 Content #2 Content <b>#3</b> Content #4 Content <b>#5</b> This is <strong class="excerpt">not a summary</strong>... </div>
+    </content>
+  </entry>
+  <entry xml:lang="en-UK" xml:base="http://example.com/abc">
+    <title/>
+    <id/>
+    <published>2006-02-07T02:03:55Z</published>
+    <updated>2006-02-07T02:03:55Z</updated>
+    <content type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">
+      abc abc abc abc abc abc
+      John Doe</div>
+    </content>
+    <author>
+      <name>John Doe</name>
+    </author>
+  </entry>
+</feed>

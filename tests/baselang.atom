@@ -9,18 +9,18 @@
     <id>http://example.com/entryOne</id>
     <link rel="alternate" href="http://example.com/entryOne" type="text/html"/>
     <updated>2005-12-22T10:35:00+10:00</updated>
-    <content type="xhtml" xml:lang="fr" xml:base="http://example.com/blog/">
-      <div xmlns="http://www.w3.org/1999/xhtml">
-<p>Entry One, Paragraph One</p>
-<p xml:base="http://example.com/blog/2/" xml:lang="en-GB">Entry One, Paragraph Two</p>
-</div>
-    </content>
     <summary type="xhtml" xml:lang="fr" xml:base="http://example.com/blog/">
       <div xmlns="http://www.w3.org/1999/xhtml">
 <p>Entry One, Paragraph One</p>
 <p xml:base="http://example.com/blog/2/" xml:lang="en-GB">Entry One, Paragraph Two</p>
 </div>
     </summary>
+    <content type="xhtml" xml:lang="fr" xml:base="http://example.com/blog/">
+      <div xmlns="http://www.w3.org/1999/xhtml">
+<p>Entry One, Paragraph One</p>
+<p xml:base="http://example.com/blog/2/" xml:lang="en-GB">Entry One, Paragraph Two</p>
+</div>
+    </content>
     <author>
       <name>Author One</name>
       <uri>http://example.com/authorOne</uri>

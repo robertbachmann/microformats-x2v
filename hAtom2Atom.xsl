@@ -2,7 +2,7 @@
                                 hAtom2Atom.xsl
    An XSLT stylesheet for transforming hAtom documents into Atom documents.
 
-            $Id: hAtom2Atom.xsl 29 2006-02-13 21:43:44Z RobertBachmann $
+            $Id: hAtom2Atom.xsl 30 2006-02-14 17:36:26Z RobertBachmann $
 
                                     LICENSE
 
@@ -400,50 +400,65 @@ This work is based on hAtom2Atom.xsl version 0.0.6 from
         </xsl:choose>
       </updated>
 
+      <xsl:variable name="entryLevelElements_excerpt">
+        <xsl:call-template name="entry-level-elements">
+          <xsl:with-param name="include">excerpt</xsl:with-param>
+        </xsl:call-template>
+      </xsl:variable>
+
+      <xsl:if test="extension:node-set($entryLevelElements_excerpt)/descendant::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' excerpt ')]">
+        <summary type="xhtml">
+          <!--[extension]-->
+            <!-- Only xml:lang and xml:base of the first element with class="summary" will be picked up.
+                 This may lead to unexpected results!
+            -->
+            <xsl:apply-templates select="extension:node-set($entryLevelElements_excerpt)/descendant::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' excerpt ')][1]" mode="add-lang-attribute">
+              <xsl:with-param name="end" select="'hentry'" />
+            </xsl:apply-templates>
+            <xsl:apply-templates select="extension:node-set($entryLevelElements_excerpt)/descendant::xhtml:*[contains(concat(' ',normalize-space(@class),' '),'  ')][1]" mode="add-base-attribute">
+              <xsl:with-param name="end" select="'hentry'" />
+            </xsl:apply-templates>
+          <!--[/extension]-->
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            <xsl:for-each select="extension:node-set($entryLevelElements_excerpt)/descendant::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' excerpt ')]">
+              <xsl:copy-of select="child::*|text()" />
+            </xsl:for-each>
+          </div>
+        </summary>
+      </xsl:if>
+
+      <xsl:variable name="entryLevelElements_content">
+        <xsl:call-template name="entry-level-elements">
+          <xsl:with-param name="include">content</xsl:with-param>
+        </xsl:call-template>
+      </xsl:variable>
+
+      <xsl:if test="extension:node-set($entryLevelElements_content)/descendant::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' content ')]">
+        <content type="xhtml">
+          <!--[extension]-->
+            <!-- Only xml:lang and xml:base of the first element with class="content" will be picked up.
+                 This may lead to unexpected results!
+            -->
+            <xsl:apply-templates select="extension:node-set($entryLevelElements_content)/descendant::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' content ')][1]" mode="add-lang-attribute">
+              <xsl:with-param name="end" select="'hentry'" />
+            </xsl:apply-templates>
+            <xsl:apply-templates select="extension:node-set($entryLevelElements_content)/descendant::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' content ')][1]" mode="add-base-attribute">
+              <xsl:with-param name="end" select="'hentry'" />
+            </xsl:apply-templates>
+          <!--[/extension]-->
+          <div xmlns="http://www.w3.org/1999/xhtml">
+            <xsl:for-each select="extension:node-set($entryLevelElements_content)/descendant::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' content ')]">
+              <xsl:copy-of select="child::*|text()" />
+            </xsl:for-each>
+          </div>
+        </content>
+      </xsl:if>
+
       <xsl:apply-templates select="node()|@*">
         <xsl:with-param name="where">entry</xsl:with-param>
       </xsl:apply-templates>
+
     </entry>
-  </xsl:if>
-</xsl:template>
-
-<!-- FIX: Implement concatenation rules as specified in hAtom -->
-<xsl:template match="xhtml:*[contains(concat(' ',normalize-space(@class),' '),' content ')]">
-  <xsl:param name="where"/>
-  <xsl:if test="$where = 'entry'">
-    <content type="xhtml">
-      <!--[extension]-->
-        <xsl:apply-templates select="." mode="add-lang-attribute">
-          <xsl:with-param name="end" select="'hentry'" />
-        </xsl:apply-templates>
-        <xsl:apply-templates select="." mode="add-base-attribute">
-          <xsl:with-param name="end" select="'hentry'" />
-        </xsl:apply-templates>
-      <!--[/extension]-->
-      <div xmlns="http://www.w3.org/1999/xhtml">
-        <xsl:copy-of select="child::*|text()" />
-      </div>
-    </content>
-  </xsl:if>
-</xsl:template>
-
-<!-- FIX: Implement concatenation rules as specified in hAtom -->
-<xsl:template match="xhtml:*[contains(concat(' ',normalize-space(@class),' '),' excerpt ')]">
-  <xsl:param name="where"/>
-  <xsl:if test="$where = 'entry'">
-    <summary type="xhtml">
-      <!--[extension]-->
-        <xsl:apply-templates select="." mode="add-lang-attribute">
-          <xsl:with-param name="end" select="'hentry'" />
-        </xsl:apply-templates>
-        <xsl:apply-templates select="." mode="add-base-attribute">
-          <xsl:with-param name="end" select="'hentry'" />
-        </xsl:apply-templates>
-      <!--[/extension]-->
-      <div xmlns="http://www.w3.org/1999/xhtml">
-        <xsl:copy-of select="child::*|text()" />
-      </div>
-    </summary>
   </xsl:if>
 </xsl:template>
 
@@ -540,15 +555,21 @@ This work is based on hAtom2Atom.xsl version 0.0.6 from
 </xsl:template>
 
 <xsl:template name="entry-level-elements">
+  <xsl:param name="include" />
   <xsl:choose>
-    <!-- ignore these elements -->
-    <xsl:when test="contains(concat(' ',normalize-space(@class),' '),' content ')"/>
-    <xsl:when test="contains(concat(' ',normalize-space(@class),' '),' excerpt ')"/>
-    <xsl:when test="contains(concat(' ',normalize-space(@class),' '),' author ')"/>
+    <xsl:when test="contains(concat(' ',normalize-space(@class),' '),' content ') 
+                    or contains(concat(' ',normalize-space(@class),' '),' excerpt ')
+                    or contains(concat(' ',normalize-space(@class),' '),' author ')">
+      <xsl:if test="contains(concat(' ',normalize-space(@class),' '),concat(' ',$include,' '))">
+        <xsl:copy-of select="."/>
+      </xsl:if>
+    </xsl:when>
     <xsl:otherwise>
       <xsl:copy>
         <xsl:for-each select="@*|node()">
-          <xsl:call-template name="entry-level-elements"/>
+          <xsl:call-template name="entry-level-elements">
+            <xsl:with-param name="include" select="$include" />
+          </xsl:call-template>
         </xsl:for-each>
       </xsl:copy>
     </xsl:otherwise>

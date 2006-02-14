@@ -10,17 +10,17 @@
     <link rel="alternate" href="http://example.com/entryOne" hreflang="en-GB" type="application/xhtml" title="Entry One Bookmark Title" length="100"/>
     <published>2005-12-22T10:34:00+10:00</published>
     <updated>2005-12-22T10:35:00+10:00</updated>
+    <summary type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">
+Entry One, Summary
+</div>
+    </summary>
     <content type="xhtml">
       <div xmlns="http://www.w3.org/1999/xhtml">
 <p>Entry One, Paragraph One</p>
 <p>Entry One, Paragraph Two</p>
 </div>
     </content>
-    <summary type="xhtml">
-      <div xmlns="http://www.w3.org/1999/xhtml">
-Entry One, Summary
-</div>
-    </summary>
     <author>
       <name>Author One</name>
       <uri>http://example.com/authorOne</uri>
@@ -38,17 +38,17 @@ Entry One, Summary
     <link rel="alternate" href="http://example.com/entryTwo" hreflang="en-GB" type="application/xhtml" title="Entry Two Bookmark Title" length="100"/>
     <published>2005-12-21T10:34:00+10:00</published>
     <updated>2005-12-21T10:35:00+10:00</updated>
+    <summary type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">
+<p>Entry Two, Summary</p>
+</div>
+    </summary>
     <content type="xhtml">
       <div xmlns="http://www.w3.org/1999/xhtml">
 <p>Entry Two, Paragraph One</p>
 <p>Entry Two, Paragraph Two</p>
 </div>
     </content>
-    <summary type="xhtml">
-      <div xmlns="http://www.w3.org/1999/xhtml">
-<p>Entry Two, Summary</p>
-</div>
-    </summary>
     <author>
       <name>Author Three</name>
       <uri>http://example.com/authorThree</uri>
