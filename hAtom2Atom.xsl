@@ -2,7 +2,7 @@
                                 hAtom2Atom.xsl
    An XSLT stylesheet for transforming hAtom documents into Atom documents.
 
-            $Id: hAtom2Atom.xsl 30 2006-02-14 17:36:26Z RobertBachmann $
+            $Id: hAtom2Atom.xsl 31 2006-02-25 16:01:08Z RobertBachmann $
 
                                     LICENSE
 
@@ -219,8 +219,9 @@ This work is based on hAtom2Atom.xsl version 0.0.6 from
     <!-- Extract feed title    -->
     
     <!--[extension]--> 
+      <!-- Try to find an element with class="feed-title" -->
       <xsl:variable name="classTitles"
-        select="extension:node-set($feedLevelElements)/descendant-or-self::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' title ')]"
+        select="extension:node-set($feedLevelElements)/descendant-or-self::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' feed-title ')]"
         />
       <xsl:variable name="headerTitles"
         select="extension:node-set($feedLevelElements)/descendant-or-self::xhtml:h1|extension:node-set($feedLevelElements)/descendant-or-self::xhtml:h2|extension:node-set($feedLevelElements)/descendant-or-self::xhtml:h3|extension:node-set($feedLevelElements)/descendant-or-self::xhtml:h4|extension:node-set($feedLevelElements)/descendant-or-self::xhtml:h5|extension:node-set($feedLevelElements)/descendant-or-self::xhtml:h6"
@@ -275,7 +276,7 @@ This work is based on hAtom2Atom.xsl version 0.0.6 from
       </xsl:variable>
 
       <xsl:variable name="classTitles"
-        select="extension:node-set($entryLevelElements)/descendant-or-self::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' headline ')]"
+        select="extension:node-set($entryLevelElements)/descendant-or-self::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' entry-title ')]"
       />
 
       <xsl:variable name="headerTitles"
@@ -386,14 +387,12 @@ This work is based on hAtom2Atom.xsl version 0.0.6 from
               <xsl:call-template name="text-value-of" />
             </xsl:for-each>
           </xsl:when>
-          <!--[extension]-->
-            <!-- If no "updated" is present use the value of the first "published" -->
-            <xsl:when test="extension:node-set($entryLevelElements)/descendant::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' published ')]">
-              <xsl:for-each select="extension:node-set($entryLevelElements)/descendant::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' published ')][1]">
-                <xsl:call-template name="text-value-of" />
-              </xsl:for-each>
-            </xsl:when>
-          <!--[/extension]-->
+          <!-- If no "updated" is present use the value of the first "published" -->
+          <xsl:when test="extension:node-set($entryLevelElements)/descendant::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' published ')]">
+            <xsl:for-each select="extension:node-set($entryLevelElements)/descendant::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' published ')][1]">
+              <xsl:call-template name="text-value-of" />
+            </xsl:for-each>
+          </xsl:when>
           <xsl:otherwise>
             <!--ERROR: <updated> is mandatory -->
           </xsl:otherwise>
@@ -402,17 +401,17 @@ This work is based on hAtom2Atom.xsl version 0.0.6 from
 
       <xsl:variable name="entryLevelElements_excerpt">
         <xsl:call-template name="entry-level-elements">
-          <xsl:with-param name="include">excerpt</xsl:with-param>
+          <xsl:with-param name="include">entry-summary</xsl:with-param>
         </xsl:call-template>
       </xsl:variable>
 
-      <xsl:if test="extension:node-set($entryLevelElements_excerpt)/descendant::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' excerpt ')]">
+      <xsl:if test="extension:node-set($entryLevelElements_excerpt)/descendant::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' entry-summary ')]">
         <summary type="xhtml">
           <!--[extension]-->
             <!-- Only xml:lang and xml:base of the first element with class="summary" will be picked up.
                  This may lead to unexpected results!
             -->
-            <xsl:apply-templates select="extension:node-set($entryLevelElements_excerpt)/descendant::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' excerpt ')][1]" mode="add-lang-attribute">
+            <xsl:apply-templates select="extension:node-set($entryLevelElements_excerpt)/descendant::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' entry-summary ')][1]" mode="add-lang-attribute">
               <xsl:with-param name="end" select="'hentry'" />
             </xsl:apply-templates>
             <xsl:apply-templates select="extension:node-set($entryLevelElements_excerpt)/descendant::xhtml:*[contains(concat(' ',normalize-space(@class),' '),'  ')][1]" mode="add-base-attribute">
@@ -420,7 +419,7 @@ This work is based on hAtom2Atom.xsl version 0.0.6 from
             </xsl:apply-templates>
           <!--[/extension]-->
           <div xmlns="http://www.w3.org/1999/xhtml">
-            <xsl:for-each select="extension:node-set($entryLevelElements_excerpt)/descendant::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' excerpt ')]">
+            <xsl:for-each select="extension:node-set($entryLevelElements_excerpt)/descendant::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' entry-summary ')]">
               <xsl:copy-of select="child::*|text()" />
             </xsl:for-each>
           </div>
@@ -429,25 +428,25 @@ This work is based on hAtom2Atom.xsl version 0.0.6 from
 
       <xsl:variable name="entryLevelElements_content">
         <xsl:call-template name="entry-level-elements">
-          <xsl:with-param name="include">content</xsl:with-param>
+          <xsl:with-param name="include">entry-content</xsl:with-param>
         </xsl:call-template>
       </xsl:variable>
 
-      <xsl:if test="extension:node-set($entryLevelElements_content)/descendant::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' content ')]">
+      <xsl:if test="extension:node-set($entryLevelElements_content)/descendant::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' entry-content ')]">
         <content type="xhtml">
           <!--[extension]-->
             <!-- Only xml:lang and xml:base of the first element with class="content" will be picked up.
                  This may lead to unexpected results!
             -->
-            <xsl:apply-templates select="extension:node-set($entryLevelElements_content)/descendant::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' content ')][1]" mode="add-lang-attribute">
+            <xsl:apply-templates select="extension:node-set($entryLevelElements_content)/descendant::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' entry-content ')][1]" mode="add-lang-attribute">
               <xsl:with-param name="end" select="'hentry'" />
             </xsl:apply-templates>
-            <xsl:apply-templates select="extension:node-set($entryLevelElements_content)/descendant::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' content ')][1]" mode="add-base-attribute">
+            <xsl:apply-templates select="extension:node-set($entryLevelElements_content)/descendant::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' entry-content ')][1]" mode="add-base-attribute">
               <xsl:with-param name="end" select="'hentry'" />
             </xsl:apply-templates>
           <!--[/extension]-->
           <div xmlns="http://www.w3.org/1999/xhtml">
-            <xsl:for-each select="extension:node-set($entryLevelElements_content)/descendant::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' content ')]">
+            <xsl:for-each select="extension:node-set($entryLevelElements_content)/descendant::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' entry-content ')]">
               <xsl:copy-of select="child::*|text()" />
             </xsl:for-each>
           </div>
@@ -557,8 +556,8 @@ This work is based on hAtom2Atom.xsl version 0.0.6 from
 <xsl:template name="entry-level-elements">
   <xsl:param name="include" />
   <xsl:choose>
-    <xsl:when test="contains(concat(' ',normalize-space(@class),' '),' content ') 
-                    or contains(concat(' ',normalize-space(@class),' '),' excerpt ')
+    <xsl:when test="contains(concat(' ',normalize-space(@class),' '),' entry-content ') 
+                    or contains(concat(' ',normalize-space(@class),' '),' entry-summary ')
                     or contains(concat(' ',normalize-space(@class),' '),' author ')">
       <xsl:if test="contains(concat(' ',normalize-space(@class),' '),concat(' ',$include,' '))">
         <xsl:copy-of select="."/>

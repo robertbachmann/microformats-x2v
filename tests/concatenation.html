@@ -11,8 +11,8 @@ This test is intended to test support for hAtom's concatenation
 rules.
 
 Features tested:
-	- Concatenation of "content" elements
-	- Concatenation of "excerpt" elements
+	- Concatenation of "entry-content" elements
+	- Concatenation of "entry-summary" elements
 
 Scope of possible change:
 	- The output of this test case is not valid atom.
@@ -24,70 +24,70 @@ Scope of possible change:
 -->
 
 <div class="hfeed" xml:lang="en-UK" xml:base="http://example.com/abc">
-  <h1 class="title">Feed Title</h1>
+  <h1 class="feed-title">Feed Title</h1>
   <ol>
     <li class="hentry">
-      <h2 class="title">Title ...</h2>
+      <h2 class="entry-title">Title ...</h2>
       
-      <span class="content">Content <b>#1</b></span>
-      <span class="content"> Content #2</span>
-      <span class="content"> Content <b>#3</b></span>
+      <span class="entry-content">Content <b>#1</b></span>
+      <span class="entry-content"> Content #2</span>
+      <span class="entry-content"> Content <b>#3</b></span>
       <span>ignored</span>
       <div>
-          <span class="content">Content #4</span>
+          <span class="entry-content">Content #4</span>
       </div>
-      <span class="content">Content <b>#5</b></span>
+      <span class="entry-content">Content <b>#5</b></span>
       
-      <span class="excerpt">Summary #1</span>
-      <span class="excerpt"> Summary #2</span>
-      <div><div class="excerpt"> Summary #3</div></div>
-      <span class="excerpt"> Summary #4</span>
-      <span class="excerpt"> Summary <strong>#5</strong></span>
+      <span class="entry-summary">Summary #1</span>
+      <span class="entry-summary"> Summary #2</span>
+      <div><div class="entry-summary"> Summary #3</div></div>
+      <span class="entry-summary"> Summary #4</span>
+      <span class="entry-summary"> Summary <strong>#5</strong></span>
       <span class="published updated">2006-02-07T01:02:03Z</span>
       
     </li>
     
-    <span class="content">ignored</span>
+    <span class="entry-content">ignored</span>
     
     <li class="hentry" lang="de">
       <div xml:lang="fr" xml:base="http://example.com/">
         <h2 class="title">Title ...</h2>
-        <span class="content excerpt">Content #1 and Summary #1</span>
-        <span class="content"> Content #2</span>
-        <span class="content"> Content <b>#3</b></span>
+        <span class="entry-content entry-summary">Content #1 and Summary #1</span>
+        <span class="entry-content"> Content #2</span>
+        <span class="entry-content"> Content <b>#3</b></span>
         <span>ignored</span>
       </div>
-      <span class="content" xml:lang="fr"> Content #4</span>
-      <span class="content"> Content <b>#5</b></span>
-      <span class="excerpt"> Summary <a href="./">#2</a></span>
-      <span class="excerpt"> Summary #3</span>
-      <span class="excerpt"> Summary #4</span>
-      <span class="excerpt"> Summary #5</span>
+      <span class="entry-content" xml:lang="fr"> Content #4</span>
+      <span class="entry-content"> Content <b>#5</b></span>
+      <span class="entry-summary"> Summary <a href="./">#2</a></span>
+      <span class="entry-summary"> Summary #3</span>
+      <span class="entry-summary"> Summary #4</span>
+      <span class="entry-summary"> Summary #5</span>
       <span class="published updated">2006-02-07T02:03:03Z</span>
     </li>
-    <span class="summary">ignored</span>
+    <span class="entry-summary">ignored</span>
     
     <li class="hentry">
       <div xml:lang="fr">
         <h2 class="title">Title ...</h2>
-        <span class="content excerpt" lang="de">Content #1 and Summary #1</span>
-        <span class="content"> Content #2</span>
-        <span class="content"> Content <b>#3</b></span>
+        <span class="entry-content entry-summary" lang="de">Content #1 and Summary #1</span>
+        <span class="entry-content"> Content #2</span>
+        <span class="entry-content"> Content <b>#3</b></span>
         <span>ignored</span>
       </div>
-      <span class="content"> Content #4</span>
-      <span class="content"> Content <b>#5</b></span>
-      <span class="excerpt"> Summary <a href="./">#2</a></span>
-      <span class="excerpt"> Summary #3</span>
-      <span class="excerpt"> Summary #4</span>
-      <span class="content"> This is <strong class="excerpt">not a summary</strong>... </span>
+      <span class="entry-content"> Content #4</span>
+      <span class="entry-content"> Content <b>#5</b></span>
+      <span class="entry-summary"> Summary <a href="./">#2</a></span>
+      <span class="entry-summary"> Summary #3</span>
+      <span class="entry-summary"> Summary #4</span>
+      <span class="entry-content"> This is <strong class="entry-summary">not a summary</strong>... </span>
       <span class="published updated">2006-02-07T02:03:03Z</span>
     </li>
     <li class="hentry">
-      <div class="content">
+      <div class="entry-content">
       abc abc abc abc abc abc
       </div>
-      <div class="author content">John Doe</div>
+      <div class="author entry-content">John Doe</div>
       <span class="published">2006-02-07T02:03:55Z</span>
     </li>
   </ol>

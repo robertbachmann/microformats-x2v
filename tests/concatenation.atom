@@ -37,7 +37,7 @@
       <div xmlns="http://www.w3.org/1999/xhtml">Content #1 and Summary #1 Summary <a href="./">#2</a> Summary #3 Summary #4</div>
     </summary>
     <content type="xhtml" xml:lang="de">
-      <div xmlns="http://www.w3.org/1999/xhtml">Content #1 and Summary #1 Content #2 Content <b>#3</b> Content #4 Content <b>#5</b> This is <strong class="excerpt">not a summary</strong>... </div>
+      <div xmlns="http://www.w3.org/1999/xhtml">Content #1 and Summary #1 Content #2 Content <b>#3</b> Content #4 Content <b>#5</b> This is <strong class="entry-summary">not a summary</strong>... </div>
     </content>
   </entry>
   <entry xml:lang="en-UK" xml:base="http://example.com/abc">
