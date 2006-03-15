@@ -48,7 +48,7 @@
     <content type="xhtml">
       <div xmlns="http://www.w3.org/1999/xhtml">
       abc abc abc abc abc abc
-      John Doe</div>
+      <b class="fn">John Doe</b></div>
     </content>
     <author>
       <name>John Doe</name>

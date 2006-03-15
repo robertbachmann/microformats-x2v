@@ -2,7 +2,7 @@
                                 hAtom2Atom.xsl
    An XSLT stylesheet for transforming hAtom documents into Atom documents.
 
-            $Id: hAtom2Atom.xsl 32 2006-02-26 18:40:45Z RobertBachmann $
+            $Id: hAtom2Atom.xsl 33 2006-03-15 20:18:32Z RobertBachmann $
 
                                     LICENSE
 
@@ -461,12 +461,62 @@ This work is based on hAtom2Atom.xsl version 0.0.6 from
         </content>
       </xsl:if>
 
+      <xsl:choose>
+        <xsl:when test="descendant::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' author ')]">
+          <xsl:for-each select="descendant::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' author ')]">
+            <xsl:for-each select="descendant-or-self::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' vcard ')]">
+              <author><xsl:call-template name="vcard"/></author>
+            </xsl:for-each>
+          </xsl:for-each>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:apply-templates mode="find-author" select="parent::*" />
+        </xsl:otherwise>
+      </xsl:choose>
+ 
       <xsl:apply-templates select="node()|@*">
         <xsl:with-param name="where">entry</xsl:with-param>
       </xsl:apply-templates>
 
     </entry>
   </xsl:if>
+</xsl:template>
+
+<!-- 
+    Find author outside of "hentry" 
+-->
+<xsl:template match="*" mode="find-author">
+  <xsl:variable name="elements">
+    <xsl:call-template name="find-author-filter" />
+  </xsl:variable>
+  <xsl:choose>
+    <xsl:when test="extension:node-set($elements)/descendant::xhtml:address[contains(concat(' ',normalize-space(@class),' '),' author ')]">
+	  <xsl:for-each select="extension:node-set($elements)/descendant::xhtml:address[contains(concat(' ',normalize-space(@class),' '),' author ')][1]">
+	    <xsl:for-each select="descendant-or-self::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' vcard ')]">
+          <author><xsl:call-template name="vcard"/></author>
+	    </xsl:for-each>
+	   </xsl:for-each>
+    </xsl:when>
+    <xsl:otherwise>
+	  <xsl:apply-templates mode="find-author" select="parent::*" />
+    </xsl:otherwise>
+  </xsl:choose>  
+</xsl:template>
+
+<!-- Filter for find-author template -->
+<xsl:template name="find-author-filter">
+  <xsl:choose> 
+    <xsl:when test="contains(concat(' ',normalize-space(@class),' '),' hentry ')"/>
+    <xsl:when test="(local-name() = 'q' or local-name() = 'blockquote')
+                and namespace-uri() = 'http://www.w3.org/1999/xhtml' "/>
+    <xsl:otherwise>
+      <xsl:copy>
+        <xsl:for-each select="@*|node()">
+          <xsl:call-template name="feed-level-elements"/>
+        </xsl:for-each>
+      </xsl:copy>
+    </xsl:otherwise>
+  </xsl:choose>
 </xsl:template>
 
 <!-- 
@@ -635,19 +685,6 @@ This work is based on hAtom2Atom.xsl version 0.0.6 from
       </xsl:call-template>
     </email>
   </xsl:if>
-</xsl:template>
-
-<xsl:template name="author" match="xhtml:*[contains(concat(' ',normalize-space(@class),' '),' author ')]">
-  <xsl:choose>
-  <xsl:when test="descendant-or-self::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' vcard ')]">
-    <xsl:for-each select="descendant-or-self::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' vcard ')]">
-      <author><xsl:call-template name="vcard"/></author>
-    </xsl:for-each>
-  </xsl:when>
-  <xsl:otherwise>
-    <author><name><xsl:call-template name="text-value-of"/></name></author>
-  </xsl:otherwise>
-  </xsl:choose>
 </xsl:template>
 
 <!--                      
