@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
-<feed xmlns="http://www.w3.org/2005/Atom" xml:base="http://example.org/Only-used-for-testing/">
+<feed xmlns="http://www.w3.org/2005/Atom" xml:base="http://example.com/author.html">
   <updated>2005-12-25T00:00:00Z</updated>
-  <id>http://example.org/Only-used-for-testing/</id>
-  <link rel="alternate" href="http://example.org/Only-used-for-testing/" type="text/html"/>
+  <id>http://example.com/author.html</id>
+  <link rel="alternate" href="http://example.com/author.html" type="text/html"/>
   <title>Feed Title</title>
   <entry>
     <title>Entry One Title</title>
@@ -21,7 +21,7 @@
   </entry>
   <entry>
     <title>Entry Two Title</title>
-    <id>http://example.org/Only-used-for-testing/#e2</id>
+    <id>http://example.com/author.html#e2</id>
     <updated>2005-12-25T00:00:00Z</updated>
     <author>
       <name>Entry Two Author One</name>
@@ -32,7 +32,7 @@
   </entry>
   <entry>
     <title>Entry Three Title</title>
-    <id>http://example.org/Only-used-for-testing/#e3</id>
+    <id>http://example.com/author.html#e3</id>
     <updated>2005-12-25T00:00:00Z</updated>
     <author>
       <name>Entry Three Author One</name>
@@ -47,7 +47,7 @@
   </entry>
   <entry>
     <title>Entry Four Title</title>
-    <id>http://example.org/Only-used-for-testing/#e4</id>
+    <id>http://example.com/author.html#e4</id>
     <updated>2005-12-25T00:00:00Z</updated>
     <author>
       <name>Entry Four Author One</name>
@@ -67,7 +67,7 @@
   </entry>
   <entry>
     <title>Entry Five Title</title>
-    <id>http://example.org/Only-used-for-testing/#e5</id>
+    <id>http://example.com/author.html#e5</id>
     <updated>2005-12-25T00:00:00Z</updated>
     <author>
       <name>Entry Five Author One</name>
@@ -82,7 +82,7 @@
   </entry>
   <entry>
     <title>Entry Six Title</title>
-    <id>http://example.org/Only-used-for-testing/#e6</id>
+    <id>http://example.com/author.html#e6</id>
     <updated>2005-12-25T00:00:00Z</updated>
     <author>
       <name>John Doe</name>

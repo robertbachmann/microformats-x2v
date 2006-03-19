@@ -2,7 +2,7 @@
                                 hAtom2Atom.xsl
    An XSLT stylesheet for transforming hAtom documents into Atom documents.
 
-            $Id: hAtom2Atom.xsl 33 2006-03-15 20:18:32Z RobertBachmann $
+            $Id: hAtom2Atom.xsl 34 2006-03-19 18:28:28Z RobertBachmann $
 
                                     LICENSE
 
@@ -86,7 +86,7 @@ This work is based on hAtom2Atom.xsl version 0.0.6 from
 <!-- Downloaded from http://www.w3.org/2000/07/uri43/uri.xsl -->
 <xsl:import href="uri.xsl" />
 
-<xsl:param name="source-uri">http://example.org/Only-used-for-testing/</xsl:param>
+<xsl:param name="source-uri" />
 <xsl:param name="content-type">text/html</xsl:param>
 
 <xsl:output method="xml" indent="yes"/>
@@ -462,8 +462,8 @@ This work is based on hAtom2Atom.xsl version 0.0.6 from
       </xsl:if>
 
       <xsl:choose>
-        <xsl:when test="descendant::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' author ')]">
-          <xsl:for-each select="descendant::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' author ')]">
+        <xsl:when test="extension:node-set($entryLevelElements)/descendant::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' author ')]">
+          <xsl:for-each select="extension:node-set($entryLevelElements)/descendant::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' author ')]">
             <xsl:for-each select="descendant-or-self::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' vcard ')]">
               <author><xsl:call-template name="vcard"/></author>
             </xsl:for-each>

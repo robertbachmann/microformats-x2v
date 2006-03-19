@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
-<feed xmlns="http://www.w3.org/2005/Atom" xml:base="http://example.org/Only-used-for-testing/">
+<feed xmlns="http://www.w3.org/2005/Atom" xml:base="http://example.com/tag.html">
   <updated/>
-  <id>http://example.org/Only-used-for-testing/</id>
-  <link rel="alternate" href="http://example.org/Only-used-for-testing/" type="text/html"/>
+  <id>http://example.com/tag.html</id>
+  <link rel="alternate" href="http://example.com/tag.html" type="text/html"/>
   <title>Feed Title</title>
   <entry>
     <title>Entry One Title</title>
