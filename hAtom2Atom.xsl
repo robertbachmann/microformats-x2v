@@ -2,7 +2,7 @@
                                 hAtom2Atom.xsl
    An XSLT stylesheet for transforming hAtom documents into Atom documents.
 
-            $Id: hAtom2Atom.xsl 35 2006-03-22 21:10:35Z RobertBachmann $
+            $Id: hAtom2Atom.xsl 36 2006-03-22 22:13:54Z RobertBachmann $
 
                                     LICENSE
 
@@ -99,6 +99,11 @@ This work is based on hAtom2Atom.xsl version 0.0.6 from
     <xsl:with-param name="where" select="$where"/>
   </xsl:apply-templates>
 </xsl:template>
+
+<!-- Inhibit <q> and <blockquote -->
+<xsl:template match="xhtml:q|xhtml:blockquote" />
+<xsl:template match="xhtml:blockquote[contains(concat(' ',normalize-space(@class),' '),' hentry ')]" />
+<xsl:template match="xhtml:q[contains(concat(' ',normalize-space(@class),' '),' hentry ')]" />
 
 <xsl:template match="/">
   <!--
