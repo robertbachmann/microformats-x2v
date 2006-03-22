@@ -1,18 +1,29 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xml:base="http://example.com/tag.html">
   <updated/>
   <id>http://example.com/tag.html</id>
   <link rel="alternate" href="http://example.com/tag.html" type="text/html"/>
   <title>Feed Title</title>
+  <category term="some-tag" label="some tag no. 1"/>
+  <category term="some-tag" label="some tag no. 2"/>
   <entry>
     <title>Entry One Title</title>
-    <id>http://example.com/entry</id>
-    <link rel="alternate" href="http://example.com/entry" type="text/html"/>
+    <id>http://example.com/tag.html#e1</id>
     <updated>2005-12-25T00:00:00Z</updated>
-    <category term="ipod" label="iPod"/>
+    <content type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">
+      <a rel="taG" href="http://example.com/foo+bar">bar+baz</a>
+      <a rel="TAg" href="http://example.com/foo/bar">bar/baz</a>
+      <a rel="tag" href="http://example.com/foo/bar">foo/bar</a>
+      <a href="http://flickr.com/photos/tags/chihuahua" rel="tag">Chihuahua</a>
+    </div>
+    </content>
+    <category term="übercool" label="übercool"/>
     <category term="Gravity" label="Gravity"/>
-    <category term="chihuahua" label="Chihuahua"/>
-    <category term="foo+bar" label="bar+baz"/>
+    <category term="ipod" label="iPod"/>
+    <category term="foo bar" label="bar+baz"/>
     <category term="bar" label="bar/baz"/>
+    <category term="bar" label="foo/bar"/>
+    <category term="chihuahua" label="Chihuahua"/>
   </entry>
 </feed>

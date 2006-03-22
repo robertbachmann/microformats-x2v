@@ -20,7 +20,6 @@ Features not tested:
 
 Scope of possible change:
 	- The output of this test case is not valid atom.
-	  Notably, id and updated elements do not exist at the feed level.
 	- Changes in the hAtom specification may invalidate this test case
 	- Comparisons between actual and controlled test output should not
 	  take order into consideration, except where the atom specification
@@ -33,18 +32,28 @@ Scope of possible change:
 
 <div class="hfeed">
 <h2 class="title">Feed Title</h2>
-  <div class="hentry">
-  <h3>Entry One Title</h3>
-  <p class="updated">2005-12-25T00:00:00Z</p>
-  <a rel="bookmark" href="http://example.com/entry"/>
-  <!-- Lifted from http://technorati.com/help/tags.html -->
-  <a href="http://apple.com/ipod" rel="tag">iPod</a>
-  <a href="http://en.wikipedia.org/wiki/Gravity" rel="tag">Gravity</a>
-  <a href="http://flickr.com/photos/tags/chihuahua" rel="tag">Chihuahua</a>
-  <!-- Hit some more obscure cases -->
-  <a href="http://example.com/foo+bar" rel="tag">bar+baz</a>
-  <a href="http://example.com/foo/bar" rel="tag">bar/baz</a>
+  <a rel="tag" href="../some-tag#1">some tag no. 1</a>
+  <q><a rel="tag" href="../ignored#1">ignored no. 1</a></q>
+  
+  <div class="hentry" id="e1">
+    <h3>Entry One Title</h3>
+    <p class="updated">2005-12-25T00:00:00Z</p>
+    <a rel="tag" href="../%C3%BCbercool">übercool</a>
+    <q><a rel="tag" href="../ignored#2">ignored no. 2</a></q>
+    
+    <a rel="ttag" href="../ignored#3">ignored no. 3</a>
+    <a rel="tagg" href="../ignored#4">ignored no. 4</a>
+    
+    <a rel="Tag" href="http://en.wikipedia.org/wiki/Gravity">Gravity</a>
+    <a rel="TAg" href="http://apple.com/ipod">iPod</a>
+    <p class="entry-content">
+      <a rel="taG" href="http://example.com/foo+bar">bar+baz</a>
+      <a rel="TAg" href="http://example.com/foo/bar">bar/baz</a>
+      <a rel="tag" href="http://example.com/foo/bar">foo/bar</a>
+      <a href="http://flickr.com/photos/tags/chihuahua" rel="tag">Chihuahua</a>
+    </p>
   </div>
+  <a rel="tag" href="../some-tag#2">some tag no. 2</a>
 </div>
 
 </body>

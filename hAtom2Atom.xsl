@@ -2,7 +2,7 @@
                                 hAtom2Atom.xsl
    An XSLT stylesheet for transforming hAtom documents into Atom documents.
 
-            $Id: hAtom2Atom.xsl 34 2006-03-19 18:28:28Z RobertBachmann $
+            $Id: hAtom2Atom.xsl 35 2006-03-22 21:10:35Z RobertBachmann $
 
                                     LICENSE
 
@@ -63,8 +63,9 @@ This work is based on hAtom2Atom.xsl version 0.0.6 from
                xmlns:xhtml="http://www.w3.org/1999/xhtml"
                xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                xmlns:extension="http://exslt.org/common"
+               xmlns:str="http://exslt.org/strings"
                xmlns:uri ="http://www.w3.org/2000/07/uri43/uri.xsl?template="
-               extension-element-prefixes="extension"
+               extension-element-prefixes="extension str"
                exclude-result-prefixes="xhtml uri">
 <!-- 
     node-set() for Microsoft's XML, .net's System.xml and Oracle's XDK
@@ -89,7 +90,7 @@ This work is based on hAtom2Atom.xsl version 0.0.6 from
 <xsl:param name="source-uri" />
 <xsl:param name="content-type">text/html</xsl:param>
 
-<xsl:output method="xml" indent="yes"/>
+<xsl:output method="xml" indent="yes" encoding="UTF-8" />
 
 <xsl:template match="node()|@*">
   <xsl:param name="where"/>
@@ -244,6 +245,11 @@ This work is based on hAtom2Atom.xsl version 0.0.6 from
         </xsl:otherwise>
       </xsl:choose>
     <!--[/extension]--> 
+    
+    <!-- Extract feed's tags -->
+    <xsl:for-each select="extension:node-set($feedLevelElements)/descendant::xhtml:a[contains(concat(' ',normalize-space(translate(@rel,'TAG','tag')),' '),' tag ')]">
+      <xsl:call-template name="create-category" />
+    </xsl:for-each>
     
     <xsl:apply-templates select="node()|@*">
       <xsl:with-param name="where">feed</xsl:with-param>
@@ -473,10 +479,11 @@ This work is based on hAtom2Atom.xsl version 0.0.6 from
           <xsl:apply-templates mode="find-author" select="parent::*" />
         </xsl:otherwise>
       </xsl:choose>
- 
-      <xsl:apply-templates select="node()|@*">
-        <xsl:with-param name="where">entry</xsl:with-param>
-      </xsl:apply-templates>
+
+      <!-- Extract entry's tags -->
+      <xsl:for-each select="extension:node-set($entryLevelElements)/descendant::xhtml:a[contains(concat(' ',normalize-space(translate(@rel,'TAG','tag')),' '),' tag ')]">
+        <xsl:call-template name="create-category" />
+      </xsl:for-each>
 
     </entry>
   </xsl:if>
@@ -691,38 +698,149 @@ This work is based on hAtom2Atom.xsl version 0.0.6 from
       Templates for handling rel-tag
 -->
 <!--[extension]-->
-<xsl:template match="xhtml:a[contains(concat(' ',normalize-space(translate(@rel,'TAG','tag')),' '),' tag ')]">
+<xsl:template name="create-category">
   <category>
     <xsl:attribute name="term">
       <xsl:call-template name="extract-tag">
-        <xsl:with-param name="in" select="@href"/>
+        <xsl:with-param name="uri" select="@href"/>
       </xsl:call-template>
     </xsl:attribute>
     <xsl:attribute name="label"><xsl:value-of select="."/></xsl:attribute>
   </category>
 </xsl:template>
 
+<!--
+  Extract a tag from an URI
+-->
 <xsl:template name="extract-tag">
-  <xsl:param name="in"/>
-  <xsl:param name="out"/>
+  <xsl:param name="uri" />
+  
+  <xsl:variable name="uri-sans-fragment">
+    <xsl:choose>
+      <xsl:when test="contains($uri,'#')">
+        <xsl:value-of select="substring-before($uri,'#')" />
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$uri" />
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:variable>
+
+  <xsl:variable name="uri-sans-query">
+    <xsl:choose>
+      <xsl:when test="contains($uri-sans-fragment,'?')">
+        <xsl:value-of select="substring-before($uri-sans-fragment,'?')" />
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:value-of select="$uri-sans-fragment" />
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:variable>
+
+  <xsl:variable name="uri-sans-trailing-slashes">
+    <xsl:call-template name="strip-trailing-slashes">
+      <xsl:with-param name="str" select="$uri-sans-query" />
+    </xsl:call-template>
+  </xsl:variable>
+
+  <xsl:call-template name="decode-uri">
+    <xsl:with-param name="uri">
+      <xsl:call-template name="basename">
+        <xsl:with-param name="uri" select="$uri-sans-trailing-slashes" />
+      </xsl:call-template>
+    </xsl:with-param>
+  </xsl:call-template>
+</xsl:template>
+
+<!--
+  Strips trailing slashes from a string
+-->
+<xsl:template name="strip-trailing-slashes">
+  <xsl:param name="str" />
   <xsl:choose>
-    <xsl:when test="string-length($in) = 0">
-      <xsl:value-of select="$out"/>
-    </xsl:when>
-    <xsl:when test="substring($in,1,1) = '/'">
-      <xsl:call-template name="extract-tag">
-        <xsl:with-param name="in" select="substring($in,2)"/>
+    <xsl:when test="substring($str,string-length($str)) = '/'">
+      <xsl:call-template name="strip-trailing-slashes">
+        <xsl:with-param name="str" 
+           select="substring($str,1,string-length($str)-1)" />
       </xsl:call-template>
     </xsl:when>
     <xsl:otherwise>
-      <xsl:call-template name="extract-tag">
-        <xsl:with-param name="in" select="substring($in,2)"/>
-        <xsl:with-param name="out" select="concat($out,substring($in,1,1))"/>
-      </xsl:call-template>
+      <xsl:value-of select="$str" />
     </xsl:otherwise>
   </xsl:choose>
 </xsl:template>
-<!--[/extension]-->
+
+<!-- 
+  Basename for URI
+-->
+<xsl:template name="basename">
+  <xsl:param name="uri" />
+  <xsl:choose>
+    <xsl:when test="contains($uri,'/')">
+      <xsl:call-template name="basename">
+        <xsl:with-param name="uri"
+           select="substring-after($uri,'/')" />
+      </xsl:call-template>
+    </xsl:when>
+    <xsl:otherwise>
+      <xsl:value-of select="$uri" />
+    </xsl:otherwise>
+  </xsl:choose>
+</xsl:template>
+
+<!-- 
+  Decodes an URI 
+-->
+<xsl:template name="decode-uri">
+  <xsl:param name="uri" />
+  <xsl:choose>
+    <xsl:when test="function-available('str:decode-uri')">
+      <xsl:variable name="s">
+        <xsl:call-template name="plus_to_space">
+          <xsl:with-param name="string" select="$uri" />
+        </xsl:call-template>
+      </xsl:variable>
+      <xsl:value-of select="str:decode-uri($s)" />
+    </xsl:when>
+    <xsl:when test="system-property('xsl:vendor-url') = 'http://xml.apache.org/xalan-j'">
+      <xsl:value-of 
+        xmlns:xalan="http://xml.apache.org/xalan/java"
+        select="xalan:java.net.URLDecoder.decode($uri,'UTF-8')"
+      />
+    </xsl:when>
+    <xsl:when test="system-property('xsl:vendor-url') = 'http://www.saxonica.com/'">
+      <xsl:value-of
+        xmlns:saxon="java:java.net.URLDecoder"
+        select="saxon:decode($uri,'UTF-8')"
+      />
+    </xsl:when>   
+    <xsl:otherwise>
+      <xsl:message terminate="yes">XSLT engine does not support EXSLT's decode-uri().</xsl:message>
+    </xsl:otherwise>
+  </xsl:choose>
+</xsl:template>
+
+<!--
+  Replace "+" with " " 
+-->
+<xsl:template name="plus_to_space">
+  <xsl:param name="string" />
+  <xsl:choose>
+    <xsl:when test="contains($string,'+')">
+      <xsl:variable name="new_string" select="
+        concat(
+          substring-before($string,'+'),
+          ' ',
+          substring-after($string,'+')
+        )
+        "/>
+      <xsl:call-template name="plus_to_space">
+        <xsl:with-param name="string" select="$new_string" />
+      </xsl:call-template>
+    </xsl:when>
+    <xsl:otherwise><xsl:value-of select="$string" /></xsl:otherwise>
+  </xsl:choose>
+</xsl:template>
 
 
 <!-- 
