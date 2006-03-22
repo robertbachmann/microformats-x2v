@@ -1,0 +1,9 @@
+BEGIN:VCALENDAR
+PRODID:-//Life Lint//LifeLintCalendar 0.5//EN
+VERSION:2.0
+BEGIN:VEVENT
+URL:http://www.lifelint.com/squidlist/calendar/12279/2006/1/15
+SUMMARY:Bad Movie Night - Gigli (blame mike spiegelman)
+DTSTART:20060115
+END:VEVENT
+END:VCALENDAR

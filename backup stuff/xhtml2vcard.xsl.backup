@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+<xsl:stylesheet 
+ xmlns:xsl ="http://www.w3.org/1999/XSL/Transform" 
+ version="1.0"
+>
+
+<xsl:output
+  encoding="UTF-8"
+  indent="no"
+  media-type="text/x-vcard"
+  method="text"
+/>
+
+<xsl:strip-space elements="a"/>
+
+<xsl:template match="/"><xsl:apply-templates /></xsl:template>
+
+<xsl:template match="*[contains(@class,'vcard')]">BEGIN:VCARD
+VERSION:3.0
+
+<!-- URL Property -->
+<xsl:if test="descendant-or-self::node()[contains(@class,'url')]">
+URL:<xsl:value-of select="descendant-or-self::node()[contains(@class,'url')]/@href" />
+</xsl:if>
+
+<!-- TEL Property -->
+<xsl:if test="descendant-or-self::node()[contains(@class,'tel')]">
+DESCRIPTION:<xsl:value-of select="descendant-or-self::node()[contains(@class,'tel')]" />
+</xsl:if>
+
+<!-- EMAIL Property -->
+<xsl:if test="descendant-or-self::node()[contains(@class,'email')]">
+EMAIL:<xsl:value-of select="descendant-or-self::node()[contains(@class,'email')]/@href" />
+</xsl:if>
+
+<!-- FN Property -->
+<xsl:if test="descendant-or-self::node()[contains(@class,'fn')]">
+FN:<xsl:value-of select="descendant-or-self::node()[contains(@class,'fn')]" />
+</xsl:if>
+
+<!-- N Property -->
+<xsl:if test="descendant-or-self::node()[contains(@class,'n')]">
+N:<xsl:value-of select="descendant-or-self::node()[contains(@class,'n')]/node()[contains(@class,'Family-Name')]" />;<xsl:value-of select="descendant-or-self::node()[contains(@class,'n')]/node()[contains(@class,'Given-Name')]" />;<xsl:value-of select="descendant-or-self::node()[contains(@class,'n')]/node()[contains(@class,'Additional-Name')]" />;<xsl:value-of select="descendant-or-self::node()[contains(@class,'n')]/node()[contains(@class,'Prefix')]" />;<xsl:value-of select="descendant-or-self::node()[contains(@class,'n')]/node()[contains(@class,'Suffix')]" />;
+</xsl:if>
+
+<!-- ADR Property -->
+<xsl:if test="descendant-or-self::node()[contains(@class,'adr')]">
+ADR:<xsl:value-of select="descendant-or-self::node()[contains(@class,'adr')]/node()[contains(@class,'Post-Office-Box')]" />;<xsl:value-of select="descendant-or-self::node()[contains(@class,'adr')]/node()[contains(@class,'Extended-Address')]" />;<xsl:value-of select="descendant-or-self::node()[contains(@class,'adr')]/node()[contains(@class,'Street-Address')]" />;<xsl:value-of select="descendant-or-self::node()[contains(@class,'adr')]/node()[contains(@class,'Locality')]" />;<xsl:value-of select="descendant-or-self::node()[contains(@class,'adr')]/node()[contains(@class,'Region')]" />;<xsl:value-of select="descendant-or-self::node()[contains(@class,'adr')]/node()[contains(@class,'Postal-Code')]" />;<xsl:value-of select="descendant-or-self::node()[contains(@class,'adr')]/node()[contains(@class,'Country
+')]" />;
+</xsl:if>
+
+END:VCARD
+</xsl:template>
+
+<!-- don't pass text thru -->
+<xsl:template match="text()|@*">
+</xsl:template>
+
+</xsl:stylesheet>

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- from http://lists.w3.org/Archives/Public/www-rdf-calendar/2006Jan/0003.html -->
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head profile="http://www.w3.org/2003/g/data-view">
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="transformation" href="http://www.w3.org/2002/12/cal/glean-hcal.xsl" />
+    <title>Test Case</title>
+  </head>
+  <body>
+    <p>Test Case</p>
+
+    <table border="0" summary="Itinerary">
+      <tr class="vevent">
+	<td valign="top">23&#160;Jan</td>
+
+	<td valign="top"><abbr class="dtstart" title="2006-01-23T09:47:00">09:47a</abbr><abbr class="dtend" title="2006-01-23T09:47:00">11:24a</abbr></td>
+	<td valign="top"><img alt="[I]" src="/graphics/icons/14.gif" /></td>
+	<td valign="top"><span class="summary">BDL-ORD/AA 1295</span></td>
+      </tr>
+      <tr class="vevent">
+	<td valign="top">23&#160;Jan</td>
+	<td valign="top"><abbr class="dtstart" title="2006-01-23T13:07:00">01:07p</abbr><abbr class="dtend" title="2006-01-23T13:07:00">03:51p</abbr></td>
+	<td valign="top"><img alt="[I]" src="/graphics/icons/14.gif" /></td>
+
+	<td valign="top"><span class="summary"><a class="url" href="http://dps1.travelocity.com/dparcobrand.ctl?smls=Y&amp;Service=YHOE&amp;.intl=us&amp;aln_name=AA&amp;flt_num=1655&amp;dep_arp_name=&amp;arr_arp_name=&amp;dep_dt_dy_1=23&amp;dep_dt_mn_1=Jan&amp;dep_dt_yr_1=2006&amp;dep_tm_1=9:00am">ORD-SFO/AA 1655</a></span></td>
+      </tr>
+    </table>
+
+    <p>The first row has no url, the second one does.</p>
+
+  </body>
+</html>

@@ -1,0 +1,8 @@
+BEGIN:VCALENDAR
+PRODID:-//Life Lint//LifeLintCalendar 0.5//EN
+VERSION:2.0
+METHOD:xyz
+BEGIN:VEVENT
+SUMMARY:Calendaring Interoperability Planning Meeting
+END:VEVENT
+END:VCALENDAR

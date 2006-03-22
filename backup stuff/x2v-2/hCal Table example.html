@@ -1,0 +1,146 @@
+<html>
+<head>
+<title>Blog Business Summit</title>
+</head>
+
+<body id="sessions">
+<!-- Modeled after W3C example: http://www.w3.org/TR/REC-html40/struct/tables.html#multi-dimension -->
+<!-- XHTML 1.1 description, all the attributes are still present http://www.w3.org/TR/xhtml-modularization/abstract_modules.html#s_tablemodule -->
+
+<h1>Sessions Grid</h1>
+<table border="1" cellpadding="4" cellspacing="0"  width="50%">
+  <tr align="center">
+    <td colspan="3"> <strong>Blog Business Summit 2005 San Fran </strong> </td>
+  </tr>
+  <tr align="center">
+    <td colspan="3"> <strong>Thursday, August 18, 2005</strong> </td>
+  </tr>
+<!-- start vevent encoding -->
+  <tr class="vevent">
+    <td class="bluetd"> <abbr class="dtstart" title="20050818T08:00:00">8:00</abbr> am to <abbr class="dtend" title="20050818T08:45:00">8:45</abbr> am </td>
+    <td colspan="2" align="center" class="summary">Breakfast</td>
+  </tr>
+  <tr>
+    <td class="bluetd">&nbsp;</td>
+    <!-- axis="location" describes the iCal property, id="l01" gives a unique id to call-back too -->
+    <td colspan="2" align="center" id="l01" axis="location">
+		<!-- class="location" might be redundant here? -->
+    	<strong class="location">Grand Ballrooms I &amp; II </strong>
+    </td>
+  </tr>
+  <!-- class="vevent" descibes the following as a iCalednar event, the headers="l01" is a space seperated list of call-back values to be included in the hCal transformation -->
+  <tr class="vevent" headers="l01">
+    <td class="bluetd"> <abbr class="dtstart" title="20050818T09:00:00">9:00</abbr> am to <abbr class="dtend" title="20050818T10:00:00">10:00</abbr> am </td>
+    <td colspan="2" align="center"> <a class="url summary" href="/sessions/archives/2005/08/san_francisco_c.htm#staying_on_top_of_buzz">Staying on Top of the Buzz: Blog Monitoring Tools and Techniques</a><br />
+    <em class="comments">Evelyn Rodriguez, Jay Stockwell, Bob Wyman</em> </td>
+  </tr>
+    
+  <tr>
+    <td class="bluetd">&nbsp;</td>
+    <td align="center" id="l02" axis="location"><strong class="location">Track 1<br />Grand Ballroom I </strong></td>
+    <td align="center" id="l03" axis="location"><strong class="location">Track 2<br />Grand Ballroom II</strong></td>
+  </tr>
+  
+  <!-- headers="l01" call-back for location data -->
+  <tr class="vevent" headers="l01">
+    <td class="bluetd"> <abbr class="dtstart" title="20050818T14:00:00">2:00</abbr> pm to <abbr class="dtend" title="20050818T15:00:00">3:00</abbr> pm </td>
+    <td colspan="2" align="center"> <a class="url summary" href="/sessions/archives/2005/08/san_francisco_c.htm#blogs_that_sell">Blogs That Sell: Creating Content That Drives Conversion</a><br />
+    <em class="comments">Buzz Bruggeman and DL Byron</em> </td>
+  </tr>
+
+  <!-- split table -->
+
+  <tr>
+	<!-- no class="vevent" reference here, just id="t01" for call-back -->
+	<!-- not sure what to put in axis="" (maybe axis="vevent") the id should be enough to get the parser here and find class="dtstart" etc. -->
+    <td class="bluetd" id="t01" axis=""><abbr class="dtstart" title="20050818T15:15:00">3:15</abbr> pm to <abbr class="dtend" title="20050818T6:15:00">4:15</abbr> pm</td>
+    
+    <!-- this is a vevent with headers calling back to t01 (time) and l02 (location) -->
+    <td align="center" class="vevent" headers="t01 l02"> <a class="url summary" href="/sessions/archives/2005/08/san_francisco_c.htm#rss_ads">Advertising Income: Incorporating HTML and RSS Ads Into your Content</a><br />
+    <em class="comments">Dave Taylor</em> </td>
+    
+    <!-- this is a vevent with headers calling back to t01 (time) and l03 (location) -->
+    <td align="center" class="vevent" headers="t01 l03"> <a class="url summary" href="/sessions/archives/2005/08/san_francisco_c.htm#buzz_marketing">Buzz Marketing: Using Blogs, Forums, Conversations and Community to Build Brands and Traffic</a><br />
+    <em class="comments">David Wharton, John Cass, Buzz Bruggeman</em> </td>
+  </tr>
+<!-- end vevent encoding -->  
+
+<!-- the rest follows the same rules -->
+
+  <tr>
+    <td class="bluetd"   > 4:30 pm to 5:30 pm </td>
+    <td align="center"  > <a href="/sessions/archives/2005/08/san_francisco_c.htm#maximizing" title="Maximum">Maximizing Advertising Revenue: Content and Promotional
+        Techniques</a><br />
+    <em>Chris Pirillo and Eric Rice</em> </td>
+    <td align="center"  > <a href="/sessions/archives/2005/08/san_francisco_c.htm#dealing_with_bloggers">Dealing with Bloggers: Partnering and Defense Strategies</a><br />
+    <em>Robert Scoble, Janet Johnson</em> </td>
+  </tr>
+  <tr align="center" bgcolor="#FFFFFF">
+    <td colspan="3" class="graytd"  > 5:30 pm to 7:00pm<br />
+    Microsoft Business Bloggers Reception </td>
+  </tr>
+  <tr align="center" bgcolor="#FFFFFF">
+    <td colspan="3"  > <strong>Friday, August 19,
+          2005 <br />
+    </strong> </td>
+  </tr>
+  <tr>
+    <td class="bluetd"  > 8:00 am to 8:45 am </td>
+    <td colspan="2" align="center"  > Breakfast Demo Session: WordPress </td>
+  </tr>
+  <tr align="center">
+    <td class="bluetd"  >&nbsp;</td>
+    <td colspan="2"  ><strong>Grand Ballrooms I &amp; II </strong></td>
+  </tr>
+  <tr>
+    <td class="bluetd"  > 9:00 am to 10:00 am </td>
+    <td colspan="2" align="center"  > <a href="/sessions/archives/2005/08/day_two_overvie.htm#keynote">Keynote: Why Microsoft is Betting Big on
+        Bloggers and RSS</a><br />
+    <em>Dean Hachamovitch and Robert Scoble</em> </td>
+  </tr>
+  <tr>
+    <td class="bluetd"  > 10:15 am to 11:15 am </td>
+    <td colspan="2" align="center"  > <a href="/sessions/archives/2005/08/day_two_overvie.htm#platform">Picking a Platform: Blogging Engines Compared</a><br />
+    <em>Molly Holzschlag, DL Byron</em> </td>
+  </tr>
+  <tr>
+    <td class="bluetd"  > 11:30 am to 12:30 pm </td>
+    <td colspan="2" align="center"  > <a href="/sessions/archives/2005/08/day_two_overvie.htm#blog_writing_style">Blog Writing Style: Strategy and Tactics for Succesful Posting</a>
+   <br />
+    <em>Molly Holzschlag, Darren Barefoot</em> </td>
+  </tr>
+  <tr>
+    <td class="bluetd"> 12:30 pm to 2:00 pm </td>
+    <td colspan="2" align="center" class="graytd"   > <strong>Lunch</strong> </td>
+  </tr>
+  <tr>
+    <td  >&nbsp;</td>
+    <td align="center"  > <strong>Track 1 <br />
+    Grand Ballroom I </strong> </td>
+    <td align="center"  > <strong>Track 2 <br />
+    Grand Ballroom II </strong> </td>
+  </tr>
+  <tr>
+    <td class="bluetd"  > 2:00 pm to 3:00 pm </td>
+    <td align="center"  > <a href="/sessions/archives/2005/08/day_two_overvie.htm#blog_network">Building a Blog Network</a><br />
+    <em>Stowe Boyd, Paul Scrivens, Shawn Gold</em> </td>
+    <td align="center"  > <a href="/sessions/archives/2005/08/day_two_overvie.htm#when_worlds_collide">When Worlds Collide: Traditional Public Relations and
+        the Blogosphere</a><br />
+    <em>Steve Broback, Lynann Bradbury, Laurie Mayers, Rick Murray</em> </td>
+  </tr>
+  <tr>
+    <td class="bluetd"  > 3:15 pm to 4:15pm </td>
+    <td align="center"  > <a href="/sessions/archives/2005/08/day_two_overvie.htm#measuring_success">Measuring Success: Setting Goals and Establishing Metrics</a><br />
+    <em>Anil Dash, Sally Falkow</em> </td>
+    <td align="center"  > <a href="/sessions/archives/2005/08/day_two_overvie.htm#lessons_learned">Lessons Learned and Best Practices: the GM and Intuit
+        Experience</a><br />
+    <em>Debbie Weil, Michael Wiley, Paul Rosenfeld</em> </td>
+  </tr>
+  <tr>
+    <td class="bluetd"  > 4:30pm to 5:30pm </td>
+    <td colspan="2" align="center"  > <a href="/sessions/archives/2005/08/day_two_overvie.htm#corporate_blogging">Corporate Blogging: Strategy and Policy</a><br />
+    <em>Rebecca Blood, Biz Stone, Matthew Oliphant</em> </td>
+  </tr>
+</table>
+</body>
+</html>

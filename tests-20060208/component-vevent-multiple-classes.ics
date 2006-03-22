@@ -1,0 +1,11 @@
+BEGIN:VCALENDAR
+PRODID:-//Life Lint//LifeLintCalendar 0.5//EN
+VERSION:2.0
+BEGIN:VEVENT
+URL:http://www.web2con.com/
+SUMMARY:Web 2.0 Conference
+DTSTART:20051005
+DTEND:20051008
+LOCATION:Argent Hotel\, San Francisco\, CA
+END:VEVENT
+END:VCALENDAR

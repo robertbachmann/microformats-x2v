@@ -1,0 +1,11 @@
+BEGIN:VCALENDAR
+PRODID:-//Life Lint//LifeLintCalendar 0.5//EN
+VERSION:2.0
+BEGIN:VEVENT
+URL:http://www.blogbusinesssummit.com/seminars/
+DTSTART:20051029
+SUMMARY:Blog Business Summit Seminar Series
+LOCATION:Seattle\, Washington
+DESCRIPTION:Learn how to get your business up and running in the blogosphere at our Business Blogging 101 Seminar
+END:VEVENT
+END:VCALENDAR

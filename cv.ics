@@ -1,0 +1,28 @@
+BEGIN:VCALENDAR
+PRODID:-//suda.co.uk//X2V 0.6.9 (BETA)//EN
+X-ORIGINAL-URL: (Best Practice: should be URL that this was ripped from)
+X-WR-CALNAME: suda.co.uk/cv [CV of an Informatician]
+VERSION:2.0
+BEGIN:VEVENT
+SUMMARY;LANGUAGE=en:Technology Developer
+DTSTART:20010910
+URL:http://www.google.com/search?hl=en&q=paradigm+new+media+group
+X-RDATE;VALUE=PERIOD:20010910T000000Z/20020901T000000
+RDATE;VALUE=PERIOD:20060403T020000Z/20060403T040000Z,20060404T010000Z/PT3HZ
+END:VEVENT
+
+BEGIN:VEVENT
+SUMMARY;LANGUAGE=en:General Manager - KSLU Radio
+DTSTART:20000501
+DTEND:20010501
+URL:http://www.google.com/search?hl=en&q=kslu+saint+louis+university
+END:VEVENT
+
+BEGIN:VEVENT
+SUMMARY;LANGUAGE=en:Webdesigner - Art Department
+DTSTART:19980601
+DTEND:19990701
+URL:http://www.riverfronttimes.com/
+END:VEVENT
+
+END:VCALENDAR

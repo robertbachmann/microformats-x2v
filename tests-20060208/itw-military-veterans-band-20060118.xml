@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+  <head>
+    <title>Iowa Military Veterans Band</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <link rel="stylesheet" href="../css/inside.css" type="text/css" />
+    <!--[if gte IE 5.5000]>
+	<script type="text/javascript" src="../js/pngfix.js"></script>
+	<link rel="stylesheet" href="../css/ie-win.css" type="text/css" />
+	<![endif]-->
+  </head>
+  <body>
+    <div id="content">
+      <div id="top-bar"></div>
+      <div id="left">
+	<a href="http://www.iowamilitaryveteransband.com/home/" title="Home"><img src="http://www.iowamilitaryveteransband.com/images/logo.gif" alt="IOWA MILITARY VETERANS BAND" /></a><br />
+	<img src="http://www.iowamilitaryveteransband.com/images/red-star.gif" alt="*" />
+	<ul>
+	  <li><a style="width: 78px; height: 20px; background: url( /images/menu/home.gif ) top left no-repeat;" href="http://www.iowamilitaryveteransband.com/home/" title="Home"><span>Home</span></a></li>
+	  <li><a style="width: 78px; height: 30px; background: url( /images/menu/background.gif ) top left no-repeat;" href="http://www.iowamilitaryveteransband.com/background/" title="Band Background"><span>Band Background</span></a></li>
+	  <li><a style="width: 78px; height: 20px; background: url( /images/menu/members.gif ) top left no-repeat;" href="http://www.iowamilitaryveteransband.com/members/" title="Members"><span>Members</span></a></li>
+	  <li><a class="current" style="width: 78px; height: 20px; background: url( /images/menu/schedule.gif ) top left no-repeat;" href="http://www.iowamilitaryveteransband.com/schedule/" title="Schedule"><span>Schedule</span></a></li>
+	  <li><a style="width: 74px; height: 30px; background: url( /images/menu/contribution.gif ) top left no-repeat;" href="http://www.iowamilitaryveteransband.com/contribution/" title="Contributors/Contributions"><span>Contributors/Contributions</span></a></li>
+	  <li><a style="width: 78px; height: 20px; background: url( /images/menu/contact_us.gif ) top left no-repeat;" href="http://www.iowamilitaryveteransband.com/contact/" title="Contact Us"><span>Contact Us</span></a></li>
+	</ul>
+      <img src="http://www.iowamilitaryveteransband.com/images/red-star.gif" alt="*" />    		</div>
+      <div id="right">
+	<div id="header">
+	  <img src="http://www.iowamilitaryveteransband.com/images/star-row-short.gif" alt="*****" style="margin-bottom: 15px;"/>
+	  <img src="http://www.iowamilitaryveteransband.com/images/schedule_header.gif" alt="IOWA MILTARY VETERANS BAND - SCHEDULE" />
+	</div>
+	<div id="center">
+	  <div style="margin-left: 15px;">
+	    <div id="schedule-marker">
+	    <img  src="http://www.iowamilitaryveteransband.com/images/list-marker-red.gif" alt="-" /></div>
+	    <h2 style="float: left; margin: 0 0 0.5em 0; padding: 0;">2005 Concert Schedule</h2>
+	    <div style="clear: both;"></div>
+	  </div>
+	  <div style="margin: 0 0 25px 25px; border-bottom: #b5b9c0 1px solid;">
+	    <p class="vevent"><span style="color: #666;"><abbr class="dtstart" title="2005-07-03T19:30Z">July 3, 7:30 p.m.</abbr> -</span> <span style="color: #7e9fb2;">State Capitol &#8220;Music Under the Stars&#8221;, Des Moines</span></p>
+	    <p class="vevent" ><span style="color: #666;"><abbr class="dtstart" title="2005-07-23T19:00Z">July 23, 7 p.m.</abbr> -</span> <span style="color: #7e9fb2;"><span class="summary">Iowa State Legion Convention</span>, <span class="location">Downtown Marriott, Des Moines</span></span></p>
+	    <p class="vevent"><span style="color: #666;"><abbr class="dtstart" title="2005-08-07T11:00Z">August 7, 11 a.m.</abbr> -</span> <span style="color: #7e9fb2;"><a class="summary" href="http://www.hooverassociation.org/hooverfest.html" style="color: #35689e;">Hooverfest</a>, <span class="location">West Branch</span></span></p>
+	    <p class="vevent"><span style="color: #666;"><abbr class="dtstart" title="2005-09-15T10:30Z">August 15, 10:30 a.m.</abbr> -</span> <span style="color: #7e9fb2;"><a href="http://www.iowastatefair.com/" class="summary" style="color: #35689e;">Iowa State Fair</a>, <span class="location">Des Moines</span></span></p>
+	    <p class="vevent"><span style="color: #666;"><abbr class="dtstart" title="2005-10-22T14:00Z">October 22, 2 p.m.</abbr> -</span> <a class="location" href="http://www.state.ia.us/iavetshome/" style="color: #35689e;">Iowa Veterans Home, Marshalltown</a></p>
+	    <p class="vevent"><span style="color: #666;"><abbr class="dtstart" title="2005-11-06T15:00Z">November 6, 3 p.m.</abbr> -</span> <span style="color: #7e9fb2;"><span class="summary">&#8220;A Star-Spangled Salute&#8221;</span>, <a class="location" href="http://www.civiccenter.org/" style="color: #35689e;">Civic Center of Greater Des Moines</a></span></p>
+	  </div>
+	  <div style="text-align: center;">
+
+	    <img src="http://www.iowamilitaryveteransband.com/images/2006_schedule.gif" alt="IOWA MILITARY VETERANS BAND 2006 SCHEDULE COMING SOON" style="margin-bottom: 20px;" />
+	  </div>
+	</div>
+	<div id="far-right" class="no-border">
+	  <a href="http://www.civiccenter.org/"><img src="http://www.iowamilitaryveteransband.com/images/poster_small.gif" alt="Iowa Military Veterans Band Photo" style="border: 0;" /></a>
+	</div>
+	<img src="http://www.iowamilitaryveteransband.com/images/star-row-short.gif" alt="*****" style="margin-top: 5px;"/>
+      </div>
+      <div id="bottom-bar"></div>
+    </div>
+  </body>
+</html>

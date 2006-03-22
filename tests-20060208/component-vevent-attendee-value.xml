@@ -1,0 +1,5 @@
+<div class="vcalendar">
+  <div class="vevent">
+    <div>Attending: <span class="attendee"><a class="value" href="mailto:jsmith@host1.com">jsmith@host1.com</a> RSVPed? <span class="rsvp">TRUE</span></span></div>
+  </div>
+</div>
