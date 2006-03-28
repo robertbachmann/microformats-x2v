@@ -24,8 +24,8 @@ brian@suda.co.uk
 http://suda.co.uk/
 
 XHTML-2-vCard
-Version 0.7.11
-2005-02-27
+Version 0.7.12
+2005-03-27
 
 Copyright 2005 Brian Suda
 This work is relicensed under The W3C Open Source License
@@ -44,7 +44,7 @@ I'm not an XSLT expert, so there are no guarantees to quality of this code!
 
 
 
-<xsl:param name="Prodid" select='"-//suda.co.uk//X2V 0.7.11 (BETA)//EN"' />
+<xsl:param name="Prodid" select='"-//suda.co.uk//X2V 0.7.12 (BETA)//EN"' />
 <xsl:param name="Source" >(Best Practices states this should be the URL the vcard was transformed from)</xsl:param>
 <xsl:param name="Encoding" >UTF-8</xsl:param>
 <xsl:param name="Anchor" />
@@ -581,6 +581,7 @@ BDAY:</xsl:text>
 				<xsl:call-template name="sub-prop">
 					<xsl:with-param name="class" select='"latitude"' />
 				</xsl:call-template>
+				<xsl:text>;</xsl:text>
 				<xsl:call-template name="sub-prop">
 					<xsl:with-param name="class" select='"longitude"' />
 				</xsl:call-template>
@@ -599,6 +600,7 @@ BDAY:</xsl:text>
 			<xsl:call-template name="sub-prop">
 				<xsl:with-param name="class" select='"organization-name"' />
 			</xsl:call-template>
+			<xsl:text>;</xsl:text>
 			<xsl:for-each select=".//*[contains(concat(' ', @class, ' '), concat(' ', 'organization-unit', ' '))]" >
 				<xsl:choose>
 					<xsl:when test=".//*[contains(concat(' ', normalize-space(@class), ' '),' value ')]">
@@ -672,21 +674,27 @@ BDAY:</xsl:text>
 	<xsl:call-template name="sub-prop">
 		<xsl:with-param name="class" select='"post-office-box"' />
 	</xsl:call-template>
+	<xsl:text>;</xsl:text>
 	<xsl:call-template name="sub-prop">
 		<xsl:with-param name="class" select='"extended-address"' />
 	</xsl:call-template>
+	<xsl:text>;</xsl:text>
 	<xsl:call-template name="sub-prop">
 		<xsl:with-param name="class" select='"street-address"' />
 	</xsl:call-template>
+	<xsl:text>;</xsl:text>
 	<xsl:call-template name="sub-prop">
 		<xsl:with-param name="class" select='"locality"' />
 	</xsl:call-template>
+	<xsl:text>;</xsl:text>
 	<xsl:call-template name="sub-prop">
 		<xsl:with-param name="class" select='"region"' />
 	</xsl:call-template>
+	<xsl:text>;</xsl:text>
 	<xsl:call-template name="sub-prop">
 		<xsl:with-param name="class" select='"postal-code"' />
 	</xsl:call-template>
+	<xsl:text>;</xsl:text>
 	<xsl:call-template name="sub-prop">
 		<xsl:with-param name="class" select='"country-name"' />
 	</xsl:call-template>
@@ -741,15 +749,19 @@ BDAY:</xsl:text>
 	<xsl:call-template name="sub-prop">
 		<xsl:with-param name="class" select='"family-name"' />
 	</xsl:call-template>
+	<xsl:text>;</xsl:text>
 	<xsl:call-template name="sub-prop">
 		<xsl:with-param name="class" select='"given-name"' />
 	</xsl:call-template>
+	<xsl:text>;</xsl:text>
 	<xsl:call-template name="sub-prop">
 		<xsl:with-param name="class" select='"additional-name"' />
 	</xsl:call-template>
+	<xsl:text>;</xsl:text>
 	<xsl:call-template name="sub-prop">
 		<xsl:with-param name="class" select='"honorific-prefix"' />
 	</xsl:call-template>
+	<xsl:text>;</xsl:text>
 	<xsl:call-template name="sub-prop">
 		<xsl:with-param name="class" select='"honorific-suffix"' />
 	</xsl:call-template>
@@ -1109,7 +1121,6 @@ BDAY:</xsl:text>
 		</xsl:call-template>
 	</xsl:variable>
 	<xsl:value-of select="normalize-space($v1)"/>
-	<xsl:text>;</xsl:text>
 </xsl:template>
 
 <!-- get the class value -->
