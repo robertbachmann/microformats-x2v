@@ -1,8 +1,0 @@
-<ul class="schedule vcalendar">
-  <li class="vevent"><span class="summary invisible">IEEE-754 Working Group Meeting</span><span class="dtstart" title="20060118">18</span> January, 2006 <span class="rdate" title="20060118T1300-0800/20060118T1700-0800, 20060119T1300-0800/20060119T1700-0800">1-5PM</span> at <span class="location">HP Cupertino</span> (<a href="email/msg01957.html">directions</a>, <a href="email/msg01961.html">agenda</a>)</li>
-
-  <li class="vevent"><span class="summary invisible">IEEE-754 Working Group Meeting</span><span class="dtstart" title="20060215">15</span>-<span class="dtend" title="20060217">16</span> February, 2006
-  <span class="rdate" title="20060215T1300-0800/20060215T1700-0800, 20060216T1300-0800/20060216T1700-0800">1-5PM</span> at <span class="location">Sun Menlo Park</span></li>
-
-  <li class="vevent"><span class="summary invisible">IEEE-754 Working Group Meeting</span><span class="dtstart" title="20060315">15</span>-<span class="dtend" title="20060317">16</span> March, 2006 <span class="rdate" title="20060315T1300-0800/20060315T1700-0800, 20060316T1300-0800/20060316T1700-0800">1-5PM</span> at <span class="location">Sun Santa Clara</span></li>
-</ul>

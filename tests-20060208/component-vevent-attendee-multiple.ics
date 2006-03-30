@@ -1,8 +1,0 @@
-BEGIN:VCALENDAR
-PRODID:-//Life Lint//LifeLintCalendar 0.5//EN
-VERSION:2.0
-BEGIN:VEVENT
-ATTENDEE;PARTSTAT=Tentative:jqpublic@host.com
-ATTENDEE;ROLE=REQ-PARTICIPANT;PARTSTAT=Accepted;DELEGATED-FROM="mailto:jimdo@host1.com":jdoe@host1.com
-END:VEVENT
-END:VCALENDAR

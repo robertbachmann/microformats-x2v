@@ -1,8 +1,0 @@
-BEGIN:VCALENDAR
-PRODID:-//Life Lint//LifeLintCalendar 0.5//EN
-VERSION:2.0
-BEGIN:VEVENT
-SUMMARY:Cricket & Tennis Centre
-DESCRIPTION:Melbourne's Cricket & Tennis Centres are in the heart of the city
-END:VEVENT
-END:VCALENDAR

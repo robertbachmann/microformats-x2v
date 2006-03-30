@@ -1,8 +1,0 @@
-BEGIN:VCALENDAR
-PRODID:-//Life Lint//LifeLintCalendar 0.5//EN
-VERSION:2.0
-BEGIN:VEVENT
-SUMMARY:ORD-SFO/AA 1655
-URL:http://dps1.travelocity.com/dparcobrand.ctl?smls=Y&Service=YHOE&.intl=us&aln_name=AA&flt_num=1655&dep_arp_name=&arr_arp_name=&dep_dt_dy_1=23&dep_dt_mn_1=Jan&dep_dt_yr_1=2006&dep_tm_1=9:00am
-END:VEVENT
-END:VCALENDAR
