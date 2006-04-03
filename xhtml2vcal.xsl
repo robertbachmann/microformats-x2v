@@ -771,8 +771,8 @@ ATTACH</xsl:text>
 <xsl:choose>
 	<xsl:when test="@href != ''">
 		<xsl:choose>
-			<xsl:when test="@hreftype">
-				<xsl:text>;FMTTYPE=</xsl:text><xsl:value-of select="@hreftype"/>
+			<xsl:when test="@type">
+				<xsl:text>;FMTTYPE=</xsl:text><xsl:value-of select="@type"/>
 			</xsl:when>
 			<xsl:when test="substring-before(@href,':') = 'http'">
 				<xsl:text>:</xsl:text><xsl:value-of select="@href" />
