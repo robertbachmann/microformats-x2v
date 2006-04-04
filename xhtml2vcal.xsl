@@ -52,8 +52,8 @@ I'm not an XSLT expert, so there are no guarantees to quality of this code!
 <xsl:template match="/">
 	<xsl:text>BEGIN:VCALENDAR</xsl:text>
 	<xsl:text>&#x0A;PRODID:</xsl:text><xsl:value-of select="$Prodid"/>
-	<xsl:text>&#x0A;X-ORIGINAL-URL: </xsl:text><xsl:value-of select="$x-from-url"/>
-	<xsl:text>&#x0A;X-WR-CALNAME: </xsl:text>
+	<xsl:text>&#x0A;X-ORIGINAL-URL:</xsl:text><xsl:value-of select="$x-from-url"/>
+	<xsl:text>&#x0A;X-WR-CALNAME:</xsl:text>
 	<xsl:call-template name="escapeText">
 		<xsl:with-param name="text-string"><xsl:value-of select="normalize-space(//*[name() = 'title'])" /></xsl:with-param>
 	</xsl:call-template>
