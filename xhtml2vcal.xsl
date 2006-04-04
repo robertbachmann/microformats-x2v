@@ -20,8 +20,8 @@ brian@suda.co.uk
 http://suda.co.uk/
 
 XHTML-2-iCal
-Version 0.7.3
-2006-03-21
+Version 0.7.4
+2006-04-04
 
 Copyright 2005 Brian Suda
 This work is relicensed under The W3C Open Source License
@@ -33,7 +33,7 @@ Until the hCal spec has been finalised this is a work in progress.
 I'm not an XSLT expert, so there are no guarantees to quality of this code!
 
 -->
-<xsl:param name="Prodid">-//suda.co.uk//X2V 0.7.3 (BETA)//EN</xsl:param>
+<xsl:param name="Prodid">-//suda.co.uk//X2V 0.7.4 (BETA)//EN</xsl:param>
 <xsl:param name="x-from-url">(Best Practice: should be URL that this was ripped from)</xsl:param>
 <xsl:param name="Anchor" />
 
@@ -52,8 +52,8 @@ I'm not an XSLT expert, so there are no guarantees to quality of this code!
 <xsl:template match="/">
 	<xsl:text>BEGIN:VCALENDAR</xsl:text>
 	<xsl:text>&#x0A;PRODID:</xsl:text><xsl:value-of select="$Prodid"/>
-	<xsl:text>&#x0A;X-ORIGINAL-URL: </xsl:text><xsl:value-of select="normalize-space($x-from-url)"/>
-	<xsl:text>&#x0A;X-WR-CALNAME: </xsl:text>
+	<xsl:text>&#x0A;X-ORIGINAL-URL:</xsl:text><xsl:value-of select="normalize-space($x-from-url)"/>
+	<xsl:text>&#x0A;X-WR-CALNAME:</xsl:text>
 	<xsl:call-template name="escapeText">
 		<xsl:with-param name="text-string"><xsl:value-of select="normalize-space(//*[name() = 'title'])" /></xsl:with-param>
 	</xsl:call-template>
