@@ -52,7 +52,7 @@ I'm not an XSLT expert, so there are no guarantees to quality of this code!
 <xsl:template match="/">
 	<xsl:text>BEGIN:VCALENDAR</xsl:text>
 	<xsl:text>&#x0A;PRODID:</xsl:text><xsl:value-of select="$Prodid"/>
-	<xsl:text>&#x0A;X-ORIGINAL-URL: </xsl:text><xsl:value-of select="$x-from-url"/>
+	<xsl:text>&#x0A;X-ORIGINAL-URL: </xsl:text><xsl:value-of select="normalize-space($x-from-url)"/>
 	<xsl:text>&#x0A;X-WR-CALNAME: </xsl:text>
 	<xsl:call-template name="escapeText">
 		<xsl:with-param name="text-string"><xsl:value-of select="normalize-space(//*[name() = 'title'])" /></xsl:with-param>
@@ -816,6 +816,7 @@ ATTACH</xsl:text>
 </xsl:template>
 
 <!-- UID property-->
+<!--
 <xsl:template match="@id" mode="uid">
 <xsl:text>
 UID:</xsl:text>
@@ -823,6 +824,7 @@ UID:</xsl:text>
 	<xsl:with-param name="text-string"><xsl:value-of select="normalize-space(.)" /></xsl:with-param>
 </xsl:call-template>
 </xsl:template>
+-->
 
 <!-- convert all times to UTC Times -->
 <!-- RFC2426 mandates that iCal dates are in UTC without dashes or colons as seperators -->
@@ -853,8 +855,29 @@ UID:</xsl:text>
 		<xsl:text>Z</xsl:text>
 	</xsl:when>
 	<xsl:when test="substring-before($time-string,'T') = false()">
-		<!-- i think we need to pad a timestamp here?  -->
 		<xsl:value-of select="translate(translate($time-string, ':' ,''), '-' ,'')"/>
+		<xsl:if test="string-length(translate(translate($time-string, ':' ,''), '-' ,''))  &lt; 9">
+			<xsl:text>T</xsl:text>
+		</xsl:if>
+		<xsl:if test="string-length(translate(translate($time-string, ':' ,''), '-' ,''))  &lt; 10">
+			<xsl:text>0</xsl:text>
+		</xsl:if>
+		<xsl:if test="string-length(translate(translate($time-string, ':' ,''), '-' ,''))  &lt; 11">
+			<xsl:text>0</xsl:text>
+		</xsl:if>
+		<xsl:if test="string-length(translate(translate($time-string, ':' ,''), '-' ,''))  &lt; 12">
+			<xsl:text>0</xsl:text>
+		</xsl:if>
+		<xsl:if test="string-length(translate(translate($time-string, ':' ,''), '-' ,''))  &lt; 13">
+			<xsl:text>0</xsl:text>
+		</xsl:if>
+		<xsl:if test="string-length(translate(translate($time-string, ':' ,''), '-' ,''))  &lt; 14">
+			<xsl:text>0</xsl:text>
+		</xsl:if>
+		<xsl:if test="string-length(translate(translate($time-string, ':' ,''), '-' ,''))  &lt; 15">
+			<xsl:text>0</xsl:text>
+		</xsl:if>
+		<xsl:text>Z</xsl:text>
 	</xsl:when>
 	<xsl:otherwise>
 		<xsl:variable name="event-year"> <xsl:value-of select="substring(translate($time-string, '-' ,''),1,4)"/></xsl:variable>
