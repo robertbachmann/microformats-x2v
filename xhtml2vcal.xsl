@@ -770,10 +770,10 @@ ATTACH</xsl:text>
 
 <xsl:choose>
 	<xsl:when test="@href != ''">
+		<xsl:if test="@type">
+			<xsl:text>;FMTTYPE=</xsl:text><xsl:value-of select="@type"/>
+		</xsl:if>
 		<xsl:choose>
-			<xsl:when test="@type">
-				<xsl:text>;FMTTYPE=</xsl:text><xsl:value-of select="@type"/>
-			</xsl:when>
 			<xsl:when test="substring-before(@href,':') = 'http'">
 				<xsl:text>:</xsl:text><xsl:value-of select="@href" />
 			</xsl:when>
@@ -781,7 +781,9 @@ ATTACH</xsl:text>
 				<xsl:text>;ENCODING=BASE64;VALUE=BINARY:</xsl:text><xsl:value-of select="substring-after(@src,',')"/>
 			</xsl:when>
 			<xsl:when test="@href != ''">
-				<xsl:text>:</xsl:text><xsl:value-of select="@href"/>
+				<!-- probably need to make this absolute ONLY if no other protocol -->
+				<xsl:text>:</xsl:text>
+				<xsl:value-of select="@href"/>
 			</xsl:when>
 			<xsl:otherwise>
 				<xsl:text>:</xsl:text><xsl:value-of select="normalize-space(.)"/>
