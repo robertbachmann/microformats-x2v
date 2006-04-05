@@ -282,7 +282,7 @@ URL:</xsl:text>
 						</xsl:call-template>
 						
 					</xsl:with-param>
-					<xsl:with-param name="there"><xsl:value-of select="@src"/></xsl:with-param>
+					<xsl:with-param name="there"><xsl:value-of select="@href"/></xsl:with-param>
 				</xsl:call-template>
 			</xsl:otherwise>
 		</xsl:choose>
