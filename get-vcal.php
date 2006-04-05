@@ -64,7 +64,7 @@ if ((substr($uri, 0,7) == "http://") || (substr($uri, 0,8) == "https://")) {
 
 	// set the parameter buffer
 	// pass the $uri and the $anchor if it is available
-	$xsl_params = array('x-from-url'=>$uri,'x-anchor'=>$anchor,'Anchor'=>$anchor);
+	$xsl_params = array('x-from-url'=>$uri,'Source'=>$uri,'x-anchor'=>$anchor,'Anchor'=>$anchor);
 
 	$Str = '';
 	// process the two files to get the desired output

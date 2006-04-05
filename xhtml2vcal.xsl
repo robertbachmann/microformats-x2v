@@ -20,7 +20,7 @@ brian@suda.co.uk
 http://suda.co.uk/
 
 XHTML-2-iCal
-Version 0.7.4
+Version 0.7.5
 2006-04-04
 
 Copyright 2005 Brian Suda
@@ -33,8 +33,8 @@ Until the hCal spec has been finalised this is a work in progress.
 I'm not an XSLT expert, so there are no guarantees to quality of this code!
 
 -->
-<xsl:param name="Prodid">-//suda.co.uk//X2V 0.7.4 (BETA)//EN</xsl:param>
-<xsl:param name="x-from-url">(Best Practice: should be URL that this was ripped from)</xsl:param>
+<xsl:param name="Prodid">-//suda.co.uk//X2V 0.7.5 (BETA)//EN</xsl:param>
+<xsl:param name="Source">(Best Practice: should be URL that this was ripped from)</xsl:param>
 <xsl:param name="Anchor" />
 
 <xsl:param name="Debug" select="0"/>
