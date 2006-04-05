@@ -95,7 +95,7 @@ Without the correct profile you cannot assume the class values are intended for 
 
 		<xsl:call-template name="vcardProperties"/>
 
-		<xsl:text>&#x0A;END:VCARD&#x0A;&#x0A;</xsl:text>
+		<xsl:text>&#x0A;END:VCARD</xsl:text>
 	</xsl:if>
 </xsl:template>
 
