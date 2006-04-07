@@ -72,7 +72,7 @@ Without the correct profile you cannot assume the class values are intended for 
 		<xsl:text>BEGIN:VCARD</xsl:text>
 		<xsl:text>&#x0A;PRODID:</xsl:text><xsl:value-of select="$Prodid"/>
 		<xsl:text>&#x0A;SOURCE:</xsl:text><xsl:value-of select="$Source"/>
-		<xsl:text>&#x0A;NAME: </xsl:text>
+		<xsl:text>&#x0A;NAME:</xsl:text>
 		<xsl:apply-templates select="//*[name() = 'title']" mode="unFormatText" />
 		<xsl:text>&#x0A;VERSION:3.0</xsl:text>
 
