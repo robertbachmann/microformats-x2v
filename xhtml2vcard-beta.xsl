@@ -24,8 +24,8 @@ brian@suda.co.uk
 http://suda.co.uk/
 
 XHTML-2-vCard
-Version 0.7.12
-2005-03-27
+Version 0.7.13
+2005-04-06
 
 Copyright 2005 Brian Suda
 This work is relicensed under The W3C Open Source License
@@ -44,7 +44,7 @@ I'm not an XSLT expert, so there are no guarantees to quality of this code!
 
 
 
-<xsl:param name="Prodid" select='"-//suda.co.uk//X2V 0.7.12 (BETA)//EN"' />
+<xsl:param name="Prodid" select='"-//suda.co.uk//X2V 0.7.13 (BETA)//EN"' />
 <xsl:param name="Source" >(Best Practices states this should be the URL the vcard was transformed from)</xsl:param>
 <xsl:param name="Encoding" >UTF-8</xsl:param>
 <xsl:param name="Anchor" />
@@ -308,6 +308,27 @@ URL:</xsl:text>
 			</xsl:otherwise>
 		</xsl:choose>
 	</xsl:when>
+	<xsl:when test="@data != ''">
+		<xsl:choose>
+			<xsl:when test="substring-before(@data,':') = 'http'">
+				<xsl:value-of select="normalize-space(@data)" />
+			</xsl:when>
+			<xsl:otherwise>
+				<!-- convert to absolute url -->
+				<xsl:call-template name="uri:expand">
+					<xsl:with-param name="base">
+
+						<xsl:call-template name="baseURL">
+							<xsl:with-param name="Source"><xsl:value-of select="$Source" /></xsl:with-param>
+						</xsl:call-template>
+						
+					</xsl:with-param>
+					<xsl:with-param name="there"><xsl:value-of select="@src"/></xsl:with-param>
+				</xsl:call-template>
+
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:when>
 	<xsl:otherwise>
 		<xsl:variable name="textFormatted">
 		<xsl:apply-templates select="." mode="unFormatText" />
@@ -419,7 +440,7 @@ BDAY:</xsl:text>
 			<xsl:when test="substring-before(@src,':') = 'data'">
 					<xsl:text>;ENCODING=b;TYPE=</xsl:text><xsl:value-of select="substring-after(substring-after(substring-before(@src,';'),':'),'/')"/><xsl:text>:</xsl:text><xsl:value-of select="substring-after(@src,',')"/>
 			</xsl:when>
-			<xsl:when test="@src">
+			<xsl:otherwise>
 				<xsl:choose>
 					<xsl:when test="@src">
 						<xsl:text>;VALUE=uri:</xsl:text>
@@ -486,13 +507,6 @@ BDAY:</xsl:text>
 						<xsl:value-of select="normalize-space($textFormatted)"/>
 					</xsl:otherwise>
 				</xsl:choose>
-			</xsl:when>
-			<xsl:otherwise>
-				<xsl:text>:</xsl:text>
-				<xsl:variable name="textFormatted">
-				<xsl:apply-templates select="." mode="unFormatText" />
-				</xsl:variable>
-				<xsl:value-of select="normalize-space($textFormatted)"/>
 			</xsl:otherwise>
 		</xsl:choose>
 		</xsl:if>
@@ -794,6 +808,27 @@ BDAY:</xsl:text>
 						<xsl:otherwise>
 							<xsl:call-template name="escapeText">
 								<xsl:with-param name="text-string" select='substring-before(normalize-space(@title), " ")' />
+							</xsl:call-template>
+						</xsl:otherwise>
+					</xsl:choose>
+				</xsl:when>
+				<xsl:when test="local-name(.) = 'img' and @alt">
+					<xsl:variable name="family-name">
+						<xsl:value-of select='substring-after(normalize-space(@alt), " ")' />
+					</xsl:variable>
+					<xsl:call-template name="escapeText">
+						<xsl:with-param name="text-string" select="$family-name" />
+					</xsl:call-template>
+					<xsl:text>;</xsl:text>
+					<xsl:choose>
+						<xsl:when test='not(substring-before(normalize-space(@alt), " "))'>
+							<xsl:call-template name="escapeText">
+								<xsl:with-param name="text-string" select="normalize-space(@alt)" />
+							</xsl:call-template>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:call-template name="escapeText">
+								<xsl:with-param name="text-string" select='substring-before(normalize-space(@alt), " ")' />
 							</xsl:call-template>
 						</xsl:otherwise>
 					</xsl:choose>

@@ -24,8 +24,8 @@ brian@suda.co.uk
 http://suda.co.uk/
 
 XHTML-2-vCard
-Version 0.7.10.1
-2005-02-27
+Version 0.7.11
+2005-04-07
 
 Copyright 2005 Brian Suda
 This work is relicensed under The W3C Open Source License
@@ -44,7 +44,7 @@ I'm not an XSLT expert, so there are no guarantees to quality of this code!
 
 
 
-<xsl:param name="Prodid" select='"-//suda.co.uk//X2V 0.7.10.1 (BETA)//EN"' />
+<xsl:param name="Prodid" select='"-//suda.co.uk//X2V 0.7.11 (BETA)//EN"' />
 <xsl:param name="Source" >(Best Practices states this should be the URL the vcard was transformed from)</xsl:param>
 <xsl:param name="Encoding" >UTF-8</xsl:param>
 <xsl:param name="Anchor" />
@@ -746,6 +746,27 @@ BDAY:</xsl:text>
 						<xsl:otherwise>
 							<xsl:call-template name="escapeText">
 								<xsl:with-param name="text-string" select='substring-before(normalize-space(@title), " ")' />
+							</xsl:call-template>
+						</xsl:otherwise>
+					</xsl:choose>
+				</xsl:when>
+				<xsl:when test="local-name(.) = 'img' and @alt">
+					<xsl:variable name="family-name">
+						<xsl:value-of select='substring-after(normalize-space(@alt), " ")' />
+					</xsl:variable>
+					<xsl:call-template name="escapeText">
+						<xsl:with-param name="text-string" select="$family-name" />
+					</xsl:call-template>
+					<xsl:text>;</xsl:text>
+					<xsl:choose>
+						<xsl:when test='not(substring-before(normalize-space(@alt), " "))'>
+							<xsl:call-template name="escapeText">
+								<xsl:with-param name="text-string" select="normalize-space(@alt)" />
+							</xsl:call-template>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:call-template name="escapeText">
+								<xsl:with-param name="text-string" select='substring-before(normalize-space(@alt), " ")' />
 							</xsl:call-template>
 						</xsl:otherwise>
 					</xsl:choose>
