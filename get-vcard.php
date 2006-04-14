@@ -84,6 +84,8 @@ set_time_limit(90);
 		$filename = "xhtml2vcard.xsl"; 	
 	}
 
+	$filename = "xhtml2vcard.xsl"; 	
+
 	// open the preflight check XSL file
 	$filename_preflight = "xhtml2vcard-preflight.xsl"; 
 	$handle2 = fopen($filename_preflight, "r");
