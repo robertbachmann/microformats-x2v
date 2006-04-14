@@ -24,8 +24,8 @@ brian@suda.co.uk
 http://suda.co.uk/
 
 XHTML-2-vCard
-Version 0.7.14
-2005-04-13
+Version 0.7.12
+2005-03-27
 
 Copyright 2005 Brian Suda
 This work is relicensed under The W3C Open Source License
@@ -44,7 +44,7 @@ I'm not an XSLT expert, so there are no guarantees to quality of this code!
 
 
 
-<xsl:param name="Prodid" select='"-//suda.co.uk//X2V 0.7.14 (BETA)//EN"' />
+<xsl:param name="Prodid" select='"-//suda.co.uk//X2V 0.7.12 (BETA)//EN"' />
 <xsl:param name="Source" >(Best Practices states this should be the URL the vcard was transformed from)</xsl:param>
 <xsl:param name="Encoding" >UTF-8</xsl:param>
 <xsl:param name="Anchor" />
@@ -72,7 +72,7 @@ Without the correct profile you cannot assume the class values are intended for 
 		<xsl:text>BEGIN:VCARD</xsl:text>
 		<xsl:text>&#x0A;PRODID:</xsl:text><xsl:value-of select="$Prodid"/>
 		<xsl:text>&#x0A;SOURCE:</xsl:text><xsl:value-of select="$Source"/>
-		<xsl:text>&#x0A;NAME:</xsl:text>
+		<xsl:text>&#x0A;NAME: </xsl:text>
 		<xsl:apply-templates select="//*[name() = 'title']" mode="unFormatText" />
 		<xsl:text>&#x0A;VERSION:3.0</xsl:text>
 
@@ -103,13 +103,11 @@ Without the correct profile you cannot assume the class values are intended for 
 <xsl:template name="vcardProperties">
 	<!--  Implied "N" Optimization -->
 	<xsl:variable name="n-elt" select=".//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ', normalize-space(@class), ' '),' n ')]" />
-	<xsl:variable name="is-org" select="(true() = normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ') and name() = 'img']/@alt) and true() = normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' org ') and name() = 'img']/@alt) and normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ') and name() = 'img']/@alt) = normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' org ') and name() = 'img']/@alt)) or (true() = normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ') and name() = 'abbr']/@title) and true() = normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' org ') and name() = 'abbr']/@title) and normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ') and name() = 'abbr']/@title) = normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' org ') and name() = 'abbr']/@title)) or (true() = normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ') and name() = 'abbr']/@title) and true() = normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' org ') and name() = 'img']/@alt) and normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ') and name() = 'abbr']/@title) = normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' org ') and name() = 'img']/@alt)) or (true() = normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ') and name() = 'img']/@alt) and true() = normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' org ') and name() = 'abbr']/@title) and normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ') and name() = 'img']/@alt) = normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' org ') and name() = 'abbr']/@title)) or (true() = normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ')]) and true() = normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' org ') and name() = 'abbr']/@title) and normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ')]) = normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' org ') and name() = 'abbr']/@title)) or (true() = normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ')]) and true() = normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' org ') and name() = 'img']/@alt) and normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ')]) = normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' org ') and name() = 'img']/@alt)) or (true() = normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' org ')]) and true() = normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ') and name() = 'abbr']/@title) and normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ')]) = normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ') and name() = 'abbr']/@title)) or (true() = normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' org ')]) and true() = normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ') and name() = 'abbr']/@title) and normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' org ')]) = normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ') and name() = 'img']/@alt))"/>
-
 	<xsl:choose>
 		<xsl:when test="$n-elt">
 			<xsl:call-template name="n-prop" />
 		</xsl:when>
-		<xsl:when test="$is-org">
+		<xsl:when test="normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ')]) = normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' org ')])">
 			<xsl:text>&#x0A;N:;;;;;</xsl:text>		
 		</xsl:when>
 		<xsl:when test="not($n-elt) and not(string-length(normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ')])) &gt; 1+string-length(translate(normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ')]),' ','')))">
@@ -129,7 +127,6 @@ Without the correct profile you cannot assume the class values are intended for 
 		<xsl:with-param name="label">FN</xsl:with-param>
 		<xsl:with-param name="class">fn</xsl:with-param>
 	</xsl:call-template>
-	
 	<xsl:call-template name="emailProp">
 		<xsl:with-param name="label">EMAIL</xsl:with-param>
 		<xsl:with-param name="class">email</xsl:with-param>
@@ -167,26 +164,14 @@ Without the correct profile you cannot assume the class values are intended for 
 	
 	<!-- Check to see if this is not a company -->
 	<xsl:choose>
-		<xsl:when test="not($is-org)">
+		<xsl:when test="not(normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ')]) = normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' org ')]))">
 			<!-- check to see it is only one word long -->
 			<xsl:choose>
-				<xsl:when test="((true() = normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ') and name() = 'img']/@alt) and (string-length(normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ') and name() = 'img']/@alt)) = string-length(translate(normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ') and name() = 'img']/@alt),' ','')))) or (true() = normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ') and name() = 'abbr']/@title) and (string-length(normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ') and name() = 'abbr']/@title)) = string-length(translate(normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ') and name() = 'abbr']/@title),' ','')))) or (true() = normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ') and not(name() = 'abbr' or name() = 'img')]) and (string-length(normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ') and not(name() = 'abbr' or name() = 'img')])) = string-length(translate(normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ') and not(name() = 'abbr' or name() = 'img')]),' ','')))))">
+				<xsl:when test="string-length(normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ')])) = string-length(translate(normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ')]),' ',''))">
 					<xsl:call-template name="multiTextPropLang">
 						<xsl:with-param name="label">NICKNAME</xsl:with-param>
 						<xsl:with-param name="class">nickname</xsl:with-param>
-						<xsl:with-param name="append">
-							<xsl:choose>
-								<xsl:when test="true() = normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ') and name() = 'img']/@alt)">
-									<xsl:value-of select=".//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ')]/@alt"/>
-								</xsl:when>
-								<xsl:when test="true() = normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ') and name() = 'abbr']/@title)">
-									<xsl:value-of select="normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ')]/@title)"/>
-								</xsl:when>
-								<xsl:otherwise>
-									<xsl:value-of select="normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ')])"/>
-								</xsl:otherwise>
-							</xsl:choose>
-						</xsl:with-param>
+						<xsl:with-param name="append"><xsl:value-of select="normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ')])"/></xsl:with-param>
 					</xsl:call-template>
 				</xsl:when>
 				<xsl:otherwise>
@@ -297,7 +282,7 @@ URL:</xsl:text>
 						</xsl:call-template>
 						
 					</xsl:with-param>
-					<xsl:with-param name="there"><xsl:value-of select="@href"/></xsl:with-param>
+					<xsl:with-param name="there"><xsl:value-of select="@src"/></xsl:with-param>
 				</xsl:call-template>
 			</xsl:otherwise>
 		</xsl:choose>
@@ -318,27 +303,6 @@ URL:</xsl:text>
 						
 					</xsl:with-param>
 					<xsl:with-param name="there"><xsl:value-of select="@src"/></xsl:with-param>
-				</xsl:call-template>
-
-			</xsl:otherwise>
-		</xsl:choose>
-	</xsl:when>
-	<xsl:when test="@data != ''">
-		<xsl:choose>
-			<xsl:when test="substring-before(@data,':') = 'http'">
-				<xsl:value-of select="normalize-space(@data)" />
-			</xsl:when>
-			<xsl:otherwise>
-				<!-- convert to absolute url -->
-				<xsl:call-template name="uri:expand">
-					<xsl:with-param name="base">
-
-						<xsl:call-template name="baseURL">
-							<xsl:with-param name="Source"><xsl:value-of select="$Source" /></xsl:with-param>
-						</xsl:call-template>
-						
-					</xsl:with-param>
-					<xsl:with-param name="there"><xsl:value-of select="@data"/></xsl:with-param>
 				</xsl:call-template>
 
 			</xsl:otherwise>
@@ -455,7 +419,7 @@ BDAY:</xsl:text>
 			<xsl:when test="substring-before(@src,':') = 'data'">
 					<xsl:text>;ENCODING=b;TYPE=</xsl:text><xsl:value-of select="substring-after(substring-after(substring-before(@src,';'),':'),'/')"/><xsl:text>:</xsl:text><xsl:value-of select="substring-after(@src,',')"/>
 			</xsl:when>
-			<xsl:otherwise>
+			<xsl:when test="@src">
 				<xsl:choose>
 					<xsl:when test="@src">
 						<xsl:text>;VALUE=uri:</xsl:text>
@@ -522,6 +486,13 @@ BDAY:</xsl:text>
 						<xsl:value-of select="normalize-space($textFormatted)"/>
 					</xsl:otherwise>
 				</xsl:choose>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:text>:</xsl:text>
+				<xsl:variable name="textFormatted">
+				<xsl:apply-templates select="." mode="unFormatText" />
+				</xsl:variable>
+				<xsl:value-of select="normalize-space($textFormatted)"/>
 			</xsl:otherwise>
 		</xsl:choose>
 		</xsl:if>
@@ -804,6 +775,7 @@ BDAY:</xsl:text>
 			<xsl:call-template name="lang" />
 			<xsl:text>;CHARSET=</xsl:text><xsl:value-of select="$Encoding"/>
 			<xsl:text>:</xsl:text>
+		
 			<xsl:choose>
 				<xsl:when test="local-name(.) = 'abbr' and @title">
 					<xsl:variable name="family-name">
@@ -826,28 +798,6 @@ BDAY:</xsl:text>
 						</xsl:otherwise>
 					</xsl:choose>
 				</xsl:when>
-				<xsl:when test="local-name(.) = 'img' and @alt">
-					<xsl:variable name="family-name">
-						<xsl:value-of select='substring-after(normalize-space(@alt), " ")' />
-					</xsl:variable>
-					<xsl:call-template name="escapeText">
-						<xsl:with-param name="text-string" select="$family-name" />
-					</xsl:call-template>
-					<xsl:text>;</xsl:text>
-					<xsl:choose>
-						<xsl:when test='not(substring-before(normalize-space(@alt), " "))'>
-							<xsl:call-template name="escapeText">
-								<xsl:with-param name="text-string" select="normalize-space(@alt)" />
-							</xsl:call-template>
-						</xsl:when>
-						<xsl:otherwise>
-							<xsl:call-template name="escapeText">
-								<xsl:with-param name="text-string" select='substring-before(normalize-space(@alt), " ")' />
-							</xsl:call-template>
-						</xsl:otherwise>
-					</xsl:choose>
-				</xsl:when>
-				<!-- might need to add case when data is on OBJECT element? -->
 				<xsl:otherwise>
 					<xsl:variable name="family-name">
 						<xsl:value-of select='substring-after(normalize-space(.), " ")' />
@@ -959,7 +909,7 @@ BDAY:</xsl:text>
 			<xsl:call-template name="lang" />
 			<xsl:text>;CHARSET=</xsl:text><xsl:value-of select="$Encoding"/>
 	    	<xsl:text>:</xsl:text>
-			<xsl:if test="$append">				
+			<xsl:if test="$append">
 				<xsl:value-of select="$append"/><xsl:text>,</xsl:text>
 			</xsl:if>
 		</xsl:when>
@@ -978,7 +928,7 @@ BDAY:</xsl:text>
 		<xsl:choose>
 			<xsl:when test='local-name(.) = "ol" or local-name(.) = "ul"'>
 				<xsl:for-each select="*">
-					<xsl:if test="not(position()=1) and not($append)">
+					<xsl:if test="not(position()=1)">
 						<xsl:text>,</xsl:text>
 					</xsl:if>
 					<xsl:choose>
