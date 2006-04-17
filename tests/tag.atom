@@ -3,12 +3,13 @@
   <updated/>
   <id>http://example.com/tag.html</id>
   <link rel="alternate" href="http://example.com/tag.html" type="text/html"/>
-  <title>Feed Title</title>
+  <title>Page title</title>
   <category term="some-tag" label="some tag no. 1"/>
   <category term="some-tag" label="some tag no. 2"/>
   <entry>
     <title>Entry One Title</title>
     <id>http://example.com/tag.html#e1</id>
+    <link rel="alternate" href="http://example.com/tag.html#e1" type="text/html"/>
     <updated>2005-12-25T00:00:00Z</updated>
     <content type="xhtml">
       <div xmlns="http://www.w3.org/1999/xhtml">

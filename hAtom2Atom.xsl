@@ -2,59 +2,63 @@
                                 hAtom2Atom.xsl
    An XSLT stylesheet for transforming hAtom documents into Atom documents.
 
-            $Id: hAtom2Atom.xsl 36 2006-03-22 22:13:54Z RobertBachmann $
+            $Id: hAtom2Atom.xsl 37 2006-04-17 18:22:05Z RobertBachmann $
 
-                                    LICENSE
+                            SUPPORTED XSLT ENGINES
 
-Copyright 2005 Luke Arno <http://lukearno.com/>
-Copyright 2005-06 Robert Bachmann <http://rbach.priv.at/>
-Copyright 2005-06 Benjamin Carlyle <http://soundadvice.id.au/>
-
-This work is licensed under The W3C Open Source License
-http://www.w3.org/Consortium/Legal/copyright-software-19980720
+   4xslt <http://4suite.org/>
+   libxslt <http://xmlsoft.org/XSLT/>
+   Saxon <http://saxon.sourceforge.net/>
+   Xalan-J <http://xml.apache.org/xalan-j/>
 
                               USAGE INSTRUCTIONS
 
-To use this programme your XSLT engine must support the node-set()
-extension function.
-If your XSLT engine supports EXSLT it will most likely support node-set().
-If you are using Microsoft's XML, .net's System.xml or Oracles XDK
-you must change the value of xmlns:extension.
-See the comment located bellow <xsl:transform> for instructions.
+   It is highly recommended that you set the stylesheet's 
+   source-uri parameter to the source URI of your input document.
 
-Your XHTML document must have the namespace "http://www.w3.org/1999/xhtml",
-if it does not or if your input document is written in HTML, filter it
-through "tidy -asxhtml" <http://tidy.sourceforge.net/> before
-processing it with hAtom2Atom.xsl.
-
-This stylesheet and the hAtom specification are still works in progress. 
-Use it at your own risk! 
-In all likelihood you will have to play around to get valid output.
+   Your XHTML document must have the namespace "http://www.w3.org/1999/xhtml".
+   If it does not or if your input document is written in HTML, filter it
+   through "tidy -asxhtml" <http://tidy.sourceforge.net/> before
+   processing it with hAtom2Atom.xsl.
 
                                      NOTES
 
-Code sections which are extensions to the current hAtom draft are enclosed
-by "[extension]" and "[/extension]".
+   Code sections which are extensions to the current hAtom draft are enclosed
+   by "[extension]" and "[/extension]".
+
+   This stylesheet and the hAtom specification are still works in progress. 
+   Use it at your own risk! 
+   In all likelihood you will have to play around to get valid output.
 
                                    SEE ALSO
 
-For the latest version of this stylesheet: 
-    <http://rbach.priv.at/hAtom/>
+   For the latest version of this stylesheet: 
+     <http://rbach.priv.at/hAtom/>
     
-Information about hAtom:
-    <http://microformats.org/wiki/hatom>
+   Information about hAtom:
+     <http://microformats.org/wiki/hatom>
     
-Information about Atom:
-    <http://www.ietf.org/rfc/rfc4287>
+   Information about Atom:
+     <http://www.ietf.org/rfc/rfc4287>
+
+                                    LICENSE
+
+   Copyright 2005 Luke Arno <http://lukearno.com/>
+   Copyright 2005-06 Robert Bachmann <http://rbach.priv.at/>
+   Copyright 2005-06 Benjamin Carlyle <http://soundadvice.id.au/>
+
+   This work is licensed under The W3C Open Source License
+   http://www.w3.org/Consortium/Legal/copyright-software-19980720
+
 
                                ACKNOWLEDGEMENTS
 
-Structure of the multi-valued attribute selection trick taken from
-Brian Suda's XHTML-2-iCal: 
-    <http://suda.co.uk/projects/X2V/xhtml2vcal.xsl>
+   Structure of the multi-valued attribute selection trick taken from
+   Brian Suda's XHTML-2-iCal: 
+     <http://suda.co.uk/projects/X2V/xhtml2vcal.xsl>
 
-This work is based on hAtom2Atom.xsl version 0.0.6 from
-    <http://lukearno.com/projects/hAtom/>
+   This work is based on hAtom2Atom.xsl version 0.0.6 from
+     <http://lukearno.com/projects/hAtom/>
 
 -->
 
@@ -67,22 +71,6 @@ This work is based on hAtom2Atom.xsl version 0.0.6 from
                xmlns:uri ="http://www.w3.org/2000/07/uri43/uri.xsl?template="
                extension-element-prefixes="extension str"
                exclude-result-prefixes="xhtml uri">
-<!-- 
-    node-set() for Microsoft's XML, .net's System.xml and Oracle's XDK
-
-
-    Microsoft users should replace 
-        xmlns:extension="http://exslt.org/common"
-    with
-        xmlns:extension="urn:schemas-microsoft-com:xslt"
-
-
-    Oracle users should replace
-        xmlns:extension="http://exslt.org/common"
-    with
-        xmlns:extension="http://www.oracle.com/XSL/Transform/java"
--->
-
 
 <!-- Downloaded from http://www.w3.org/2000/07/uri43/uri.xsl -->
 <xsl:import href="uri.xsl" />
@@ -91,6 +79,17 @@ This work is based on hAtom2Atom.xsl version 0.0.6 from
 <xsl:param name="content-type">text/html</xsl:param>
 
 <xsl:output method="xml" indent="yes" encoding="UTF-8" />
+
+<xsl:variable name="source-uri-sans-fragment">
+  <xsl:choose>
+    <xsl:when test="contains($source-uri,'#')">
+      <xsl:value-of select="substring-before($source-uri,'#')" />
+    </xsl:when>
+    <xsl:otherwise>
+      <xsl:value-of select="$source-uri" />
+    </xsl:otherwise>
+  </xsl:choose>
+</xsl:variable>
 
 <xsl:template match="node()|@*">
   <xsl:param name="where"/>
@@ -102,8 +101,6 @@ This work is based on hAtom2Atom.xsl version 0.0.6 from
 
 <!-- Inhibit <q> and <blockquote -->
 <xsl:template match="xhtml:q|xhtml:blockquote" />
-<xsl:template match="xhtml:blockquote[contains(concat(' ',normalize-space(@class),' '),' hentry ')]" />
-<xsl:template match="xhtml:q[contains(concat(' ',normalize-space(@class),' '),' hentry ')]" />
 
 <xsl:template match="/">
   <!--
@@ -209,13 +206,13 @@ This work is based on hAtom2Atom.xsl version 0.0.6 from
         </xsl:when>
         <!-- If the feed has an ID attribute use it thogether with $source-uri -->
         <xsl:when test="@id">
-          <xsl:variable name="uri" select="concat($source-uri,'#',@id)"/>
+          <xsl:variable name="uri" select="concat($source-uri-sans-fragment,'#',@id)"/>
           <id><xsl:value-of select="$uri"/></id>
           <link rel="alternate" href="{$uri}" type="{$content-type}"/>
         </xsl:when>
         <!-- Use the $source-uri of the feed -->
         <xsl:otherwise>
-          <xsl:variable name="uri" select="$source-uri"/>
+          <xsl:variable name="uri" select="$source-uri-sans-fragment"/>
           <id><xsl:value-of select="$uri"/></id>
           <link rel="alternate" href="{$uri}" type="{$content-type}"/>
         </xsl:otherwise>
@@ -229,9 +226,6 @@ This work is based on hAtom2Atom.xsl version 0.0.6 from
       <xsl:variable name="classTitles"
         select="extension:node-set($feedLevelElements)/descendant-or-self::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' feed-title ')]"
         />
-      <xsl:variable name="headerTitles"
-        select="extension:node-set($feedLevelElements)/descendant-or-self::xhtml:h1|extension:node-set($feedLevelElements)/descendant-or-self::xhtml:h2|extension:node-set($feedLevelElements)/descendant-or-self::xhtml:h3|extension:node-set($feedLevelElements)/descendant-or-self::xhtml:h4|extension:node-set($feedLevelElements)/descendant-or-self::xhtml:h5|extension:node-set($feedLevelElements)/descendant-or-self::xhtml:h6"
-        />
     
       <xsl:choose>
         <xsl:when test="$classTitles">
@@ -239,8 +233,8 @@ This work is based on hAtom2Atom.xsl version 0.0.6 from
             <title><xsl:call-template name="text-value-of"/></title>
           </xsl:for-each>
         </xsl:when>
-        <xsl:when test="$headerTitles">
-          <xsl:for-each select="$headerTitles[1]">
+        <xsl:when test="/xhtml:html/xhtml:head/xhtml:title">
+          <xsl:for-each select="/xhtml:html/xhtml:head/xhtml:title[1]">
             <title><xsl:call-template name="text-value-of"/></title>
           </xsl:for-each>
         </xsl:when>
@@ -264,7 +258,7 @@ This work is based on hAtom2Atom.xsl version 0.0.6 from
 
 <xsl:template match="xhtml:*[contains(concat(' ',normalize-space(@class),' '),' hentry ')]">
   <xsl:param name="where"/>
-  <xsl:if test="$where = 'feed'">
+  <xsl:if test="($where = 'feed') and (local-name() != 'q' and local-name() != 'blockquote')">
   <xsl:variable name="entry-base">
     <xsl:apply-templates select="." mode="get-base">
       <xsl:with-param name="fallback" select="/xhtml:html/xhtml:head/xhtml:base[1]/@href" />
@@ -342,28 +336,12 @@ This work is based on hAtom2Atom.xsl version 0.0.6 from
             </xsl:for-each>
           </link>
         </xsl:when>
-      <!--[extension]-->
         <!-- Try to use the entry's id attribute as ID -->
         <xsl:when test="@id != ''">
-          <id>
-            <!-- Convert to absolute URI -->
-            <xsl:call-template name="uri:expand">
-              <xsl:with-param name="base" select="$entry-base" />
-              <xsl:with-param name="there" select="concat('#',@id)" />
-            </xsl:call-template>
-          </id>
+          <xsl:variable name="uri" select="concat($source-uri-sans-fragment,'#',@id)" />
+          <id><xsl:value-of select="$uri" /></id>
+          <link rel="alternate" href="{$uri}" type="{$content-type}" />
         </xsl:when>
-        <!-- Try to use the entry's name attribute as ID -->
-        <xsl:when test="@name != ''">
-          <id>
-            <!-- Convert to absolute URI -->
-            <xsl:call-template name="uri:expand">
-              <xsl:with-param name="base" select="$entry-base" />
-              <xsl:with-param name="there" select="concat('#',@name)" />
-            </xsl:call-template>
-          </id>
-        </xsl:when>
-      <!--[/extension]-->
         <xsl:otherwise>
           <!--ERROR: <id> is mandatory -->
           <id/>

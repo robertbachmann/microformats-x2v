@@ -1,9 +1,9 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xml:base="http://example.com/updated-published.html">
   <updated/>
   <id>http://example.com/updated-published.html</id>
   <link rel="alternate" href="http://example.com/updated-published.html" type="text/html"/>
-  <title>Feed Title</title>
+  <title>Page title</title>
   <entry>
     <title>Title ...</title>
     <id/>

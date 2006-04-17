@@ -1,9 +1,9 @@
-<?xml version="1.0"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xml:base="http://example.com/author.html">
   <updated>2005-12-25T00:00:00Z</updated>
   <id>http://example.com/author.html</id>
   <link rel="alternate" href="http://example.com/author.html" type="text/html"/>
-  <title>Feed Title</title>
+  <title>Page title</title>
   <entry>
     <title>Entry One Title</title>
     <id>http://example.com/entry</id>
@@ -22,6 +22,7 @@
   <entry>
     <title>Entry Two Title</title>
     <id>http://example.com/author.html#e2</id>
+    <link rel="alternate" href="http://example.com/author.html#e2" type="text/html"/>
     <updated>2005-12-25T00:00:00Z</updated>
     <author>
       <name>Entry Two Author One</name>
@@ -33,6 +34,7 @@
   <entry>
     <title>Entry Three Title</title>
     <id>http://example.com/author.html#e3</id>
+    <link rel="alternate" href="http://example.com/author.html#e3" type="text/html"/>
     <updated>2005-12-25T00:00:00Z</updated>
     <author>
       <name>Entry Three Author One</name>
@@ -48,6 +50,7 @@
   <entry>
     <title>Entry Four Title</title>
     <id>http://example.com/author.html#e4</id>
+    <link rel="alternate" href="http://example.com/author.html#e4" type="text/html"/>
     <updated>2005-12-25T00:00:00Z</updated>
     <author>
       <name>Entry Four Author One</name>
@@ -68,6 +71,7 @@
   <entry>
     <title>Entry Five Title</title>
     <id>http://example.com/author.html#e5</id>
+    <link rel="alternate" href="http://example.com/author.html#e5" type="text/html"/>
     <updated>2005-12-25T00:00:00Z</updated>
     <author>
       <name>Entry Five Author One</name>
@@ -83,6 +87,7 @@
   <entry>
     <title>Entry Six Title</title>
     <id>http://example.com/author.html#e6</id>
+    <link rel="alternate" href="http://example.com/author.html#e6" type="text/html"/>
     <updated>2005-12-25T00:00:00Z</updated>
     <author>
       <name>John Doe</name>
