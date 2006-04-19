@@ -714,7 +714,7 @@ URL</xsl:text>
 				<!-- convert to absolute url -->
 				
 				<xsl:call-template name="uri:expand">
-					<xsl:with-param name="base"><xsl:value-of select="$x-from-url" /></xsl:with-param>
+					<xsl:with-param name="base"><xsl:value-of select="$Source" /></xsl:with-param>
 					<xsl:with-param name="there"><xsl:value-of select="@href"/></xsl:with-param>
 				</xsl:call-template>
 				
@@ -735,7 +735,7 @@ URL</xsl:text>
 				<xsl:text>:</xsl:text>
 				<!-- convert to absolute url -->
 				<xsl:call-template name="uri:expand">
-					<xsl:with-param name="base" ><xsl:value-of select="$x-from-url" /></xsl:with-param>
+					<xsl:with-param name="base" ><xsl:value-of select="$Source" /></xsl:with-param>
 					<xsl:with-param name="there" ><xsl:value-of select="@longdesc" /></xsl:with-param>
 				</xsl:call-template>
 			</xsl:when>
@@ -802,7 +802,7 @@ ATTACH</xsl:text>
 				<xsl:text>;VALUE=</xsl:text>
 				<!-- convert to absolute url -->
 				<xsl:call-template name="uri:expand">
-					<xsl:with-param name="base" ><xsl:value-of select="$x-from-url"/></xsl:with-param>
+					<xsl:with-param name="base" ><xsl:value-of select="$Source"/></xsl:with-param>
 					<xsl:with-param name="there" ><xsl:value-of select="@src"/></xsl:with-param>
 				</xsl:call-template>
 				</xsl:when>
