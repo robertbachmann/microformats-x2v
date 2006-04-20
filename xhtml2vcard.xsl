@@ -24,8 +24,8 @@ brian@suda.co.uk
 http://suda.co.uk/
 
 XHTML-2-vCard
-Version 0.7.15
-2005-04-14
+Version 0.7.15.1
+2005-04-20
 
 Copyright 2005 Brian Suda
 This work is relicensed under The W3C Open Source License
@@ -44,7 +44,7 @@ I'm not an XSLT expert, so there are no guarantees to quality of this code!
 
 
 
-<xsl:param name="Prodid" select='"-//suda.co.uk//X2V 0.7.15 (BETA)//EN"' />
+<xsl:param name="Prodid" select='"-//suda.co.uk//X2V 0.7.15.1 (BETA)//EN"' />
 <xsl:param name="Source" >(Best Practices states this should be the URL the vcard was transformed from)</xsl:param>
 <xsl:param name="Encoding" >UTF-8</xsl:param>
 <xsl:param name="Anchor" />
@@ -103,7 +103,18 @@ Without the correct profile you cannot assume the class values are intended for 
 <xsl:template name="vcardProperties">
 	<!--  Implied "N" Optimization -->
 	<xsl:variable name="n-elt" select=".//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ', normalize-space(@class), ' '),' n ')]" />
-	<xsl:variable name="is-org" select="(true() = normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ') and name() = 'img']/@alt) and true() = normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' org ') and name() = 'img']/@alt) and normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ') and name() = 'img']/@alt) = normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' org ') and name() = 'img']/@alt)) or (true() = normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ') and name() = 'abbr']/@title) and true() = normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' org ') and name() = 'abbr']/@title) and normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ') and name() = 'abbr']/@title) = normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' org ') and name() = 'abbr']/@title)) or (true() = normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ') and name() = 'abbr']/@title) and true() = normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' org ') and name() = 'img']/@alt) and normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ') and name() = 'abbr']/@title) = normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' org ') and name() = 'img']/@alt)) or (true() = normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ') and name() = 'img']/@alt) and true() = normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' org ') and name() = 'abbr']/@title) and normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ') and name() = 'img']/@alt) = normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' org ') and name() = 'abbr']/@title)) or (true() = normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ')]) and true() = normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' org ') and name() = 'abbr']/@title) and normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ')]) = normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' org ') and name() = 'abbr']/@title)) or (true() = normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ')]) and true() = normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' org ') and name() = 'img']/@alt) and normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ')]) = normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' org ') and name() = 'img']/@alt)) or (true() = normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' org ')]) and true() = normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ') and name() = 'abbr']/@title) and normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ')]) = normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ') and name() = 'abbr']/@title)) or (true() = normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' org ')]) and true() = normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ') and name() = 'abbr']/@title) and normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' org ')]) = normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ') and name() = 'img']/@alt)) or (true() = normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ')]) and true() = normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' org ')]) and normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ')]) = normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' org ')]))"/>
+	<xsl:variable name="fn-val">
+	  <xsl:call-template name="textPropLang">
+	    <xsl:with-param name="class">fn</xsl:with-param>
+	  </xsl:call-template>
+	</xsl:variable>
+	<xsl:variable name="org-val">
+	  <xsl:call-template name="textPropLang">
+	    <xsl:with-param name="class">org</xsl:with-param>
+	  </xsl:call-template>
+	</xsl:variable>
+
+	<xsl:variable name="is-org" select="$fn-val = $org-val" />
 
 	<xsl:choose>
 		<xsl:when test="$n-elt">
@@ -1031,6 +1042,7 @@ BDAY:</xsl:text>
 
 <!-- TEXT PROPERTY with LANGUAGE -->
 <xsl:template name="textPropLang">
+	<!-- if label is left out, just computes the property value -->
 	<xsl:param name="label" />
 	<xsl:param name="class" />
 
@@ -1038,11 +1050,13 @@ BDAY:</xsl:text>
 
 	<xsl:if test="position() = 1">
 
-        <xsl:text>&#x0A;</xsl:text>
-		<xsl:value-of select="$label" />
-    	<xsl:call-template name="lang" />
-		<xsl:text>;CHARSET=</xsl:text><xsl:value-of select="$Encoding"/>
-        <xsl:text>:</xsl:text>
+	  <xsl:if test="$label">
+	    <xsl:text>&#x0A;</xsl:text>
+	    <xsl:value-of select="$label" />
+	    <xsl:call-template name="lang" />
+	    <xsl:text>;CHARSET=</xsl:text><xsl:value-of select="$Encoding"/>
+	    <xsl:text>:</xsl:text>
+	  </xsl:if>
 		<xsl:choose>
 			<xsl:when test='local-name(.) = "ol" or local-name(.) = "ul"'>
 				<xsl:for-each select="*">
