@@ -24,8 +24,8 @@ brian@suda.co.uk
 http://suda.co.uk/
 
 XHTML-2-vCard
-Version 0.7.15.1
-2005-04-20
+Version 0.7.16
+2005-04-21
 
 Copyright 2005 Brian Suda
 This work is relicensed under The W3C Open Source License
@@ -44,7 +44,7 @@ I'm not an XSLT expert, so there are no guarantees to quality of this code!
 
 
 
-<xsl:param name="Prodid" select='"-//suda.co.uk//X2V 0.7.15.1 (BETA)//EN"' />
+<xsl:param name="Prodid" select='"-//suda.co.uk//X2V 0.7.16 (BETA)//EN"' />
 <xsl:param name="Source" >(Best Practices states this should be the URL the vcard was transformed from)</xsl:param>
 <xsl:param name="Encoding" >UTF-8</xsl:param>
 <xsl:param name="Anchor" />
@@ -1401,6 +1401,36 @@ BDAY:</xsl:text>
 			<xsl:value-of select="$ff" />
 		</xsl:otherwise>
 	</xsl:choose>
+</xsl:template>
+
+<!-- recursive function to extract headers="id id id" -->
+<xsl:template name="extract-ids">
+<xsl:param name="text-string"/>
+<xsl:choose>
+	<xsl:when test="substring-before($text-string,' ') = true()">
+		<xsl:call-template name="get-header">
+			<xsl:with-param name="header-id"><xsl:value-of select="substring-before($text-string,' ')"/></xsl:with-param>
+		</xsl:call-template>
+		<xsl:call-template name="extract-ids">
+			<xsl:with-param name="text-string"><xsl:value-of select="substring-after($text-string,' ')"/></xsl:with-param>
+		</xsl:call-template>
+	</xsl:when>
+	<xsl:otherwise>
+		<xsl:call-template name="get-header">
+			<xsl:with-param name="header-id"><xsl:value-of select="$text-string"/></xsl:with-param>
+		</xsl:call-template>
+	</xsl:otherwise>
+</xsl:choose>
+</xsl:template>
+
+<xsl:template name="get-header">
+	<!-- problem here! need to pass the tag WITH the id, not decendants -->
+	<xsl:param name="header-id"/>
+	<xsl:for-each select="//*[@id=$header-id]">
+		<xsl:call-template name="vcardProperties">
+	<!--		<xsl:with-param name="Anchor"><xsl:value-of select="$header-id"/></xsl:with-param> -->
+		</xsl:call-template>
+	</xsl:for-each>
 </xsl:template>
 
 <!-- recursive function to give plain text some equivalent HTML formatting -->
