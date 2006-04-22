@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en"
+      xml:base="http://example.com/singleEntry.html">
+  <updated/>
+   <id>http://example.com/singleEntry.html</id>
+   <link rel="alternate" href="http://example.com/singleEntry.html" type="text/html"/>
+  <title>Html Title</title>
+  <entry xml:lang="en">
+    <title>Entry #1</title>
+      <id>http://example.com/singleEntry.html#entry1</id>
+      <link rel="alternate" href="http://example.com/singleEntry.html#entry1"
+            type="text/html"/>
+    <published>2006-04-20T21:10:14+0200</published>
+    <updated>2006-04-20T21:10:14+0200</updated>
+    <summary type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">Entry #1, summary</div>
+    </summary>
+    <content type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">Entry #1, content</div>
+    </content>
+    <author>
+      <name>John Doe</name>
+    </author>
+  </entry>
+  <entry xml:lang="en">
+    <title>Entry #2</title>
+      <id>http://example.com/singleEntry.html#entry2</id>
+      <link rel="alternate" href="http://example.com/singleEntry.html#entry2"
+            type="text/html"/>
+    <published>2006-04-20T21:10:15+0200</published>
+    <updated>2006-04-20T21:10:15+0200</updated>
+    <summary type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">Entry #2, summary</div>
+    </summary>
+    <content type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">Entry #2, content</div>
+    </content>
+    <author>
+      <name>John Doe</name>
+    </author>
+  </entry>
+  <entry xml:lang="en">
+    <title>Entry #3</title>
+      <id>http://example.com/singleEntry.html#entry3</id>
+      <link rel="alternate" href="http://example.com/singleEntry.html#entry3"
+            type="text/html"/>
+    <published>2006-04-20T21:10:16+0200</published>
+    <updated>2006-04-20T21:10:16+0200</updated>
+    <summary type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">Entry #3, summary</div>
+    </summary>
+    <content type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">Entry #3, content</div>
+    </content>
+    <author>
+      <name>John Doe</name>
+    </author>
+  </entry>
+</feed>

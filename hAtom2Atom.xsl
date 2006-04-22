@@ -2,7 +2,7 @@
                                 hAtom2Atom.xsl
    An XSLT stylesheet for transforming hAtom documents into Atom documents.
 
-            $Id: hAtom2Atom.xsl 37 2006-04-17 18:22:05Z RobertBachmann $
+            $Id: hAtom2Atom.xsl 38 2006-04-22 16:42:03Z RobertBachmann $
 
                             SUPPORTED XSLT ENGINES
 
@@ -20,6 +20,21 @@
    If it does not or if your input document is written in HTML, filter it
    through "tidy -asxhtml" <http://tidy.sourceforge.net/> before
    processing it with hAtom2Atom.xsl.
+
+                             STYLESHEET PARAMETERS                             
+   
+   $source-uri: 
+     Source URI of the input document, e.g: http://example.com/foo.html
+     It is highly recommended that you set this parameter.
+
+   $content-type:
+     The content type of your input document. The default is "text/html".
+
+   $implicit-feed: 
+     If no feeds are found, the value of $implicit-feed determines
+     wether the whole document should be treated as feed or if the
+     first hentry should be extracted as stand-alone atom:entry.
+     The default is "0".
 
                                      NOTES
 
@@ -77,6 +92,7 @@
 
 <xsl:param name="source-uri" />
 <xsl:param name="content-type">text/html</xsl:param>
+<xsl:param name="implicit-feed">0</xsl:param>
 
 <xsl:output method="xml" indent="yes" encoding="UTF-8" />
 
@@ -106,10 +122,11 @@
   <!--
   See if we can find feed elements within this document.
   Entries that are part of a feed are processed when we
-  reach the feed element. If no feeds are found, the
-  whole document is a feed.
-  entry elements that do not occur within a feed when feed
-  elements are present are ignored. (TODO: Check, is this valid?)
+  reach the feed element. 
+  If no feeds are found, the value of $implicit-feed determines
+  wether the whole document should be treated as feed or if the
+  first hentry should be extracted as stand-alone atom:entry.
+
   Use modes throughout to determine context. Are we
   * outside a feed (none),
   * inside a feed (feed), or
@@ -121,8 +138,24 @@
         <xsl:apply-templates select="."/>
       </xsl:for-each>
     </xsl:when>
+    <xsl:when test="descendant::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' hentry ')]">
+	  <xsl:choose>
+        <xsl:when test="$implicit-feed != 0">
+		  <xsl:for-each select="/child::*[1]">
+    	    <xsl:call-template name="feed" />
+	      </xsl:for-each>
+        </xsl:when>
+        <xsl:otherwise>
+		  <xsl:for-each select="descendant::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' hentry ')][1]">
+		    <xsl:call-template name="entry">
+	          <xsl:with-param name="were">standalone</xsl:with-param>
+            </xsl:call-template>
+		  </xsl:for-each>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:when>
     <xsl:otherwise>
-      <xsl:call-template name="feed"/>
+      <xsl:message terminate="yes">ERROR: No hAtom feeds and hAtom entries were found.</xsl:message>
     </xsl:otherwise>
   </xsl:choose>
 </xsl:template>
@@ -259,6 +292,13 @@
 <xsl:template match="xhtml:*[contains(concat(' ',normalize-space(@class),' '),' hentry ')]">
   <xsl:param name="where"/>
   <xsl:if test="($where = 'feed') and (local-name() != 'q' and local-name() != 'blockquote')">
+    <xsl:call-template name="entry">
+	  <xsl:with-param name="were">feed</xsl:with-param>
+    </xsl:call-template>
+  </xsl:if>
+</xsl:template>
+
+<xsl:template name="entry">
   <xsl:variable name="entry-base">
     <xsl:apply-templates select="." mode="get-base">
       <xsl:with-param name="fallback" select="/xhtml:html/xhtml:head/xhtml:base[1]/@href" />
@@ -467,9 +507,7 @@
       <xsl:for-each select="extension:node-set($entryLevelElements)/descendant::xhtml:a[contains(concat(' ',normalize-space(translate(@rel,'TAG','tag')),' '),' tag ')]">
         <xsl:call-template name="create-category" />
       </xsl:for-each>
-
     </entry>
-  </xsl:if>
 </xsl:template>
 
 <!-- 
@@ -863,7 +901,7 @@
   try to use HTML's <base>. (If no HTML <base> is present try to use
   use the $source-uri stylesheet parameter.)
 -->
-<xsl:template match="xhtml:*" mode="add-base-attribute">
+<xsl:template match="node()|*" mode="add-base-attribute">
   <xsl:param name="for-feed" />
   <xsl:param name="end" />
   <xsl:choose>
@@ -874,7 +912,7 @@
       Are we trying to find the xml:base for <feed>
       and are we already at the root element?
     -->
-    <xsl:when test="(local-name()='html' and namespace-uri() = 'http://www.w3.org/1999/xhtml')and $for-feed">
+    <xsl:when test="not(parent::*) and $for-feed">
       <!-- Try to use HTML's <base> -->
       <xsl:choose>
         <xsl:when test="/xhtml:html/xhtml:head/xhtml:base[@href]">

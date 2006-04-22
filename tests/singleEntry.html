@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"-->
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+
+<head profile="http://microformats.org/wiki/hcard-profile http://microformats.org/wiki/hatom#XMDP_Profile">
+<title>Html Title</title>
+</head>
+<body>
+<!--
+This test is intended to verify that a document containing all supported hAtom
+elements has all such elements correctly translated into atom. It additionally
+tests normalize-whitespace requirements by inserting newlines into the source
+document that should not appear in the result document.
+
+Tests for specific varitions of individual features should ideally be placed
+in their own test files. The intention of this file is to test the overall
+structural behaviour of a hAtom file rather than go into the details of how
+author or other elements may vary.
+
+Features tested:
+	- Whitespace normalisation
+	- Feed title element works
+	- Feed updated element works
+	- Entry title element works
+	- Entry published element works
+	- Entry updated element works
+	- Entry content element works
+	- Entry bookmark (permalink) element works
+	- Entry summary element works
+	- Entry author element works
+
+Features not tested:
+	- Feed author elements work (not currently defined by hAtom)
+	- Multiple feeds within a single hAtom document
+	- Multiple summary and content elements within a single entry are
+	  not yet implemented. They should be collapsed into a single content
+	  and and a single summary node per entry.
+	- A single entry with no rel=bookmark link is not tested. It is supposed
+	  to take on the URI of the source document.
+	- Multiple published and updated entries in a single entry should be
+	  disambiguated by choosing the first one that appears of each.
+
+Scope of possible change:
+	- The output of this test case is not valid atom.
+	  Notably, id and updated elements do not exist at the feed level.
+	- Changes in the hAtom specification may invalidate this test case
+	- Comparisons between actual and controlled test output should not
+	  take order into consideration, except where the atom specification
+	  indicates order is important.
+	- Comparisons between actual and controlled test output should not
+	  consider whitespace important, except where the atom specification
+	  indicates whitespace is important.
+
+-->
+
+<h1>Document h1</h1>
+
+
+<div class="hentry" id="entry1">
+<h2 class="entry-title">Entry #1</h2>
+<div class="entry-content">Entry #1, content</div>
+<div class="entry-summary">Entry #1, summary</div>
+<p>Published, <span class="published">2006-04-20T21:10:14+0200</span></p>
+</div>
+
+<div class="hentry" id="entry2">
+<h2 class="entry-title">Entry #2</h2>
+<div class="entry-content">Entry #2, content</div>
+<div class="entry-summary">Entry #2, summary</div>
+<p>Published, <span class="published">2006-04-20T21:10:15+0200</span></p>
+</div>
+
+<div class="hentry" id="entry3">
+<h2 class="entry-title">Entry #3</h2>
+<div class="entry-content">Entry #3, content</div>
+<div class="entry-summary">Entry #3, summary</div>
+<p>Published, <span class="published">2006-04-20T21:10:16+0200</span></p>
+</div>
+
+<address class="author vcard"><span class="fn">John Doe</span></address>
+
+</body>
+
+</html>
+

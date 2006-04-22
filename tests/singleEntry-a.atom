@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<entry xmlns="http://www.w3.org/2005/Atom" xml:lang="en">
+  <title>Entry #1</title>
+   <id>http://example.com/singleEntry.html#entry1</id>
+   <link rel="alternate" href="http://example.com/singleEntry.html#entry1"
+         type="text/html"/>
+  <published>2006-04-20T21:10:14+0200</published>
+  <updated>2006-04-20T21:10:14+0200</updated>
+  <summary type="xhtml">
+    <div xmlns="http://www.w3.org/1999/xhtml">Entry #1, summary</div>
+  </summary>
+  <content type="xhtml">
+    <div xmlns="http://www.w3.org/1999/xhtml">Entry #1, content</div>
+  </content>
+  <author>
+    <name>John Doe</name>
+  </author>
+</entry>
