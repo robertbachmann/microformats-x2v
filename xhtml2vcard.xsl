@@ -77,9 +77,9 @@ Without the correct profile you cannot assume the class values are intended for 
 		<xsl:text>&#x0A;VERSION:3.0</xsl:text>
 
 		<!-- check for header="" and extract that data -->
-		<xsl:if test="@headers">
+		<xsl:if test="descendant-or-self::*/@headers">
 			<xsl:call-template name="extract-ids">
-				<xsl:with-param name="text-string"><xsl:value-of select="@headers"/></xsl:with-param>
+				<xsl:with-param name="text-string"><xsl:value-of select="descendant-or-self::*/@headers"/></xsl:with-param>
 			</xsl:call-template>
 		</xsl:if>
 
@@ -384,6 +384,12 @@ BDAY:</xsl:text>
 					</xsl:otherwise>
 				</xsl:choose>
 			</xsl:when>
+			<xsl:when test='local-name(.) = "abbr" and @title'>
+				<xsl:variable name="textFormatted">
+				<xsl:apply-templates select="@title" mode="unFormatText" />
+				</xsl:variable>
+				<xsl:value-of select="normalize-space($textFormatted)"/>
+			</xsl:when>			
 			<xsl:otherwise>
 				<xsl:variable name="textFormatted">
 				<xsl:apply-templates select="." mode="unFormatText" />
@@ -651,6 +657,7 @@ BDAY:</xsl:text>
 			</xsl:call-template>
 			<xsl:text>;</xsl:text>
 			<xsl:for-each select=".//*[contains(concat(' ', @class, ' '), concat(' ', 'organization-unit', ' '))]" >
+<!--
 				<xsl:choose>
 					<xsl:when test=".//*[contains(concat(' ', normalize-space(@class), ' '),' value ')]">
 						<xsl:for-each select=".//*[contains(concat(' ', normalize-space(@class), ' '),' value ')]">
@@ -666,6 +673,35 @@ BDAY:</xsl:text>
 						</xsl:variable>
 						<xsl:value-of select="normalize-space($textFormatted)"/>
 					</xsl:otherwise>
+				</xsl:choose>
+				-->
+				<xsl:choose>
+						<xsl:when test='local-name(.) = "abbr" and @title'>
+							<xsl:variable name="textFormatted">
+							<xsl:apply-templates select="@title" mode="unFormatText" />
+							</xsl:variable>
+							<xsl:value-of select="normalize-space($textFormatted)"/>
+						</xsl:when>
+						<xsl:when test='@alt and local-name(.) = "img"'>
+							<xsl:variable name="textFormatted">
+							<xsl:apply-templates select="@alt" mode="unFormatText" />
+							</xsl:variable>
+							<xsl:value-of select="normalize-space($textFormatted)"/>
+						</xsl:when>
+						<xsl:when test=".//*[contains(concat(' ', normalize-space(@class), ' '),' value ')]">
+							<xsl:for-each select=".//*[contains(concat(' ', normalize-space(@class), ' '),' value ')]">
+								<xsl:variable name="textFormatted">
+								<xsl:apply-templates select="." mode="unFormatText" />
+								</xsl:variable>
+								<xsl:value-of select="normalize-space($textFormatted)"/>						
+							</xsl:for-each>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:variable name="textFormatted">
+							<xsl:apply-templates select="." mode="unFormatText" />
+							</xsl:variable>
+							<xsl:value-of select="normalize-space($textFormatted)"/>
+						</xsl:otherwise>
 				</xsl:choose>
 				<xsl:text>;</xsl:text>
 			</xsl:for-each>
@@ -1159,6 +1195,7 @@ BDAY:</xsl:text>
 <!-- get the class value -->
 <xsl:template name="class-value">
 	<xsl:param name="class" />
+	<!--
 		<xsl:choose>
 			<xsl:when test=".//*[contains(concat(' ', @class, ' '), concat(' ', $class , ' '))]//*[contains(concat(' ', normalize-space(@class), ' '),' value ')]">
 				<xsl:for-each select=".//*[contains(concat(' ', normalize-space(@class), ' '),' value ')]">
@@ -1168,7 +1205,7 @@ BDAY:</xsl:text>
 					<xsl:value-of select="normalize-space($textFormatted)"/>
 				</xsl:for-each>
 			</xsl:when>
-			<xsl:when test="$class = 'additional-name' or $class = 'honorific-prefix' or $class = 'honorific-suffix'">
+			<xsl:when test="$class = 'additional-name' or $class = 'honorific-prefix' or $class = 'honorific-suffix' or $class='street-address'">
 				<xsl:for-each select=".//*[contains(concat(' ', normalize-space(@class), ' '),concat(' ',$class,' '))]">
 					<xsl:variable name="textFormatted">
 					<xsl:apply-templates select="." mode="unFormatText" />
@@ -1180,9 +1217,45 @@ BDAY:</xsl:text>
 				</xsl:for-each>
 			</xsl:when>
 			<xsl:otherwise>
-				<xsl:value-of select="normalize-space(.//*[contains(concat(' ', @class, ' '), concat(' ', $class , ' '))])" />
+			-->
+				<xsl:for-each select=".//*[contains(concat(' ', @class, ' '), concat(' ', $class , ' '))]">
+				<xsl:choose>
+						<xsl:when test='local-name(.) = "abbr" and @title'>
+							<xsl:variable name="textFormatted">
+							<xsl:apply-templates select="@title" mode="unFormatText" />
+							</xsl:variable>
+							<xsl:value-of select="normalize-space($textFormatted)"/>
+						</xsl:when>
+						<xsl:when test='@alt and local-name(.) = "img"'>
+							<xsl:variable name="textFormatted">
+							<xsl:apply-templates select="@alt" mode="unFormatText" />
+							</xsl:variable>
+							<xsl:value-of select="normalize-space($textFormatted)"/>
+						</xsl:when>
+						<xsl:when test=".//*[contains(concat(' ', normalize-space(@class), ' '),' value ')]">
+							<xsl:for-each select=".//*[contains(concat(' ', normalize-space(@class), ' '),' value ')]">
+								<xsl:variable name="textFormatted">
+								<xsl:apply-templates select="." mode="unFormatText" />
+								</xsl:variable>
+								<xsl:value-of select="normalize-space($textFormatted)"/>						
+							</xsl:for-each>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:variable name="textFormatted">
+							<xsl:apply-templates select="." mode="unFormatText" />
+							</xsl:variable>
+							<xsl:value-of select="normalize-space($textFormatted)"/>
+						</xsl:otherwise>
+				</xsl:choose>
+				<xsl:if test="not(position()=last())">
+					<xsl:text>,</xsl:text>
+				</xsl:if>
+				
+				</xsl:for-each>	
+				<!--			
 			</xsl:otherwise>
 		</xsl:choose>
+	-->
 </xsl:template>
 
 <!-- Sub-Property Template for N, ADR, ORG -->
