@@ -24,8 +24,8 @@ brian@suda.co.uk
 http://suda.co.uk/
 
 XHTML-2-vCard
-Version 0.7.16
-2005-04-21
+Version 0.7.16.1
+2005-04-22
 
 Copyright 2005 Brian Suda
 This work is relicensed under The W3C Open Source License
@@ -44,7 +44,7 @@ I'm not an XSLT expert, so there are no guarantees to quality of this code!
 
 
 
-<xsl:param name="Prodid" select='"-//suda.co.uk//X2V 0.7.16 (BETA)//EN"' />
+<xsl:param name="Prodid" select='"-//suda.co.uk//X2V 0.7.16.1 (BETA)//EN"' />
 <xsl:param name="Source" >(Best Practices states this should be the URL the vcard was transformed from)</xsl:param>
 <xsl:param name="Encoding" >UTF-8</xsl:param>
 <xsl:param name="Anchor" />
@@ -114,7 +114,7 @@ Without the correct profile you cannot assume the class values are intended for 
 	  </xsl:call-template>
 	</xsl:variable>
 
-	<xsl:variable name="is-org" select="$fn-val = $org-val" />
+	<xsl:variable name="is-org" select="$fn-val = $org-val and not($fn-val = '')" />
 
 	<xsl:choose>
 		<xsl:when test="$n-elt">
@@ -247,9 +247,7 @@ Without the correct profile you cannot assume the class values are intended for 
 	<!-- Templates that still need work -->
 
 	<!-- <xsl:apply-templates select=".//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' agent ')]" mode="agent"/> 	-->
-<!--
-	<xsl:apply-templates select=".//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' url ')]" mode="url"/>
--->
+
 	<xsl:apply-templates select=".//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' bday ')]" mode="bday"/>
 
 	<!-- @@TYPE=PGP, TYPE=X509, ENCODING=b -->
@@ -263,14 +261,6 @@ Without the correct profile you cannot assume the class values are intended for 
 	<xsl:if test="$label-elt">
 			<xsl:call-template name="label-prop"/>
 	</xsl:if>
-
-	<!--
-	<xsl:text>&#x0A;UID:</xsl:text>
-	<xsl:call-template name="escapeText">
-		<xsl:with-param name="text-string"><xsl:value-of select="normalize-space(@id)" /></xsl:with-param>
-	</xsl:call-template>
-	-->
-
 
 	<xsl:call-template name="blobProp">
 		<xsl:with-param name="label">PHOTO</xsl:with-param>
@@ -298,83 +288,6 @@ Without the correct profile you cannot assume the class values are intended for 
 	</xsl:call-template>
 		
 </xsl:template>
-
-<!-- URL property -->
-<xsl:template match="*[contains(@class,'url')]" mode="url">
-<xsl:text>
-URL:</xsl:text>
-<xsl:choose>
-	<xsl:when test="@href != ''">
-		<xsl:choose>
-			<xsl:when test="substring-before(@href,':') = 'http'">
-				<xsl:value-of select="normalize-space(@href)" />
-			</xsl:when>
-			<xsl:otherwise>
-				<!-- convert to absolute url -->
-				<xsl:call-template name="uri:expand">
-					<xsl:with-param name="base">
-
-						<xsl:call-template name="baseURL">
-							<xsl:with-param name="Source"><xsl:value-of select="$Source" /></xsl:with-param>
-						</xsl:call-template>
-						
-					</xsl:with-param>
-					<xsl:with-param name="there"><xsl:value-of select="@href"/></xsl:with-param>
-				</xsl:call-template>
-			</xsl:otherwise>
-		</xsl:choose>
-	</xsl:when>
-	<xsl:when test="@src != ''">
-		<xsl:choose>
-			<xsl:when test="substring-before(@src,':') = 'http'">
-				<xsl:value-of select="normalize-space(@src)" />
-			</xsl:when>
-			<xsl:otherwise>
-				<!-- convert to absolute url -->
-				<xsl:call-template name="uri:expand">
-					<xsl:with-param name="base">
-
-						<xsl:call-template name="baseURL">
-							<xsl:with-param name="Source"><xsl:value-of select="$Source" /></xsl:with-param>
-						</xsl:call-template>
-						
-					</xsl:with-param>
-					<xsl:with-param name="there"><xsl:value-of select="@src"/></xsl:with-param>
-				</xsl:call-template>
-
-			</xsl:otherwise>
-		</xsl:choose>
-	</xsl:when>
-	<xsl:when test="@data != ''">
-		<xsl:choose>
-			<xsl:when test="substring-before(@data,':') = 'http'">
-				<xsl:value-of select="normalize-space(@data)" />
-			</xsl:when>
-			<xsl:otherwise>
-				<!-- convert to absolute url -->
-				<xsl:call-template name="uri:expand">
-					<xsl:with-param name="base">
-
-						<xsl:call-template name="baseURL">
-							<xsl:with-param name="Source"><xsl:value-of select="$Source" /></xsl:with-param>
-						</xsl:call-template>
-						
-					</xsl:with-param>
-					<xsl:with-param name="there"><xsl:value-of select="@data"/></xsl:with-param>
-				</xsl:call-template>
-
-			</xsl:otherwise>
-		</xsl:choose>
-	</xsl:when>
-	<xsl:otherwise>
-		<xsl:variable name="textFormatted">
-		<xsl:apply-templates select="." mode="unFormatText" />
-		</xsl:variable>
-		<xsl:value-of select="normalize-space($textFormatted)"/>
-	</xsl:otherwise>
-</xsl:choose>
-</xsl:template>
-
 
 <!-- BDAY property -->
 <xsl:template match="*[contains(@class,'bday')]" mode="bday">
@@ -478,63 +391,6 @@ BDAY:</xsl:text>
 				<xsl:value-of select="normalize-space($textFormatted)"/>
 			</xsl:otherwise>
 		</xsl:choose>
-		
-		
-
-<!--
-		<xsl:choose>
-			<xsl:when test='local-name(.) = "ol" or local-name(.) = "ul"'>
-				<xsl:for-each select="*">
-					<xsl:if test="not(position()=1)">
-						<xsl:text>,</xsl:text>
-					</xsl:if>
-					<xsl:choose>
-						<xsl:when test=".//*[contains(concat(' ', normalize-space(@class), ' '),' value ')]">
-							<xsl:for-each select=".//*[contains(concat(' ', normalize-space(@class), ' '),' value ')]">
-								<xsl:variable name="textFormatted">
-								<xsl:apply-templates select="." mode="unFormatText" />
-								</xsl:variable>
-								<xsl:value-of select="normalize-space($textFormatted)"/>
-							</xsl:for-each>
-						</xsl:when>
-						<xsl:otherwise>
-							<xsl:variable name="textFormatted">
-							<xsl:apply-templates select="." mode="unFormatText" />
-							</xsl:variable>
-							<xsl:value-of select="normalize-space($textFormatted)"/>
-						</xsl:otherwise>
-					</xsl:choose>		
-				</xsl:for-each>
-			</xsl:when>
-			<xsl:when test='local-name(.) = "abbr" and @title'>
-				<xsl:variable name="textFormatted">
-				<xsl:apply-templates select="@title" mode="unFormatText" />
-				</xsl:variable>
-				<xsl:value-of select="normalize-space($textFormatted)"/>
-			</xsl:when>			
-			<xsl:when test='@alt and local-name(.) = "img"'>
-				<xsl:variable name="textFormatted">
-				<xsl:apply-templates select="@alt" mode="unFormatText" />
-				</xsl:variable>
-				<xsl:value-of select="normalize-space($textFormatted)"/>
-			</xsl:when>
-			<xsl:when test=".//*[contains(concat(' ', normalize-space(@class), ' '),' value ')]">
-				<xsl:for-each select=".//*[contains(concat(' ', normalize-space(@class), ' '),' value ')]">
-					<xsl:variable name="textFormatted">
-					<xsl:apply-templates select="." mode="unFormatText" />
-					</xsl:variable>
-					<xsl:value-of select="normalize-space($textFormatted)"/>
-				</xsl:for-each>
-			</xsl:when>
-			<xsl:otherwise>
-				<xsl:variable name="textFormatted">
-				<xsl:apply-templates select="." mode="unFormatText" />
-				</xsl:variable>
-				<xsl:value-of select="normalize-space($textFormatted)"/>
-			</xsl:otherwise>
-		</xsl:choose>
-		
-	-->
 	</xsl:if>
 	</xsl:for-each>
 </xsl:template>
