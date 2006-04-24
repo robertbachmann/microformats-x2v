@@ -657,7 +657,7 @@ BDAY:</xsl:text>
 			</xsl:call-template>
 			<xsl:text>;</xsl:text>
 			<xsl:for-each select=".//*[contains(concat(' ', @class, ' '), concat(' ', 'organization-unit', ' '))]" >
-<!--
+				<!--
 				<xsl:choose>
 					<xsl:when test=".//*[contains(concat(' ', normalize-space(@class), ' '),' value ')]">
 						<xsl:for-each select=".//*[contains(concat(' ', normalize-space(@class), ' '),' value ')]">
