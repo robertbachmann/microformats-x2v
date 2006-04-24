@@ -30,6 +30,20 @@ Scope of possible change:
 
 -->
 
+<address class="author">
+  <span class="vcard">
+    <span class="fn">John Doe</span>
+    <b class="email">john@example.com</b>
+  </span>
+</address>
+
+<div>
+<address class="vcard"><span class="fn">Bill Doe (ignored: has no class author)</span></address>
+<address><span class="vcard"><span class="fn">Frank Doe (ignored: has no class author)</span></span></address>
+</div>
+
+<span class="author vcard"><span class="fn">John Black (ignored: isn't &lt;address&gt;)</span></span>
+
 <div class="hfeed">
   <h2 class="title">Feed Title</h2>
   <p class="updated">2005-12-25T00:00:00Z</p>
@@ -111,38 +125,10 @@ Scope of possible change:
   </span></span>
   </div>
   
-  <div>
-    <address class="author">
-        <span class="vcard">
-            not ignored
-            <span class="fn">John Doe</span>
-            <b class="email">john@example.com</b>
-        </span>
-      </address>
-      <div>
-        <address class="vcard">
-            ignored: has no class author 
-            <span class="fn">Bill Doe</span>
-        </address>
-
-        <address>
-            <span class="vcard">
-                ignored: has no class author 
-                <span class="fn">Frank Doe</span>
-            </span>
-        </address>
-        <div>
-            <span class="author vcard">
-                ignored: isn't &lt;address&gt;
-                <span class="fn">John Black_</span>
-            </span>
             <div class="hentry" id="e6">
                 <h3>Entry Six Title</h3>
                 <p class="updated">2005-12-25T00:00:00Z</p>
             </div>
-        </div>
-      </div>
-  </div>
 </div>
 <address class="vcard author"><span class="fn">Jane Doe</span>, <b class="email">jane@example.com</b></address>
 </body>

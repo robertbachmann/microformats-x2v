@@ -4,6 +4,10 @@
   <id>http://example.com/author.html</id>
   <link rel="alternate" href="http://example.com/author.html" type="text/html"/>
   <title>Page title</title>
+  <author>
+    <name>John Doe</name>
+    <email>john@example.com</email>
+  </author>
   <entry>
     <title>Entry One Title</title>
     <id>http://example.com/entry</id>
@@ -89,9 +93,5 @@
     <id>http://example.com/author.html#e6</id>
     <link rel="alternate" href="http://example.com/author.html#e6" type="text/html"/>
     <updated>2005-12-25T00:00:00Z</updated>
-    <author>
-      <name>John Doe</name>
-      <email>john@example.com</email>
-    </author>
   </entry>
 </feed>

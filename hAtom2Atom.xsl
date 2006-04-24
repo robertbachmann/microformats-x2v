@@ -2,7 +2,7 @@
                                 hAtom2Atom.xsl
    An XSLT stylesheet for transforming hAtom documents into Atom documents.
 
-            $Id: hAtom2Atom.xsl 38 2006-04-22 16:42:03Z RobertBachmann $
+            $Id: hAtom2Atom.xsl 39 2006-04-24 21:04:42Z RobertBachmann $
 
                             SUPPORTED XSLT ENGINES
 
@@ -148,7 +148,7 @@
         <xsl:otherwise>
 		  <xsl:for-each select="descendant::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' hentry ')][1]">
 		    <xsl:call-template name="entry">
-	          <xsl:with-param name="were">standalone</xsl:with-param>
+	          <xsl:with-param name="where">stand-alone</xsl:with-param>
             </xsl:call-template>
 		  </xsl:for-each>
         </xsl:otherwise>
@@ -204,40 +204,7 @@
     <!-- Extract feed id and link -->
     <!--[extension]-->
       <xsl:choose>
-        <!-- If there is an element with class="bookmark" at the feed level use it -->
-        <xsl:when test="extension:node-set($feedLevelElements)/descendant::xhtml:a[
-            contains(concat(' ',normalize-space(translate(@rel,'BOKMAR','bokmar')),' '),' bookmark ')
-            ][1]">
-          <xsl:variable name="uri">
-            <xsl:call-template name="uri:expand">
-              <xsl:with-param name="base">
-                <xsl:apply-templates select="extension:node-set($feedLevelElements)/descendant::xhtml:a[
-                    contains(concat(' ',normalize-space(translate(@rel,'BOKMAR','bokmar')),' '),' bookmark ')][1]" 
-                    mode="get-base">
-                   <xsl:with-param name="fallback" select="$feed-base" />
-                 </xsl:apply-templates>
-               </xsl:with-param>
-               <xsl:with-param name="there">
-                 <xsl:value-of select="extension:node-set($feedLevelElements)/descendant::xhtml:a[
-                   contains(concat(' ',normalize-space(translate(@rel,'BOKMAR','bokmar')),' '),' bookmark ')
-                 ][1]/@href" />
-               </xsl:with-param>
-             </xsl:call-template>
-          </xsl:variable>
-          <id><xsl:value-of select="$uri" /></id>
-          <link rel="alternate" href="{$uri}">
-            <xsl:for-each select="extension:node-set($feedLevelElements)/descendant::xhtml:a[
-              contains(concat(' ',normalize-space(translate(@rel,'BOKMAR','bokmar')),' '),' bookmark ')][1]">
-              <xsl:for-each select="@type|@hreflang|@title|@length">
-                <xsl:copy />
-              </xsl:for-each>
-              <xsl:if test="not(@type)">
-                <xsl:attribute name="type"><xsl:value-of select="$content-type" /></xsl:attribute>
-              </xsl:if>
-            </xsl:for-each>
-          </link>
-        </xsl:when>
-        <!-- If the feed has an ID attribute use it thogether with $source-uri -->
+        <!-- If the feed has an ID attribute use it together with $source-uri -->
         <xsl:when test="@id">
           <xsl:variable name="uri" select="concat($source-uri-sans-fragment,'#',@id)"/>
           <id><xsl:value-of select="$uri"/></id>
@@ -282,28 +249,46 @@
     <xsl:for-each select="extension:node-set($feedLevelElements)/descendant::xhtml:a[contains(concat(' ',normalize-space(translate(@rel,'TAG','tag')),' '),' tag ')]">
       <xsl:call-template name="create-category" />
     </xsl:for-each>
+
+    <!-- Find the feed's author(s) -->
+    <xsl:choose>
+	  <xsl:when test="extension:node-set($feedLevelElements)/descendant::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' author ')]">
+	    <xsl:for-each select="extension:node-set($feedLevelElements)/descendant::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' author ')]">
+		  <xsl:for-each select="descendant-or-self::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' vcard ')]">
+		    <author><xsl:call-template name="vcard"/></author>
+		  </xsl:for-each>
+	    </xsl:for-each>
+      </xsl:when>
+      <xsl:otherwise>
+	    <xsl:apply-templates mode="find-author" select="parent::*" />
+	  </xsl:otherwise>
+    </xsl:choose>
     
     <xsl:apply-templates select="node()|@*">
       <xsl:with-param name="where">feed</xsl:with-param>
     </xsl:apply-templates>
-  </feed>
+
+  </feed>      
 </xsl:template>
 
 <xsl:template match="xhtml:*[contains(concat(' ',normalize-space(@class),' '),' hentry ')]">
   <xsl:param name="where"/>
   <xsl:if test="($where = 'feed') and (local-name() != 'q' and local-name() != 'blockquote')">
     <xsl:call-template name="entry">
-	  <xsl:with-param name="were">feed</xsl:with-param>
+	  <xsl:with-param name="where">feed</xsl:with-param>
     </xsl:call-template>
   </xsl:if>
 </xsl:template>
 
 <xsl:template name="entry">
+  <xsl:param name="where"/>
+  
   <xsl:variable name="entry-base">
     <xsl:apply-templates select="." mode="get-base">
       <xsl:with-param name="fallback" select="/xhtml:html/xhtml:head/xhtml:base[1]/@href" />
     </xsl:apply-templates>
   </xsl:variable>
+
     <entry>
       <!--[extension]-->
         <xsl:apply-templates select="." mode="add-lang-attribute">
@@ -490,6 +475,7 @@
         </content>
       </xsl:if>
 
+      <!-- Find the entry's author(s) -->
       <xsl:choose>
         <xsl:when test="extension:node-set($entryLevelElements)/descendant::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' author ')]">
           <xsl:for-each select="extension:node-set($entryLevelElements)/descendant::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' author ')]">
@@ -498,9 +484,11 @@
             </xsl:for-each>
           </xsl:for-each>
         </xsl:when>
-        <xsl:otherwise>
+        <!-- If we are extracting a stand-alone entry we need to find 
+             the "nearest in parent" <addr> with class="author" -->
+        <xsl:when test="$where = 'stand-alone'">
           <xsl:apply-templates mode="find-author" select="parent::*" />
-        </xsl:otherwise>
+        </xsl:when>
       </xsl:choose>
 
       <!-- Extract entry's tags -->
@@ -535,6 +523,7 @@
 <xsl:template name="find-author-filter">
   <xsl:choose> 
     <xsl:when test="contains(concat(' ',normalize-space(@class),' '),' hentry ')"/>
+    <xsl:when test="contains(concat(' ',normalize-space(@class),' '),' hfeed ')"/>
     <xsl:when test="(local-name() = 'q' or local-name() = 'blockquote')
                 and namespace-uri() = 'http://www.w3.org/1999/xhtml' "/>
     <xsl:otherwise>

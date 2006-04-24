@@ -8,42 +8,16 @@
 </head>
 <body>
 <!--
-This test is intended to verify that a document containing all supported hAtom
-elements has all such elements correctly translated into atom. It additionally
-tests normalize-whitespace requirements by inserting newlines into the source
-document that should not appear in the result document.
-
-Tests for specific varitions of individual features should ideally be placed
-in their own test files. The intention of this file is to test the overall
-structural behaviour of a hAtom file rather than go into the details of how
-author or other elements may vary.
+This test is intended to verify the extraction of single entries.
 
 Features tested:
-	- Whitespace normalisation
-	- Feed title element works
-	- Feed updated element works
-	- Entry title element works
-	- Entry published element works
-	- Entry updated element works
-	- Entry content element works
-	- Entry bookmark (permalink) element works
-	- Entry summary element works
-	- Entry author element works
+	- Extraction of the first hentry if $implicit-feed=0
+	- Extraction of the all hentries if $implicit-feed=1
 
 Features not tested:
-	- Feed author elements work (not currently defined by hAtom)
-	- Multiple feeds within a single hAtom document
-	- Multiple summary and content elements within a single entry are
-	  not yet implemented. They should be collapsed into a single content
-	  and and a single summary node per entry.
-	- A single entry with no rel=bookmark link is not tested. It is supposed
-	  to take on the URI of the source document.
-	- Multiple published and updated entries in a single entry should be
-	  disambiguated by choosing the first one that appears of each.
 
 Scope of possible change:
 	- The output of this test case is not valid atom.
-	  Notably, id and updated elements do not exist at the feed level.
 	- Changes in the hAtom specification may invalidate this test case
 	- Comparisons between actual and controlled test output should not
 	  take order into consideration, except where the atom specification
