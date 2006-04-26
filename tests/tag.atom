@@ -10,7 +10,7 @@
     <title>Entry One Title</title>
     <id>http://example.com/tag.html#e1</id>
     <link rel="alternate" href="http://example.com/tag.html#e1" type="text/html"/>
-    <updated>2005-12-25T00:00:00Z</updated>
+    <updated>2005-12-25T00:00:00+00:00</updated>
     <content type="xhtml">
       <div xmlns="http://www.w3.org/1999/xhtml">
       <a rel="taG" href="http://example.com/foo+bar">bar+baz</a>

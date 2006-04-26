@@ -8,7 +8,7 @@
     <title>Feed One, Entry One H6 + class=title</title>
     <id>http://example.com/entry</id>
     <link rel="alternate" href="http://example.com/entry" type="text/html"/>
-    <updated>2005-12-25T00:00:00Z</updated>
+    <updated>2005-12-25T00:00:00+00:00</updated>
     <author>
       <name>Joe Bloggs</name>
     </author>

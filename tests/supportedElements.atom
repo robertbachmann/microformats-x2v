@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en" xml:base="http://example.com/blog/">
-  <updated>2006-02-13T22:21:55+0100</updated>
+  <updated>2006-02-13T22:21:55+01:00</updated>
   <id>http://example.com/supportedElements.html</id>
   <link rel="alternate" href="http://example.com/supportedElements.html" type="text/html"/>
   <title>Html Title</title>

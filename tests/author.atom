@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xml:base="http://example.com/author.html">
-  <updated>2005-12-25T00:00:00Z</updated>
+  <updated>2005-12-25T00:00:00+00:00</updated>
   <id>http://example.com/author.html</id>
   <link rel="alternate" href="http://example.com/author.html" type="text/html"/>
   <title>Page title</title>
@@ -12,7 +12,7 @@
     <title>Entry One Title</title>
     <id>http://example.com/entry</id>
     <link rel="alternate" href="http://example.com/entry" type="text/html"/>
-    <updated>2005-12-25T00:00:00Z</updated>
+    <updated>2005-12-25T00:00:00+00:00</updated>
     <author>
       <name>Entry One Author One</name>
     </author>
@@ -27,7 +27,7 @@
     <title>Entry Two Title</title>
     <id>http://example.com/author.html#e2</id>
     <link rel="alternate" href="http://example.com/author.html#e2" type="text/html"/>
-    <updated>2005-12-25T00:00:00Z</updated>
+    <updated>2005-12-25T00:00:00+00:00</updated>
     <author>
       <name>Entry Two Author One</name>
     </author>
@@ -39,7 +39,7 @@
     <title>Entry Three Title</title>
     <id>http://example.com/author.html#e3</id>
     <link rel="alternate" href="http://example.com/author.html#e3" type="text/html"/>
-    <updated>2005-12-25T00:00:00Z</updated>
+    <updated>2005-12-25T00:00:00+00:00</updated>
     <author>
       <name>Entry Three Author One</name>
       <uri>http://example.com/authorOne</uri>
@@ -55,7 +55,7 @@
     <title>Entry Four Title</title>
     <id>http://example.com/author.html#e4</id>
     <link rel="alternate" href="http://example.com/author.html#e4" type="text/html"/>
-    <updated>2005-12-25T00:00:00Z</updated>
+    <updated>2005-12-25T00:00:00+00:00</updated>
     <author>
       <name>Entry Four Author One</name>
       <uri>http://example.com/authorOne</uri>
@@ -76,7 +76,7 @@
     <title>Entry Five Title</title>
     <id>http://example.com/author.html#e5</id>
     <link rel="alternate" href="http://example.com/author.html#e5" type="text/html"/>
-    <updated>2005-12-25T00:00:00Z</updated>
+    <updated>2005-12-25T00:00:00+00:00</updated>
     <author>
       <name>Entry Five Author One</name>
       <uri>http://example.com/authorOne</uri>
@@ -92,6 +92,6 @@
     <title>Entry Six Title</title>
     <id>http://example.com/author.html#e6</id>
     <link rel="alternate" href="http://example.com/author.html#e6" type="text/html"/>
-    <updated>2005-12-25T00:00:00Z</updated>
+    <updated>2005-12-25T00:00:00+00:00</updated>
   </entry>
 </feed>

@@ -2,7 +2,7 @@
                                 hAtom2Atom.xsl
    An XSLT stylesheet for transforming hAtom documents into Atom documents.
 
-            $Id: hAtom2Atom.xsl 39 2006-04-24 21:04:42Z RobertBachmann $
+            $Id: hAtom2Atom.xsl 40 2006-04-26 21:18:33Z RobertBachmann $
 
                             SUPPORTED XSLT ENGINES
 
@@ -187,7 +187,11 @@
           <!-- Try to use the first element with class="updated" at the feed level -->
           <xsl:when test="extension:node-set($feedLevelElements)/descendant::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' updated ')]">
             <xsl:for-each select="extension:node-set($feedLevelElements)/descendant::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' updated ')][1]">
-              <xsl:call-template name="text-value-of" />
+              <xsl:call-template name="pad-datetime">
+                <xsl:with-param name="date">
+                  <xsl:call-template name="text-value-of" />
+                </xsl:with-param>
+              </xsl:call-template>
             </xsl:for-each>
           </xsl:when>
           <!-- TODO: When there is no element with class="updated" at the feed level 
@@ -383,7 +387,11 @@
             as per hAtom specification 
           -->
           <xsl:for-each select="extension:node-set($entryLevelElements)/descendant::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' published ')][1]">
-            <xsl:call-template name="text-value-of" />
+            <xsl:call-template name="pad-datetime">
+              <xsl:with-param name="date">
+                <xsl:call-template name="text-value-of" />
+              </xsl:with-param>
+            </xsl:call-template>
           </xsl:for-each>
         </published>
       </xsl:if>
@@ -398,13 +406,22 @@
               as per hAtom specification 
             -->
             <xsl:for-each select="extension:node-set($entryLevelElements)/descendant::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' updated ')][1]">
-              <xsl:call-template name="text-value-of" />
+              <xsl:call-template name="pad-datetime">
+                <xsl:with-param name="date">
+                  <xsl:call-template name="text-value-of" />
+                </xsl:with-param>
+              </xsl:call-template>
             </xsl:for-each>
           </xsl:when>
           <!-- If no "updated" is present use the value of the first "published" -->
           <xsl:when test="extension:node-set($entryLevelElements)/descendant::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' published ')]">
             <xsl:for-each select="extension:node-set($entryLevelElements)/descendant::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' published ')][1]">
-              <xsl:call-template name="text-value-of" />
+              <xsl:comment>Using the value of the first "published" element</xsl:comment>
+              <xsl:call-template name="pad-datetime">
+                <xsl:with-param name="date">
+                  <xsl:call-template name="text-value-of" />
+                </xsl:with-param>
+              </xsl:call-template>
             </xsl:for-each>
           </xsl:when>
           <xsl:otherwise>
@@ -978,6 +995,485 @@
     </xsl:when>
     <xsl:otherwise>
       <xsl:value-of select="'no'" />
+    </xsl:otherwise>
+  </xsl:choose>
+</xsl:template>
+
+<!-- 
+  Pad a datetime to the RFC 3339 format.
+  
+  The following format is accepted as input:
+  
+   date-fullyear   = 4DIGIT
+   date-month      = 2DIGIT  ; 01-12
+   date-mday       = 2DIGIT  ; 01-28, 01-29, 01-30, 01-31 based on
+                             ; month/year
+   time-hour       = 2DIGIT  ; 00-23
+   time-minute     = 2DIGIT  ; 00-59
+   time-second     = 2DIGIT  ; 00-58, 00-59, 00-60 based on leap second
+                             ; rules
+   time-secfrac    = "." 1*DIGIT
+   time-numoffset  = ("+" / "-") time-hour [[":"] time-minute]
+   time-offset     = "Z" / time-numoffset
+
+   partial-time    = time-hour [":"] time-minute 
+                     [ [":"] time-second [time-secfrac] ]
+   full-date       = date-fullyear ["-"] date-month ["-"] date-mday
+   full-time       = partial-time time-offset
+
+   whitespace      = CR / LF / HTAB / SPC
+   
+   seperator       = "T" / (1*whitespace)
+   
+   input       = *whitespace full-date [seperator full-time] *whitespace
+   
+  
+  If no <full-time> is present it will be assumed "00:00:00+00:00".
+  If no <time-second> is present it will be assumed "00".
+  If no <time-minute> is present in <time-offset> it will be assumed "00".
+  
+  A <time-offset> of "Z" will be translated to "+00:00".
+  
+  Upon invalid input the string "invalid" will be returned.
+  
+-->
+
+<xsl:template name="pad-datetime">
+  <xsl:param name="date" />
+  <xsl:param name="s" select="translate(normalize-space($date),'tz','TZ')" />
+
+  <xsl:param name="phase">year</xsl:param>
+  
+  <xsl:param name="year" />
+  <xsl:param name="month" />
+  <xsl:param name="day" />
+  <xsl:param name="hour">00</xsl:param>
+  <xsl:param name="minute">00</xsl:param>
+  <xsl:param name="second">00</xsl:param>
+
+  <xsl:param name="secfrac" />
+  <xsl:param name="offset-sign">+</xsl:param>
+  <xsl:param name="offset-h">00</xsl:param>
+  <xsl:param name="offset-m">00</xsl:param>
+  
+  <xsl:variable name="s2" select="substring($s,1,2)" />  
+  
+  <xsl:choose>
+    <xsl:when test="$s = '' and $phase = 'year'">
+      <xsl:text>invalid</xsl:text>
+	  <xsl:comment>Blank string, expected datetime(Error code: 01)</xsl:comment>
+    </xsl:when>
+    <xsl:when test="$phase = 'year'">
+      <xsl:variable name="s4" select="substring($s,1,4)" />
+      <xsl:choose>
+        <xsl:when test="
+          string-length($s4) = 4 
+          and
+          translate($s4,'0123456789','') = ''
+          ">
+          <xsl:call-template name="pad-datetime">
+            <xsl:with-param name="phase">month</xsl:with-param>
+            <xsl:with-param name="year" select="number($s4)" />
+            <xsl:with-param name="date" select="$date" />            
+            <xsl:with-param name="s">
+              <xsl:choose>
+                <xsl:when test="substring($s,5,1) = '-'">
+                  <xsl:value-of select="substring($s,6)" />
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="substring($s,5)" />
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:with-param>
+          </xsl:call-template>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text>invalid</xsl:text>
+          <xsl:comment>Invalid input: Year part is not 4 digits long and/or contains invalid characters(Error code: 02)</xsl:comment>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:when>
+    <xsl:when test="$phase = 'month'">
+      <xsl:choose>
+        <xsl:when test="
+          string-length($s2) = 2 
+          and
+          translate($s2,'0123456789','') = ''
+          ">
+          <xsl:call-template name="pad-datetime">
+            <xsl:with-param name="phase">day</xsl:with-param>
+            <xsl:with-param name="date" select="$date" />            
+            <xsl:with-param name="year" select="$year" />
+            <xsl:with-param name="month" select="$s2" />
+            <xsl:with-param name="s">
+              <xsl:choose>
+                <xsl:when test="substring($s,3,1) = '-'">
+                  <xsl:value-of select="substring($s,4)" />
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="substring($s,3)" />
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:with-param>
+          </xsl:call-template>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text>invalid</xsl:text>
+          <xsl:comment>Invalid input: Month part is not 2 digits long and/or contains invalid characters(Error code: 03)</xsl:comment>
+        </xsl:otherwise>
+      </xsl:choose>      
+    </xsl:when>    
+    <xsl:when test="$phase = 'day'">
+      <xsl:choose>
+        <xsl:when test="
+          string-length($s2) = 2 
+          and
+          translate($s2,'0123456789','') = ''
+          ">
+            <xsl:choose>
+              <xsl:when test="string-length($s) = 2">
+                <xsl:call-template name="pad-datetime">
+                  <xsl:with-param name="phase">return</xsl:with-param>
+                  <xsl:with-param name="date" select="$date" />            
+                  <xsl:with-param name="year" select="$year" />
+                  <xsl:with-param name="month" select="$month" />
+                  <xsl:with-param name="day" select="$s2" />
+                </xsl:call-template>                            
+              </xsl:when>
+              <xsl:when test="
+              (substring($s,3,1) = 'T' or substring($s,3,1) = ' ')
+              and
+              string-length($s) != 3
+              and
+              translate(substring($s,4,1),'0123456789','') = ''
+              ">
+                <xsl:call-template name="pad-datetime">
+                  <xsl:with-param name="phase">hour</xsl:with-param>
+                  <xsl:with-param name="date" select="$date" />          
+                  <xsl:with-param name="year" select="$year" />
+                  <xsl:with-param name="month" select="$month" />
+                  <xsl:with-param name="day" select="$s2" />
+                  <xsl:with-param name="s" select="substring($s,4)" />
+                </xsl:call-template>              
+              </xsl:when>
+              <xsl:when test="substring($s,3,1) != 'T' and substring($s,3,1) != ' '">
+                <xsl:text>invalid</xsl:text>
+                <xsl:comment>Invalid input: Expected "T" or whitespace after YYYYMMDD(Error code: 04)</xsl:comment>
+              </xsl:when>              
+              <xsl:otherwise>
+                <xsl:text>invalid</xsl:text>
+                <xsl:comment>Invalid input: Expected numeric characters after "T" or whitespace(Error code: 05)</xsl:comment>
+              </xsl:otherwise>
+            </xsl:choose>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text>invalid</xsl:text>
+          <xsl:comment>Invalid input: Day part is not 2 digits long and/or contains invalid characters(Error code: 06)</xsl:comment>
+        </xsl:otherwise>
+      </xsl:choose>      
+    </xsl:when>
+    <xsl:when test="$phase = 'hour'">
+      <xsl:choose>
+        <xsl:when test="
+          string-length($s2) = 2 
+          and
+          translate($s2,'0123456789','') = ''
+          ">
+          <xsl:call-template name="pad-datetime">
+            <xsl:with-param name="phase">minute</xsl:with-param>
+            <xsl:with-param name="date" select="$date" />            
+            <xsl:with-param name="year" select="$year" />
+            <xsl:with-param name="month" select="$month" />
+            <xsl:with-param name="day" select="$day" />
+            <xsl:with-param name="hour" select="$s2" />
+            <xsl:with-param name="s">
+              <xsl:choose>
+                <xsl:when test="substring($s,3,1) = ':'">
+                  <xsl:value-of select="substring($s,4)" />
+                </xsl:when>
+                <xsl:otherwise>
+                  <xsl:value-of select="substring($s,3)" />
+                </xsl:otherwise>
+              </xsl:choose>
+            </xsl:with-param>
+          </xsl:call-template>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text>invalid</xsl:text>
+          <xsl:comment>Invalid input: Hour part is not 2 digits long and/or contains invalid characters(Error code: 07)</xsl:comment>
+        </xsl:otherwise>
+      </xsl:choose>      
+    </xsl:when>
+    <xsl:when test="$phase = 'minute'">
+      <xsl:choose>
+        <xsl:when test="
+          string-length($s2) = 2 
+          and
+          translate($s2,'0123456789','') = ''
+          ">
+          <xsl:choose>
+            <xsl:when test="substring($s,3,1) = '+' or substring($s,3,1) = '-' or substring($s,3,1) = 'Z'">
+              <xsl:call-template name="pad-datetime">
+                <xsl:with-param name="phase">offset-h</xsl:with-param>
+                <xsl:with-param name="date" select="$date" />
+                <xsl:with-param name="year" select="$year" />
+                <xsl:with-param name="month" select="$month" />
+                <xsl:with-param name="day" select="$day" />
+                <xsl:with-param name="hour" select="$hour" />
+                <xsl:with-param name="minute" select="$s2" />
+                <xsl:with-param name="offset-sign" select="substring($s,3,1)" />
+                <xsl:with-param name="s" select="substring($s,4)" />
+              </xsl:call-template>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:call-template name="pad-datetime">
+                <xsl:with-param name="phase">second</xsl:with-param>
+                <xsl:with-param name="date" select="$date" />            
+                <xsl:with-param name="year" select="$year" />
+                <xsl:with-param name="month" select="$month" />
+                <xsl:with-param name="day" select="$day" />
+                <xsl:with-param name="hour" select="$hour" />
+                <xsl:with-param name="minute" select="$s2" />                
+                <xsl:with-param name="s">
+                  <xsl:choose>
+                    <xsl:when test="substring($s,3,1) = ':'">
+                      <xsl:value-of select="substring($s,4)" />
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:value-of select="substring($s,3)" />
+                    </xsl:otherwise>
+                  </xsl:choose>
+                </xsl:with-param>
+              </xsl:call-template>            
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text>invalid</xsl:text>
+          <xsl:comment>Invalid input: Minute part is not 2 digits long and/or contains invalid characters(Error code: 08)</xsl:comment>
+        </xsl:otherwise>
+      </xsl:choose>      
+    </xsl:when>
+    <xsl:when test="$phase = 'second'">
+      <xsl:choose>
+        <xsl:when test="
+          string-length($s2) = 2 
+          and
+          translate($s2,'0123456789','') = ''
+          ">
+          <xsl:choose>
+            <xsl:when test="substring($s,3,1) = '.'">
+              <xsl:call-template name="pad-datetime">
+                <xsl:with-param name="phase">secfrac</xsl:with-param>
+                <xsl:with-param name="date" select="$date" />            
+                <xsl:with-param name="year" select="$year" />
+                <xsl:with-param name="month" select="$month" />
+                <xsl:with-param name="day" select="$day" />
+                <xsl:with-param name="hour" select="$hour" />
+                <xsl:with-param name="minute" select="$minute" />              
+                <xsl:with-param name="second" select="$s2" />
+                <xsl:with-param name="s" select="substring($s,4)" />
+              </xsl:call-template>
+            </xsl:when>
+            <xsl:when test="string-length($s) != 2">
+              <xsl:call-template name="pad-datetime">
+                <xsl:with-param name="phase">offset-h</xsl:with-param>
+                <xsl:with-param name="date" select="$date" />            
+                <xsl:with-param name="year" select="$year" />
+                <xsl:with-param name="month" select="$month" />
+                <xsl:with-param name="day" select="$day" />
+                <xsl:with-param name="hour" select="$hour" />
+                <xsl:with-param name="minute" select="$minute" />              
+                <xsl:with-param name="second" select="$s2" />
+                <xsl:with-param name="offset-sign" select="substring($s,3,1)" />
+                <xsl:with-param name="s" select="substring($s,4)" />
+              </xsl:call-template>            
+            </xsl:when>
+            <xsl:otherwise>invalid</xsl:otherwise>
+          </xsl:choose>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text>invalid</xsl:text>
+          <xsl:comment>Invalid input: Second part is not 2 digits long and/or contains invalid characters(Error code: 09)</xsl:comment>
+        </xsl:otherwise>
+      </xsl:choose>      
+    </xsl:when>
+    <xsl:when test="$phase = 'secfrac'">
+    <xsl:choose>
+      <xsl:when test="$s != ''">
+        <xsl:variable name="sf">
+          <xsl:choose>
+          <xsl:when test="contains($s,'+')">
+            <xsl:value-of select="substring-before($s,'+')" />
+          </xsl:when>
+          <xsl:when test="contains($s,'-')">
+            <xsl:value-of select="substring-before($s,'-')" />
+          </xsl:when>
+          <xsl:when test="contains($s,'Z')">
+            <xsl:value-of select="substring-before($s,'Z')" />
+          </xsl:when>
+          <xsl:otherwise/>
+          </xsl:choose>
+        </xsl:variable>
+        <xsl:variable name="sf-len" select="string-length($sf)" />
+        <xsl:choose>
+        <xsl:when test="($sf-len &gt; 0) and (translate($sf,'0123456789','') = '')">
+              <xsl:call-template name="pad-datetime">
+                <xsl:with-param name="phase">offset-h</xsl:with-param>
+                <xsl:with-param name="date" select="$date" />            
+                <xsl:with-param name="year" select="$year" />
+                <xsl:with-param name="month" select="$month" />
+                <xsl:with-param name="day" select="$day" />
+                <xsl:with-param name="hour" select="$hour" />
+                <xsl:with-param name="minute" select="$minute" />              
+                <xsl:with-param name="second" select="$second" />
+                <xsl:with-param name="secfrac" select="$sf" />
+                <xsl:with-param name="offset-sign" select="substring($s,$sf-len + 1,1)" />
+                <xsl:with-param name="s" select="substring($s,$sf-len + 2)" />
+              </xsl:call-template>            
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text>invalid</xsl:text>
+          <xsl:comment>Invalid input: Secfrac part contains invalid characters(Error code: 10)</xsl:comment>
+        </xsl:otherwise>
+        </xsl:choose>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:text>invalid</xsl:text>
+        <xsl:comment>Invalid input: Expected timezone offset(Error code: 11)</xsl:comment>
+      </xsl:otherwise>
+      </xsl:choose>
+    </xsl:when>
+    <xsl:when test="$phase = 'offset-h'">
+      <xsl:choose>
+      <xsl:when test="$offset-sign = 'Z'">
+        <xsl:choose>
+          <xsl:when test="$s != ''">
+            <xsl:text>invalid</xsl:text>
+            <xsl:comment>Invalid input: Extra characters after "Z"(Error code: 12)</xsl:comment>
+          </xsl:when>
+          <xsl:otherwise>
+            <xsl:call-template name="pad-datetime">
+              <xsl:with-param name="phase">return</xsl:with-param>
+              <xsl:with-param name="date" select="$date" />
+              <xsl:with-param name="year" select="$year" />
+              <xsl:with-param name="month" select="$month" />
+              <xsl:with-param name="day" select="$day" />
+              <xsl:with-param name="hour" select="$hour" />
+              <xsl:with-param name="minute" select="$minute" />
+              <xsl:with-param name="second" select="$second" />
+              <xsl:with-param name="secfrac" select="$secfrac" />
+              <xsl:with-param name="offset-sign">+</xsl:with-param>
+              <xsl:with-param name="offset-h">00</xsl:with-param>
+              <xsl:with-param name="offset-m">00</xsl:with-param>
+            </xsl:call-template>
+          </xsl:otherwise>
+        </xsl:choose>
+      </xsl:when>
+      <xsl:when test="
+          string-length($s2) = 2 
+          and
+          translate($s2,'0123456789','') = ''
+          ">
+          <xsl:choose>
+            <xsl:when test="string-length($s) = 2">
+              <xsl:call-template name="pad-datetime">
+                <xsl:with-param name="phase">return</xsl:with-param>
+                <xsl:with-param name="date" select="$date" />
+                <xsl:with-param name="year" select="$year" />
+                <xsl:with-param name="month" select="$month" />
+                <xsl:with-param name="day" select="$day" />
+                <xsl:with-param name="hour" select="$hour" />
+                <xsl:with-param name="minute" select="$minute" />
+                <xsl:with-param name="second" select="$second" />
+                <xsl:with-param name="secfrac" select="$secfrac" />
+                <xsl:with-param name="offset-sign" select="$offset-sign" />
+                <xsl:with-param name="offset-h" select="$s2" />
+              </xsl:call-template>
+            </xsl:when>
+            <xsl:when test="string-length($s) &gt;= 2">
+              <xsl:call-template name="pad-datetime">
+                <xsl:with-param name="phase">offset-m</xsl:with-param>
+                <xsl:with-param name="date" select="$date" />
+                <xsl:with-param name="year" select="$year" />
+                <xsl:with-param name="month" select="$month" />
+                <xsl:with-param name="day" select="$day" />
+                <xsl:with-param name="hour" select="$hour" />
+                <xsl:with-param name="minute" select="$minute" />
+                <xsl:with-param name="second" select="$second" />
+                <xsl:with-param name="secfrac" select="$secfrac" />
+                <xsl:with-param name="offset-sign" select="$offset-sign" />
+                <xsl:with-param name="offset-h" select="$s2" />
+                <xsl:with-param name="s">
+                  <xsl:choose>
+                    <xsl:when test="substring($s,3,1) = ':'">
+                      <xsl:value-of select="substring($s,4)" />
+                    </xsl:when>
+                    <xsl:otherwise>
+                      <xsl:value-of select="substring($s,3)" />
+                    </xsl:otherwise>
+                  </xsl:choose>
+                </xsl:with-param>
+              </xsl:call-template>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:text>invalid</xsl:text>
+              <xsl:comment>Invalid input: Extra character after offset hour(Error code: 13)</xsl:comment>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text>invalid</xsl:text>
+          <xsl:comment>Invalid input: Offset hour part is not 2 digits long and/or contains invalid characters(Error code: 14)</xsl:comment>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:when>
+    <xsl:when test="$phase = 'offset-m'">
+      <xsl:choose>
+        <xsl:when test="
+          string-length($s2) = 2 
+          and
+          translate($s2,'0123456789','') = ''
+          ">
+          <xsl:choose>
+            <xsl:when test="string-length($s) = 2">
+              <xsl:call-template name="pad-datetime">
+                <xsl:with-param name="phase">return</xsl:with-param>
+                <xsl:with-param name="date" select="$date" />
+                <xsl:with-param name="year" select="$year" />
+                <xsl:with-param name="month" select="$month" />
+                <xsl:with-param name="day" select="$day" />
+                <xsl:with-param name="hour" select="$hour" />
+                <xsl:with-param name="minute" select="$minute" />
+                <xsl:with-param name="second" select="$second" />
+                <xsl:with-param name="secfrac" select="$secfrac" />
+                <xsl:with-param name="offset-sign" select="$offset-sign" />
+                <xsl:with-param name="offset-h" select="$offset-h" />
+                <xsl:with-param name="offset-m" select="$s2" />
+              </xsl:call-template>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:text>invalid</xsl:text>
+              <xsl:comment>Invalid input: characters after offset minute(Error code: 15)</xsl:comment>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:text>invalid</xsl:text>
+          <xsl:comment>Invalid input: Offset minute part is not 2 digits long and/or contains invalid characters(Error code: 16)</xsl:comment>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:when>
+    <xsl:when test="$phase = 'return'">
+      <xsl:value-of select="concat($year,'-',$month,'-',$day,'T',$hour,':',$minute,':',$second)" />
+      <xsl:if test="$secfrac != ''">
+        <xsl:value-of select="concat('.',$secfrac)" />
+      </xsl:if>
+      <xsl:value-of select="concat($offset-sign,$offset-h,':',$offset-m)" />
+    </xsl:when>
+    <xsl:otherwise>
+      <xsl:text>invalid</xsl:text>
+      <xsl:comment>Internal error in stylesheet(Error code: 17)</xsl:comment>
     </xsl:otherwise>
   </xsl:choose>
 </xsl:template>

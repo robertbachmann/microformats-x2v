@@ -1,40 +1,562 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xml:base="http://example.com/updated-published.html">
-  <updated/>
+  <updated>2006-04-25T00:00:00+00:00</updated>
   <id>http://example.com/updated-published.html</id>
   <link rel="alternate" href="http://example.com/updated-published.html" type="text/html"/>
   <title>Page title</title>
   <entry>
     <title>Title ...</title>
     <id/>
-    <updated>2006-02-07T01:02:03Z</updated>
+    <updated>2006-02-07T01:02:00+00:00</updated>
   </entry>
   <entry>
     <title>Title ...</title>
     <id/>
-    <updated>2006-02-07T04:05:06Z</updated>
+    <updated>2006-02-07T04:05:06+00:00</updated>
     <content type="xhtml">
       <div xmlns="http://www.w3.org/1999/xhtml">
-        <q><span class="updated">2006-02-07T01:02:03Z</span></q>
+        <q><span class="updated">2006-02-07</span></q>
       </div>
     </content>
   </entry>
   <entry>
     <title>Title ...</title>
     <id/>
-    <published>2006-02-07T04:07:07Z</published>
-    <updated>2006-02-07T04:07:07Z</updated>
+    <published>2006-02-07T04:07:07+00:00</published>
+    <updated>2006-02-07T04:07:07+00:00</updated>
   </entry>
   <entry>
     <title>Title ...</title>
     <id/>
-    <published>2006-02-07T04:07:07Z</published>
-    <updated>2006-02-07T04:08:50Z</updated>
+    <published>2006-02-07T04:07:07+00:00</published>
+    <updated>2006-02-07T04:08:50+00:00</updated>
   </entry>
   <entry>
     <title>Title ...</title>
     <id/>
-    <published>2006-02-07T08:09:10Z</published>
-    <updated>2006-02-07T08:09:10Z</updated>
+    <published>2006-02-07T08:09:10+00:00</published>
+    <updated>2006-02-07T08:09:10+00:00</updated>
+  </entry>
+  <entry>
+    <title/>
+    <id/>
+    <updated>2007-03-24T17:59:41+01:00</updated>
+    <content type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">20070324T175941+01</div>
+    </content>
+  </entry>
+  <entry>
+    <title/>
+    <id/>
+    <updated>2007-03-24T17:59:41+01:00</updated>
+    <content type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">20070324 	 175941+01:00 </div>
+    </content>
+  </entry>
+  <entry>
+    <title/>
+    <id/>
+    <updated>2007-03-24T17:59:41+01:00</updated>
+    <content type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">20070324 	 
+    
+    175941+01:00 </div>
+    </content>
+  </entry>
+  <entry>
+    <title/>
+    <id/>
+    <updated>2007-03-24T17:59:41.01+01:00</updated>
+    <content type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">            20070324     175941.01+01:00 </div>
+    </content>
+  </entry>
+  <entry>
+    <title/>
+    <id/>
+    <updated>2006-03-24T18:32:39+01:00</updated>
+    <content type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">2006-03-24T18:32:39+01:00</div>
+    </content>
+  </entry>
+  <entry>
+    <title/>
+    <id/>
+    <published>2006-03-24T18:32:39+01:00</published>
+    <updated>2006-03-24T18:30:01+01:00</updated>
+    <content type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">2006-03-24T18:32:39+0100</div>
+    </content>
+  </entry>
+  <entry>
+    <title/>
+    <id/>
+    <updated>2006-03-24T18:32:39+01:00</updated>
+    <content type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">2006-03-24T18:32:39+01:00</div>
+    </content>
+  </entry>
+  <entry>
+    <title/>
+    <id/>
+    <updated>2006-03-24T18:32:39+01:00</updated>
+    <content type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">2006-03-24 18:32:39+01:00</div>
+    </content>
+  </entry>
+  <entry>
+    <title/>
+    <id/>
+    <published>2006-03-24T18:32:39+01:00</published>
+    <updated>2006-03-24T18:32:39+01:00</updated>
+  </entry>
+  <entry>
+    <title/>
+    <id/>
+    <updated>2006-03-24T18:32:39+01:00</updated>
+    <content type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">2006-03-24T183239+0100</div>
+    </content>
+  </entry>
+  <entry>
+    <title/>
+    <id/>
+    <updated>2006-03-24T18:32:39+01:00</updated>
+    <content type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">20060324T183239+0100</div>
+    </content>
+  </entry>
+  <entry>
+    <title/>
+    <id/>
+    <updated>2006-03-24T18:32:39.1+01:00</updated>
+    <content type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">20060324T183239.1+0100</div>
+    </content>
+  </entry>
+  <entry>
+    <title/>
+    <id/>
+    <updated>2006-03-24T18:32:39.12345678901+01:00</updated>
+    <content type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">20060324T183239.12345678901+0100</div>
+    </content>
+  </entry>
+  <entry>
+    <title/>
+    <id/>
+    <updated>2006-03-24T18:32:39+01:00</updated>
+    <content type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">20060324T183239+01</div>
+    </content>
+  </entry>
+  <entry>
+    <title/>
+    <id/>
+    <updated>2006-03-24T18:32:39+01:00</updated>
+    <content type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">20060324t183239+01</div>
+    </content>
+  </entry>
+  <entry>
+    <title/>
+    <id/>
+    <updated>2006-03-24T18:32:39+01:00</updated>
+    <content type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">20060324 183239+01</div>
+    </content>
+  </entry>
+  <entry>
+    <title/>
+    <id/>
+    <updated>2006-03-24T17:32:39+00:00</updated>
+    <content type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">20060324t173239+00</div>
+    </content>
+  </entry>
+  <entry>
+    <title/>
+    <id/>
+    <updated>2006-03-24T17:32:39+00:00</updated>
+    <content type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">20060324T173239z</div>
+    </content>
+  </entry>
+  <entry>
+    <title/>
+    <id/>
+    <updated>2006-03-24T17:32:00+00:00</updated>
+    <content type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">20060324T1732z</div>
+    </content>
+  </entry>
+  <entry>
+    <title/>
+    <id/>
+    <updated>2006-03-24T17:32:00+00:00</updated>
+    <content type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">20060324T17:32z</div>
+    </content>
+  </entry>
+  <entry>
+    <title/>
+    <id/>
+    <updated>2006-03-24T17:32:00+00:00</updated>
+    <content type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">2006-03-24T17:32z</div>
+    </content>
+  </entry>
+  <entry>
+    <title/>
+    <id/>
+    <updated>2006-03-24T17:32:00+01:00</updated>
+    <content type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">2006-03-24T17:32+01</div>
+    </content>
+  </entry>
+  <entry>
+    <title/>
+    <id/>
+    <updated>2006-03-24T17:32:00+01:30</updated>
+    <content type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">2006-03-24T17:32+01:30</div>
+    </content>
+  </entry>
+  <entry>
+    <title/>
+    <id/>
+    <updated>2006-03-24T17:32:00+01:30</updated>
+    <content type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">2006-03-24T17:32+0130</div>
+    </content>
+  </entry>
+  <entry>
+    <title/>
+    <id/>
+    <updated>2006-03-24T00:00:00+00:00</updated>
+    <content type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">20060324</div>
+    </content>
+  </entry>
+  <entry>
+    <title/>
+    <id/>
+    <updated>2006-03-24T00:00:00+00:00</updated>
+    <content type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">20060324</div>
+    </content>
+  </entry>
+  <entry>
+    <title/>
+    <id/>
+    <updated>invalid</updated>
+    <content type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml"/>
+    </content>
+  </entry>
+  <entry>
+    <title/>
+    <id/>
+    <updated>invalid</updated>
+    <content type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml"> </div>
+    </content>
+  </entry>
+  <entry>
+    <title/>
+    <id/>
+    <updated>invalid</updated>
+    <content type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">   
+    </div>
+    </content>
+  </entry>
+  <entry>
+    <title/>
+    <id/>
+    <updated>invalid</updated>
+    <content type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">a006-04-15</div>
+    </content>
+  </entry>
+  <entry>
+    <title/>
+    <id/>
+    <updated>invalid</updated>
+    <content type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">200 -04-15</div>
+    </content>
+  </entry>
+  <entry>
+    <title/>
+    <id/>
+    <updated>invalid</updated>
+    <content type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">200-04-15</div>
+    </content>
+  </entry>
+  <entry>
+    <title/>
+    <id/>
+    <updated>invalid</updated>
+    <content type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">2006-0a-10</div>
+    </content>
+  </entry>
+  <entry>
+    <title/>
+    <id/>
+    <updated>invalid</updated>
+    <content type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">2006-0-10</div>
+    </content>
+  </entry>
+  <entry>
+    <title/>
+    <id/>
+    <updated>invalid</updated>
+    <content type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">20060a10</div>
+    </content>
+  </entry>
+  <entry>
+    <title/>
+    <id/>
+    <updated>invalid</updated>
+    <content type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">2006010</div>
+    </content>
+  </entry>
+  <entry>
+    <title/>
+    <id/>
+    <updated>invalid</updated>
+    <content type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">20060102a</div>
+    </content>
+  </entry>
+  <entry>
+    <title/>
+    <id/>
+    <updated>invalid</updated>
+    <content type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">20060102_</div>
+    </content>
+  </entry>
+  <entry>
+    <title/>
+    <id/>
+    <updated>invalid</updated>
+    <content type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">20060102T</div>
+    </content>
+  </entry>
+  <entry>
+    <title/>
+    <id/>
+    <updated>invalid</updated>
+    <content type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">20060102t</div>
+    </content>
+  </entry>
+  <entry>
+    <title/>
+    <id/>
+    <updated>invalid</updated>
+    <content type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">2006-01-1</div>
+    </content>
+  </entry>
+  <entry>
+    <title/>
+    <id/>
+    <updated>invalid</updated>
+    <content type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">2006-01-0a</div>
+    </content>
+  </entry>
+  <entry>
+    <title/>
+    <id/>
+    <updated>invalid</updated>
+    <content type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">2006-01-a</div>
+    </content>
+  </entry>
+  <entry>
+    <title/>
+    <id/>
+    <updated>invalid</updated>
+    <content type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">2006-01-02 1a</div>
+    </content>
+  </entry>
+  <entry>
+    <title/>
+    <id/>
+    <updated>invalid</updated>
+    <content type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">2006-01-02 1</div>
+    </content>
+  </entry>
+  <entry>
+    <title/>
+    <id/>
+    <updated>invalid</updated>
+    <content type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">2006-01-02 a</div>
+    </content>
+  </entry>
+  <entry>
+    <title/>
+    <id/>
+    <updated>invalid</updated>
+    <content type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">2006-01-02 01:0</div>
+    </content>
+  </entry>
+  <entry>
+    <title/>
+    <id/>
+    <updated>invalid</updated>
+    <content type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">2006-01-02 01:0a</div>
+    </content>
+  </entry>
+  <entry>
+    <title/>
+    <id/>
+    <updated>invalid</updated>
+    <content type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">2006-01-02 010</div>
+    </content>
+  </entry>
+  <entry>
+    <title/>
+    <id/>
+    <updated>invalid</updated>
+    <content type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">2006-01-02 01a</div>
+    </content>
+  </entry>
+  <entry>
+    <title/>
+    <id/>
+    <updated>invalid</updated>
+    <content type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">2006-01-02 01:20:0</div>
+    </content>
+  </entry>
+  <entry>
+    <title/>
+    <id/>
+    <updated>invalid</updated>
+    <content type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">2006-01-02 01:20:0a</div>
+    </content>
+  </entry>
+  <entry>
+    <title/>
+    <id/>
+    <updated>invalid</updated>
+    <content type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">2006-01-02 01:20:00.1a</div>
+    </content>
+  </entry>
+  <entry>
+    <title/>
+    <id/>
+    <updated>invalid</updated>
+    <content type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">2006-01-02 01:20:00..</div>
+    </content>
+  </entry>
+  <entry>
+    <title/>
+    <id/>
+    <updated>invalid</updated>
+    <content type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">2006-01-02 01:20:00.a</div>
+    </content>
+  </entry>
+  <entry>
+    <title/>
+    <id/>
+    <updated>invalid</updated>
+    <content type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">2006-01-02 01:20+</div>
+    </content>
+  </entry>
+  <entry>
+    <title/>
+    <id/>
+    <updated>invalid</updated>
+    <content type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">2006-01-02 01:20-</div>
+    </content>
+  </entry>
+  <entry>
+    <title/>
+    <id/>
+    <updated>invalid</updated>
+    <content type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">2006-01-02 01:20+0</div>
+    </content>
+  </entry>
+  <entry>
+    <title/>
+    <id/>
+    <updated>invalid</updated>
+    <content type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">2006-01-02 01:20+0a</div>
+    </content>
+  </entry>
+  <entry>
+    <title/>
+    <id/>
+    <updated>invalid</updated>
+    <content type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">20070324 175941.02++01:00</div>
+    </content>
+  </entry>
+  <entry>
+    <title/>
+    <id/>
+    <updated>invalid</updated>
+    <content type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">20070324 175941.+01:00</div>
+    </content>
+  </entry>
+  <entry>
+    <title/>
+    <id/>
+    <updated>invalid</updated>
+    <content type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">2006-03-24T17:59:41+ 01</div>
+    </content>
+  </entry>
+  <entry>
+    <title/>
+    <id/>
+    <updated>invalid</updated>
+    <content type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">2006-03-24T17:59:41 +0100</div>
+    </content>
+  </entry>
+  <entry>
+    <title/>
+    <id/>
+    <updated>invalid</updated>
+    <content type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">2006-03-24T17:59:41 +01</div>
+    </content>
+  </entry>
+  <entry>
+    <title/>
+    <id/>
+    <updated>invalid</updated>
+    <content type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">2006-03-24T17:59:41 Z</div>
+    </content>
   </entry>
 </feed>

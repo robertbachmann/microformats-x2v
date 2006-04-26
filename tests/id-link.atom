@@ -8,17 +8,17 @@
     <title>Title ...</title>
     <id>http://example.org/foo/entry1</id>
     <link rel="alternate" href="http://example.org/foo/entry1" hreflang="de" type="text/html"/>
-    <updated>2006-02-07T01:02:03Z</updated>
+    <updated>2006-02-07T01:02:03+00:00</updated>
   </entry>
   <entry>
     <title>Title ...</title>
     <id>http://example.com/id-link.html#e2</id>
     <link rel="alternate" href="http://example.com/id-link.html#e2" type="text/html"/>
-    <updated>2006-02-07T01:02:04Z</updated>
+    <updated>2006-02-07T01:02:04+00:00</updated>
   </entry>
   <entry>
     <title>Title ...</title>
     <id/>
-    <updated>2006-02-07T01:02:05Z</updated>
+    <updated>2006-02-07T01:02:05+00:00</updated>
   </entry>
 </feed>

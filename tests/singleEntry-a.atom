@@ -4,8 +4,8 @@
    <id>http://example.com/singleEntry.html#entry1</id>
    <link rel="alternate" href="http://example.com/singleEntry.html#entry1"
          type="text/html"/>
-  <published>2006-04-20T21:10:14+0200</published>
-  <updated>2006-04-20T21:10:14+0200</updated>
+  <published>2006-04-20T21:10:14+02:00</published>
+  <updated>2006-04-20T21:10:14+02:00</updated>
   <summary type="xhtml">
     <div xmlns="http://www.w3.org/1999/xhtml">Entry #1, summary</div>
   </summary>
