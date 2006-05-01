@@ -2,7 +2,7 @@
                                 hAtom2Atom.xsl
    An XSLT stylesheet for transforming hAtom documents into Atom documents.
 
-            $Id: hAtom2Atom.xsl 40 2006-04-26 21:18:33Z RobertBachmann $
+            $Id: hAtom2Atom.xsl 41 2006-05-01 18:35:56Z RobertBachmann $
 
                             SUPPORTED XSLT ENGINES
 
@@ -34,7 +34,12 @@
      If no feeds are found, the value of $implicit-feed determines
      wether the whole document should be treated as feed or if the
      first hentry should be extracted as stand-alone atom:entry.
-     The default is "0".
+     The default is "1".
+     
+   $debug-comments:
+     If $debug-comments is set to "1", hAtom2Atom.xsl will add 
+     comments which can aid for debugging.
+     The default is "1".
 
                                      NOTES
 
@@ -48,7 +53,7 @@
                                    SEE ALSO
 
    For the latest version of this stylesheet: 
-     <http://rbach.priv.at/hAtom/>
+     <http://rbach.priv.at/hAtom2Atom/>
     
    Information about hAtom:
      <http://microformats.org/wiki/hatom>
@@ -68,10 +73,11 @@
 
                                ACKNOWLEDGEMENTS
 
-   Structure of the multi-valued attribute selection trick taken from
-   Brian Suda's XHTML-2-iCal: 
-     <http://suda.co.uk/projects/X2V/xhtml2vcal.xsl>
-
+   Structure of the multi-valued attribute selection trick and
+   templates for datetime to UTC conversion taken from
+   Brian Suda's X2V: 
+     <http://suda.co.uk/projects/X2V/>
+     
    This work is based on hAtom2Atom.xsl version 0.0.6 from
      <http://lukearno.com/projects/hAtom/>
 
@@ -83,16 +89,18 @@
                xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
                xmlns:extension="http://exslt.org/common"
                xmlns:str="http://exslt.org/strings"
-               xmlns:uri ="http://www.w3.org/2000/07/uri43/uri.xsl?template="
+               xmlns:uri="http://www.w3.org/2000/07/uri43/uri.xsl?template="
+               xmlns:h2a="http://rbach.priv.at/hAtom2Atom/"
                extension-element-prefixes="extension str"
-               exclude-result-prefixes="xhtml uri">
+               exclude-result-prefixes="xhtml uri h2a">
 
 <!-- Downloaded from http://www.w3.org/2000/07/uri43/uri.xsl -->
 <xsl:import href="uri.xsl" />
 
 <xsl:param name="source-uri" />
 <xsl:param name="content-type">text/html</xsl:param>
-<xsl:param name="implicit-feed">0</xsl:param>
+<xsl:param name="implicit-feed">1</xsl:param>
+<xsl:param name="debug-comments">1</xsl:param>
 
 <xsl:output method="xml" indent="yes" encoding="UTF-8" />
 
@@ -115,8 +123,17 @@
   </xsl:apply-templates>
 </xsl:template>
 
+<xsl:template match="node()|@*" mode="extract-date">
+  <xsl:param name="where"/>
+  <!-- By default, do nothing -->
+  <xsl:apply-templates select="node()|@*" mode="extract-date">
+    <xsl:with-param name="where" select="$where"/>
+  </xsl:apply-templates>
+</xsl:template>
+
 <!-- Inhibit <q> and <blockquote -->
 <xsl:template match="xhtml:q|xhtml:blockquote" />
+<xsl:template match="xhtml:q|xhtml:blockquote" mode="extract-date" />
 
 <xsl:template match="/">
   <!--
@@ -194,12 +211,35 @@
               </xsl:call-template>
             </xsl:for-each>
           </xsl:when>
-          <!-- TODO: When there is no element with class="updated" at the feed level 
-               We might want to try to use the element from the entry level
-               with the greatest (newest) date-time 
-          -->
+          <!-- Try to use the newest datetime from the entry level -->
           <xsl:otherwise>
-            <!--ERROR: <updated> is required for feed -->
+            <xsl:variable name="datetimes">
+              <xsl:apply-templates select="node()|@*" mode="extract-date">
+                <xsl:with-param name="where">feed</xsl:with-param>
+              </xsl:apply-templates>
+            </xsl:variable>
+            <xsl:variable name="sorted-datetimes">      
+              <xsl:for-each select="extension:node-set($datetimes)/h2a:t">
+                <xsl:sort select="@utc" order="descending" />
+                  <h2a:t orginal="{@orginal}" utc="{@utc}" />
+              </xsl:for-each>
+            </xsl:variable>
+            <xsl:if test="$debug-comments != 0">
+              <xsl:comment>
+                <xsl:text>&#10;</xsl:text>
+                <xsl:text>Using the newest datetime from the entry level.&#10;</xsl:text>
+                <xsl:text>&#10;</xsl:text>
+                <xsl:text>Here is a sorted list from all the dates at the feed level:&#10;</xsl:text>
+                <xsl:text>&#10;</xsl:text>
+                <xsl:for-each select="extension:node-set($sorted-datetimes)/h2a:t">
+                  <xsl:value-of select="concat(@utc,' (',@orginal,')&#10;')" />
+                </xsl:for-each>
+                <xsl:text>&#10;</xsl:text>
+              </xsl:comment>
+            </xsl:if>
+            <xsl:for-each select="extension:node-set($sorted-datetimes)/h2a:t[1]">
+              <xsl:value-of select="@orginal" />
+            </xsl:for-each>
           </xsl:otherwise>
         </xsl:choose>
       </updated>
@@ -282,6 +322,49 @@
 	  <xsl:with-param name="where">feed</xsl:with-param>
     </xsl:call-template>
   </xsl:if>
+</xsl:template>
+
+<xsl:template mode="extract-date" match="xhtml:*[contains(concat(' ',normalize-space(@class),' '),' hentry ')]">
+  <xsl:variable name="entryLevelElements">
+    <xsl:call-template name="entry-level-elements"/>
+  </xsl:variable>
+  <xsl:variable name="updated">
+        <xsl:choose>
+          <xsl:when test="extension:node-set($entryLevelElements)/descendant::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' updated ')]">
+            <!-- 
+              Use the value of the 
+              first element with class="updated" 
+              as per hAtom specification 
+            -->
+            <xsl:for-each select="extension:node-set($entryLevelElements)/descendant::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' updated ')][1]">
+              <xsl:call-template name="pad-datetime">
+                <xsl:with-param name="date">
+                  <xsl:call-template name="text-value-of" />
+                </xsl:with-param>
+              </xsl:call-template>
+            </xsl:for-each>
+          </xsl:when>
+          <!-- If no "updated" is present use the value of the first "published" -->
+          <xsl:when test="extension:node-set($entryLevelElements)/descendant::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' published ')]">
+            <xsl:for-each select="extension:node-set($entryLevelElements)/descendant::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' published ')][1]">
+              <xsl:call-template name="pad-datetime">
+                <xsl:with-param name="date">
+                  <xsl:call-template name="text-value-of" />
+                </xsl:with-param>
+              </xsl:call-template>
+            </xsl:for-each>
+          </xsl:when>
+          <xsl:otherwise>
+            <!--ERROR: <updated> is mandatory -->
+          </xsl:otherwise>
+        </xsl:choose>  
+  </xsl:variable>
+	<xsl:variable name="utc">
+	  <xsl:call-template name="utc-time-converter">
+		  <xsl:with-param name="time-string" select="$updated" /> 
+		</xsl:call-template>
+	</xsl:variable>
+  <h2a:t orginal="{$updated}" utc="{substring-before($utc,'Z')}" />
 </xsl:template>
 
 <xsl:template name="entry">
@@ -416,7 +499,9 @@
           <!-- If no "updated" is present use the value of the first "published" -->
           <xsl:when test="extension:node-set($entryLevelElements)/descendant::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' published ')]">
             <xsl:for-each select="extension:node-set($entryLevelElements)/descendant::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' published ')][1]">
-              <xsl:comment>Using the value of the first "published" element</xsl:comment>
+              <xsl:if test="$debug-comments != 0">
+                <xsl:comment>Using the value of the first "published" element</xsl:comment>
+              </xsl:if>
               <xsl:call-template name="pad-datetime">
                 <xsl:with-param name="date">
                   <xsl:call-template name="text-value-of" />
@@ -1476,6 +1561,395 @@
       <xsl:comment>Internal error in stylesheet(Error code: 17)</xsl:comment>
     </xsl:otherwise>
   </xsl:choose>
+</xsl:template>
+
+<!-- From: <http://suda.co.uk/projects/X2V/> -->
+<!-- convert all times to UTC Times -->
+<!-- RFC2426 mandates that iCal dates are in UTC without dashes or colons as seperators -->
+<xsl:template name="utc-time-converter">
+<xsl:param name="time-string"></xsl:param>
+<xsl:choose>
+	<xsl:when test="substring-before($time-string,'Z') = true()">
+		<!-- need to pad with 0000s if needed -->
+		<xsl:value-of select="translate(translate(substring-before($time-string,'Z'), ':' ,''), '-' ,'')"/>
+		<xsl:if test="string-length(translate(translate(substring-before($time-string,'Z'), ':' ,''), '-' ,''))  &lt; 10">
+			<xsl:text>0</xsl:text>
+		</xsl:if>
+		<xsl:if test="string-length(translate(translate(substring-before($time-string,'Z'), ':' ,''), '-' ,''))  &lt; 11">
+			<xsl:text>0</xsl:text>
+		</xsl:if>
+		<xsl:if test="string-length(translate(translate(substring-before($time-string,'Z'), ':' ,''), '-' ,''))  &lt; 12">
+			<xsl:text>0</xsl:text>
+		</xsl:if>
+		<xsl:if test="string-length(translate(translate(substring-before($time-string,'Z'), ':' ,''), '-' ,''))  &lt; 13">
+			<xsl:text>0</xsl:text>
+		</xsl:if>
+		<xsl:if test="string-length(translate(translate(substring-before($time-string,'Z'), ':' ,''), '-' ,''))  &lt; 14">
+			<xsl:text>0</xsl:text>
+		</xsl:if>
+		<xsl:if test="string-length(translate(translate(substring-before($time-string,'Z'), ':' ,''), '-' ,''))  &lt; 15">
+			<xsl:text>0</xsl:text>
+		</xsl:if>
+		<xsl:text>Z</xsl:text>
+	</xsl:when>
+	<xsl:when test="substring-before($time-string,'T') = false()">
+		<xsl:value-of select="translate(translate($time-string, ':' ,''), '-' ,'')"/>
+		<xsl:if test="string-length(translate(translate($time-string, ':' ,''), '-' ,''))  &lt; 9">
+			<xsl:text>T</xsl:text>
+		</xsl:if>
+		<xsl:if test="string-length(translate(translate($time-string, ':' ,''), '-' ,''))  &lt; 10">
+			<xsl:text>0</xsl:text>
+		</xsl:if>
+		<xsl:if test="string-length(translate(translate($time-string, ':' ,''), '-' ,''))  &lt; 11">
+			<xsl:text>0</xsl:text>
+		</xsl:if>
+		<xsl:if test="string-length(translate(translate($time-string, ':' ,''), '-' ,''))  &lt; 12">
+			<xsl:text>0</xsl:text>
+		</xsl:if>
+		<xsl:if test="string-length(translate(translate($time-string, ':' ,''), '-' ,''))  &lt; 13">
+			<xsl:text>0</xsl:text>
+		</xsl:if>
+		<xsl:if test="string-length(translate(translate($time-string, ':' ,''), '-' ,''))  &lt; 14">
+			<xsl:text>0</xsl:text>
+		</xsl:if>
+		<xsl:if test="string-length(translate(translate($time-string, ':' ,''), '-' ,''))  &lt; 15">
+			<xsl:text>0</xsl:text>
+		</xsl:if>
+		<xsl:text>Z</xsl:text>
+	</xsl:when>
+	<xsl:otherwise>
+		<xsl:variable name="event-year"> <xsl:value-of select="substring(translate($time-string, '-' ,''),1,4)"/></xsl:variable>
+		<xsl:variable name="event-month"><xsl:value-of select="substring(translate($time-string, '-' ,''),5,2)"/></xsl:variable>
+		<xsl:variable name="event-day">  <xsl:value-of select="substring(translate($time-string, '-' ,''),7,2)"/></xsl:variable>
+		<xsl:variable name="event-date"><xsl:value-of select="substring-before(translate($time-string, '-' ,''),'T')"/></xsl:variable>
+		<xsl:choose>
+			<xsl:when test="substring-before(substring-after(translate($time-string, ':' ,''),'T'),'+') = true()">
+				<xsl:choose>
+					<xsl:when test="string-length(substring-before(substring-after(translate($time-string, ':' ,''),'T'),'+')) &lt; 6">
+						<xsl:variable name="event-time"><xsl:value-of select="concat(substring-before(substring-after(translate($time-string, ':' ,''),'T'),'+'),'00')"/></xsl:variable>
+						<xsl:choose>
+							<xsl:when test="string-length(substring-after(substring-after(translate($time-string, ':' ,''),'T'),'+')) &lt; 4">
+								<xsl:variable name="event-timezone"><xsl:value-of select="concat(substring-after(substring-after(translate($time-string, ':' ,''),'T'),'+'),'0000')"/></xsl:variable>											<xsl:call-template name="build-utc">
+									<xsl:with-param name="event-year"><xsl:value-of select="normalize-space($event-year)" /></xsl:with-param>
+									<xsl:with-param name="event-month"><xsl:value-of select="normalize-space($event-month)" /></xsl:with-param>
+									<xsl:with-param name="event-day"><xsl:value-of select="normalize-space($event-day)" /></xsl:with-param>
+									<xsl:with-param name="utc-event-time"><xsl:value-of select="normalize-space($event-time - $event-timezone)" /></xsl:with-param>
+								</xsl:call-template>
+							</xsl:when>
+							<xsl:when test="string-length(substring-after(substring-after(translate($time-string, ':' ,''),'T'),'+')) &lt; 6">
+								<xsl:variable name="event-timezone"><xsl:value-of select="concat(substring-after(substring-after(translate($time-string, ':' ,''),'T'),'+'),'00')"/></xsl:variable>											<xsl:call-template name="build-utc">
+									<xsl:with-param name="event-year"><xsl:value-of select="normalize-space($event-year)" /></xsl:with-param>
+									<xsl:with-param name="event-month"><xsl:value-of select="normalize-space($event-month)" /></xsl:with-param>
+									<xsl:with-param name="event-day"><xsl:value-of select="normalize-space($event-day)" /></xsl:with-param>
+									<xsl:with-param name="utc-event-time"><xsl:value-of select="normalize-space($event-time - $event-timezone)" /></xsl:with-param>
+								</xsl:call-template>
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:variable name="event-timezone"><xsl:value-of select="substring-after(substring-after(translate($time-string, ':' ,''),'T'),'+')"/></xsl:variable>
+								<xsl:call-template name="build-utc">
+									<xsl:with-param name="event-year"><xsl:value-of select="normalize-space($event-year)" /></xsl:with-param>
+									<xsl:with-param name="event-month"><xsl:value-of select="normalize-space($event-month)" /></xsl:with-param>
+									<xsl:with-param name="event-day"><xsl:value-of select="normalize-space($event-day)" /></xsl:with-param>
+									<xsl:with-param name="utc-event-time"><xsl:value-of select="normalize-space($event-time - $event-timezone)" /></xsl:with-param>
+								</xsl:call-template>
+							</xsl:otherwise>
+						</xsl:choose>
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:variable name="event-time"><xsl:value-of select="substring-before(substring-after(translate($time-string, ':' ,''),'T'),'+')"/></xsl:variable>
+						<xsl:choose>
+							<xsl:when test="string-length(substring-after(substring-after(translate($time-string, ':' ,''),'T'),'+')) &lt; 4">
+								<xsl:variable name="event-timezone"><xsl:value-of select="concat(substring-after(substring-after(translate($time-string, ':' ,''),'T'),'+'),'0000')"/></xsl:variable>
+								<xsl:call-template name="build-utc">
+									<xsl:with-param name="event-year"><xsl:value-of select="normalize-space($event-year)" /></xsl:with-param>
+									<xsl:with-param name="event-month"><xsl:value-of select="normalize-space($event-month)" /></xsl:with-param>
+									<xsl:with-param name="event-day"><xsl:value-of select="normalize-space($event-day)" /></xsl:with-param>
+									<xsl:with-param name="utc-event-time"><xsl:value-of select="normalize-space($event-time - $event-timezone)" /></xsl:with-param>
+								</xsl:call-template>
+							</xsl:when>
+							<xsl:when test="string-length(substring-after(substring-after(translate($time-string, ':' ,''),'T'),'+')) &lt; 6">
+								<xsl:variable name="event-timezone"><xsl:value-of select="concat(substring-after(substring-after(translate($time-string, ':' ,''),'T'),'+'),'00')"/></xsl:variable>
+								<xsl:call-template name="build-utc">
+									<xsl:with-param name="event-year"><xsl:value-of select="normalize-space($event-year)" /></xsl:with-param>
+									<xsl:with-param name="event-month"><xsl:value-of select="normalize-space($event-month)" /></xsl:with-param>
+									<xsl:with-param name="event-day"><xsl:value-of select="normalize-space($event-day)" /></xsl:with-param>
+									<xsl:with-param name="utc-event-time"><xsl:value-of select="normalize-space($event-time - $event-timezone)" /></xsl:with-param>
+								</xsl:call-template>
+							</xsl:when>
+	
+							<xsl:otherwise>
+								<xsl:variable name="event-timezone"><xsl:value-of select="substring-after(substring-after(translate($time-string, ':' ,''),'T'),'+')"/></xsl:variable>
+								<xsl:call-template name="build-utc">
+									<xsl:with-param name="event-year"><xsl:value-of select="normalize-space($event-year)" /></xsl:with-param>
+									<xsl:with-param name="event-month"><xsl:value-of select="normalize-space($event-month)" /></xsl:with-param>
+									<xsl:with-param name="event-day"><xsl:value-of select="normalize-space($event-day)" /></xsl:with-param>
+									<xsl:with-param name="utc-event-time"><xsl:value-of select="normalize-space($event-time - $event-timezone)" /></xsl:with-param>
+								</xsl:call-template>
+							</xsl:otherwise>
+						</xsl:choose>
+					</xsl:otherwise>
+				</xsl:choose>
+			</xsl:when>
+			<xsl:when test="substring-before(substring-after(translate($time-string, ':' ,''),'T'),'-') = true()">
+				<xsl:choose>
+					<xsl:when test="string-length(substring-before(substring-after(translate($time-string, ':' ,''),'T'),'-')) &lt; 6">
+						<xsl:variable name="event-time"><xsl:value-of select="concat(substring-before(substring-after(translate($time-string, ':' ,''),'T'),'-'),'00')"/></xsl:variable>
+						<xsl:choose>
+							<xsl:when test="string-length(substring-after(substring-after(translate($time-string, ':' ,''),'T'),'-')) &lt; 4">
+								<xsl:variable name="event-timezone"><xsl:value-of select="concat(substring-after(substring-after(translate($time-string, ':' ,''),'T'),'-'),'0000')"/></xsl:variable>
+								<xsl:call-template name="build-utc">
+									<xsl:with-param name="event-year"><xsl:value-of select="normalize-space($event-year)" /></xsl:with-param>
+									<xsl:with-param name="event-month"><xsl:value-of select="normalize-space($event-month)" /></xsl:with-param>
+									<xsl:with-param name="event-day"><xsl:value-of select="normalize-space($event-day)" /></xsl:with-param>
+									<xsl:with-param name="utc-event-time"><xsl:value-of select="normalize-space($event-time + $event-timezone)" /></xsl:with-param>
+								</xsl:call-template>
+							</xsl:when>
+						
+							<xsl:when test="string-length(substring-after(substring-after(translate($time-string, ':' ,''),'T'),'-')) &lt; 6">
+								<xsl:variable name="event-timezone"><xsl:value-of select="concat(substring-after(substring-after(translate($time-string, ':' ,''),'T'),'-'),'00')"/></xsl:variable>
+								<xsl:call-template name="build-utc">
+									<xsl:with-param name="event-year"><xsl:value-of select="normalize-space($event-year)" /></xsl:with-param>
+									<xsl:with-param name="event-month"><xsl:value-of select="normalize-space($event-month)" /></xsl:with-param>
+									<xsl:with-param name="event-day"><xsl:value-of select="normalize-space($event-day)" /></xsl:with-param>
+									<xsl:with-param name="utc-event-time"><xsl:value-of select="normalize-space($event-time + $event-timezone)" /></xsl:with-param>
+								</xsl:call-template>
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:variable name="event-timezone"><xsl:value-of select="substring-after(substring-after(translate($time-string, ':' ,''),'T'),'-')"/></xsl:variable>
+								<xsl:call-template name="build-utc">
+									<xsl:with-param name="event-year"><xsl:value-of select="normalize-space($event-year)" /></xsl:with-param>
+									<xsl:with-param name="event-month"><xsl:value-of select="normalize-space($event-month)" /></xsl:with-param>
+									<xsl:with-param name="event-day"><xsl:value-of select="normalize-space($event-day)" /></xsl:with-param>
+									<xsl:with-param name="utc-event-time"><xsl:value-of select="normalize-space($event-time + $event-timezone)" /></xsl:with-param>
+								</xsl:call-template>
+							</xsl:otherwise>
+						</xsl:choose>
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:variable name="event-time"><xsl:value-of select="substring-before(substring-after(translate($time-string, ':' ,''),'T'),'-')"/></xsl:variable>
+						<xsl:choose>
+							<xsl:when test="string-length(substring-after(substring-after(translate($time-string, ':' ,''),'T'),'-')) &lt; 4">
+								<xsl:variable name="event-timezone"><xsl:value-of select="concat(substring-after(substring-after(translate($time-string, ':' ,''),'T'),'-'),'0000')"/></xsl:variable>
+								<xsl:call-template name="build-utc">
+									<xsl:with-param name="event-year"><xsl:value-of select="normalize-space($event-year)" /></xsl:with-param>
+									<xsl:with-param name="event-month"><xsl:value-of select="normalize-space($event-month)" /></xsl:with-param>
+									<xsl:with-param name="event-day"><xsl:value-of select="normalize-space($event-day)" /></xsl:with-param>
+									<xsl:with-param name="utc-event-time"><xsl:value-of select="normalize-space($event-time + $event-timezone)" /></xsl:with-param>
+								</xsl:call-template>
+							</xsl:when>
+						
+							<xsl:when test="string-length(substring-after(substring-after(translate($time-string, ':' ,''),'T'),'-')) &lt; 6">
+								<xsl:variable name="event-timezone"><xsl:value-of select="concat(substring-after(substring-after(translate($time-string, ':' ,''),'T'),'-'),'00')"/></xsl:variable>
+								<xsl:call-template name="build-utc">
+									<xsl:with-param name="event-year"><xsl:value-of select="normalize-space($event-year)" /></xsl:with-param>
+									<xsl:with-param name="event-month"><xsl:value-of select="normalize-space($event-month)" /></xsl:with-param>
+									<xsl:with-param name="event-day"><xsl:value-of select="normalize-space($event-day)" /></xsl:with-param>
+									<xsl:with-param name="utc-event-time"><xsl:value-of select="normalize-space($event-time + $event-timezone)" /></xsl:with-param>
+								</xsl:call-template>
+							</xsl:when>
+							<xsl:otherwise>
+								<xsl:variable name="event-timezone"><xsl:value-of select="substring-after(substring-after(translate($time-string, ':' ,''),'T'),'-')"/></xsl:variable>
+								<xsl:call-template name="build-utc">
+									<xsl:with-param name="event-year"><xsl:value-of select="normalize-space($event-year)" /></xsl:with-param>
+									<xsl:with-param name="event-month"><xsl:value-of select="normalize-space($event-month)" /></xsl:with-param>
+									<xsl:with-param name="event-day"><xsl:value-of select="normalize-space($event-day)" /></xsl:with-param>
+									<xsl:with-param name="utc-event-time"><xsl:value-of select="normalize-space($event-time + $event-timezone)" /></xsl:with-param>
+								</xsl:call-template>
+							</xsl:otherwise>
+						</xsl:choose>
+					</xsl:otherwise>
+				</xsl:choose>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:value-of select="normalize-space($event-year)"/>
+				<xsl:value-of select="normalize-space($event-month)"/>
+				<xsl:value-of select="normalize-space($event-day)"/>
+				<xsl:text>T</xsl:text>
+				<xsl:if test="string-length(normalize-space(substring-after(translate($time-string, ':' ,''),'T'))) &lt; 6">
+					<xsl:text>0</xsl:text>
+				</xsl:if>
+				<xsl:if test="string-length(normalize-space(substring-after(translate($time-string, ':' ,''),'T'))) &lt; 5">
+					<xsl:text>0</xsl:text>
+				</xsl:if>
+				<xsl:if test="string-length(normalize-space(substring-after(translate($time-string, ':' ,''),'T'))) &lt; 4">
+					<xsl:text>0</xsl:text>
+				</xsl:if>
+				<xsl:if test="string-length(normalize-space(substring-after(translate($time-string, ':' ,''),'T'))) &lt; 3">
+					<xsl:text>0</xsl:text>
+				</xsl:if>
+				<xsl:if test="string-length(normalize-space(substring-after(translate($time-string, ':' ,''),'T'))) &lt; 2">
+					<xsl:text>0</xsl:text>
+				</xsl:if>
+				<xsl:value-of select="normalize-space(substring-after(translate($time-string, ':' ,''),'T'))"/>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:otherwise>
+</xsl:choose>
+</xsl:template>
+
+<!-- From: <http://suda.co.uk/projects/X2V/> -->
+<!-- create a valid UTC date and increments day/month/year as needed -->
+<xsl:template name="build-utc">
+<xsl:param name="event-year"></xsl:param>
+<xsl:param name="event-month"></xsl:param>
+<xsl:param name="event-day"></xsl:param>
+<xsl:param name="utc-event-time"></xsl:param>
+
+<xsl:choose>
+	<xsl:when test="$utc-event-time &gt; 235959">
+		<xsl:choose>
+			<xsl:when test="($event-month = 12) and ($event-day = 31)">
+				<xsl:value-of select="$event-year + 1"/>			
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:value-of select="$event-year"/>
+			</xsl:otherwise>
+		</xsl:choose>
+		<xsl:choose>
+			<xsl:when test="(($event-month = 12) and ($event-day = 31))">
+				<xsl:text>01</xsl:text>	
+			</xsl:when>
+			<xsl:when test="(($event-month = 11) and ($event-day = 30)) or (($event-month = 10) and ($event-day = 31)) or (($event-month = 9) and ($event-day = 30))">
+				<xsl:value-of select="$event-month + 1"/>	
+			</xsl:when>
+			<xsl:when test="(($event-month = 8) and ($event-day = 31)) or (($event-month = 7) and ($event-day = 31)) or (($event-month = 6) and ($event-day = 30)) or (($event-month = 5) and ($event-day = 31)) or (($event-month = 4) and ($event-day = 30)) or (($event-month = 3) and ($event-day = 31)) or (($event-month = 1) and ($event-day = 31)) or ($event-month = 2) and ($event-day = 29)">
+				<xsl:text>0</xsl:text><xsl:value-of select="$event-month + 1"/>	
+			</xsl:when>
+			<xsl:when test="(($event-month = 2) and ($event-day = 28) and (($event-year mod 4) != 0) or (($event-year mod 400) != 0) and (($event-year mod 100) = 0))">
+				<xsl:text>0</xsl:text><xsl:value-of select="$event-month + 1"/>				
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:value-of select="$event-month"/>
+			</xsl:otherwise>		
+		</xsl:choose>
+		<xsl:choose>
+			<xsl:when test="(($event-month = 12) and ($event-day = 31)) or (($event-month = 11) and ($event-day = 30)) or (($event-month = 10) and ($event-day = 31)) or (($event-month = 9) and ($event-day = 30)) or (($event-month = 8) and ($event-day = 31)) or (($event-month = 7) and ($event-day = 31)) or (($event-month = 6) and ($event-day = 30)) or (($event-month = 5) and ($event-day = 31)) or (($event-month = 4) and ($event-day = 30)) or (($event-month = 3) and ($event-day = 31)) or (($event-month = 1) and ($event-day = 31)) or ($event-month = 2) and ($event-day = 29)">
+				<xsl:text>01</xsl:text>
+			</xsl:when>
+			<xsl:when test="(($event-month = 2) and ($event-day = 28) and (($event-year mod 4) != 0) or (($event-year mod 400) != 0) and (($event-year mod 100) = 0))">
+				<xsl:text>01</xsl:text>
+			</xsl:when>
+			<xsl:when test="(($event-day = 2) or ($event-day = 3) or ($event-day = 4) or ($event-day = 5) or ($event-day = 6) or ($event-day = 7) or ($event-day = 8))">
+				<xsl:text>0</xsl:text><xsl:value-of select="$event-day + 1"/>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:value-of select="$event-day + 1"/>			
+			</xsl:otherwise>
+		</xsl:choose>
+
+		<xsl:text>T</xsl:text>
+				<xsl:if test="string-length($utc-event-time mod 240000) &lt; 6">
+					<xsl:text>0</xsl:text>
+				</xsl:if>
+				<xsl:if test="string-length($utc-event-time mod 240000) &lt; 5">
+					<xsl:text>0</xsl:text>
+				</xsl:if>
+				<xsl:if test="string-length($utc-event-time mod 240000) &lt; 4">
+					<xsl:text>0</xsl:text>
+				</xsl:if>
+				<xsl:if test="string-length($utc-event-time mod 240000) &lt; 3">
+					<xsl:text>0</xsl:text>
+				</xsl:if>
+				<xsl:if test="string-length($utc-event-time mod 240000) &lt; 2">
+					<xsl:text>0</xsl:text>
+				</xsl:if>
+				<!--
+				<xsl:if test="string-length($utc-event-time mod 240000) = 1">
+					<xsl:text>0</xsl:text>
+				</xsl:if>
+				-->
+<!--
+		<xsl:if test="string-length($utc-event-time mod 240000) &lt; 6">
+		<xsl:text>0</xsl:text>
+		</xsl:if>
+-->
+		<xsl:value-of select="$utc-event-time mod 240000"/>
+		<xsl:text>Z</xsl:text>
+	</xsl:when>
+	<xsl:when test="$utc-event-time &lt; 0">
+		<xsl:choose>
+			<xsl:when test="($event-month = 1) and ($event-day = 1)">
+				<xsl:value-of select="$event-year - 1"/>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:value-of select="$event-year"/>
+			</xsl:otherwise>
+		</xsl:choose>
+		<xsl:choose>
+			<xsl:when test="(($event-month = 1) and ($event-day = 1))">
+				<xsl:text>12</xsl:text>
+			</xsl:when>
+			<xsl:when test="(($event-month = 11) and ($event-day = 1)) or (($event-month = 12) and ($event-day = 1))">
+				<xsl:value-of select="$event-month - 1"/>
+			</xsl:when>
+			<xsl:when test="(($event-month = 10) and ($event-day = 1)) or (($event-month = 9) and ($event-day = 1)) or (($event-month = 8) and ($event-day = 1)) or (($event-month = 7) and ($event-day = 1)) or (($event-month = 6) and ($event-day = 1)) or (($event-month = 5) and ($event-day = 1)) or (($event-month = 4) and ($event-day = 1)) or (($event-month = 3) and ($event-day = 1)) or ($event-month = 2) and ($event-day = 1)">
+				<xsl:text>0</xsl:text><xsl:value-of select="$event-month - 1"/>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:value-of select="$event-month"/>
+			</xsl:otherwise>
+		</xsl:choose>
+		<xsl:choose>
+			<xsl:when test="(($event-month = 11) and ($event-day = 1)) or (($event-month = 9) and ($event-day = 1)) or (($event-month = 6) and ($event-day = 1)) or (($event-month = 4) and ($event-day = 1)) or (($event-month = 2) and ($event-day = 1)) or (($event-month = 1) and ($event-day = 1))">
+				<xsl:text>31</xsl:text>
+			</xsl:when>
+			<xsl:when test="(($event-month = 12) and ($event-day = 1)) or (($event-month = 10) and ($event-day = 1)) or (($event-month = 7) and ($event-day = 1)) or (($event-month = 5) and ($event-day = 1))">
+				<xsl:text>30</xsl:text>
+			</xsl:when>
+			<xsl:when test="(($event-month = 3) and ($event-day = 1) and (($event-year mod 4) != 0) or (($event-year mod 400) != 0) and (($event-year mod 100) = 0))">
+				<xsl:text>28</xsl:text>
+			</xsl:when>
+			<xsl:when test="(($event-month = 3) and ($event-day = 1) and (($event-year mod 4) = 0) or (($event-year mod 400) = 0) and (($event-year mod 100) != 0))">
+				<xsl:text>29</xsl:text>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:value-of select="$event-day - 1"/>			
+			</xsl:otherwise>
+		</xsl:choose>
+		<xsl:text>T</xsl:text>
+		<xsl:if test="string-length(240000 + $utc-event-time) &lt; 0">
+		<xsl:text>0</xsl:text>
+		</xsl:if>
+		<xsl:value-of select="240000 + $utc-event-time"/>
+		<xsl:text>Z</xsl:text>
+	</xsl:when>
+	<xsl:otherwise>
+		<xsl:value-of select="$event-year"/>
+		<xsl:value-of select="$event-month"/>
+		<xsl:value-of select="$event-day"/>
+		<xsl:text>T</xsl:text>
+		
+		<xsl:choose>
+			<xsl:when test="$utc-event-time = 240000">
+				<xsl:text>000000</xsl:text>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:if test="string-length($utc-event-time) &lt; 6">
+					<xsl:text>0</xsl:text>
+				</xsl:if>
+				<xsl:if test="string-length($utc-event-time) &lt; 5">
+					<xsl:text>0</xsl:text>
+				</xsl:if>
+				<xsl:if test="string-length($utc-event-time) &lt; 4">
+					<xsl:text>0</xsl:text>
+				</xsl:if>
+				<xsl:if test="string-length($utc-event-time) &lt; 3">
+					<xsl:text>0</xsl:text>
+				</xsl:if>
+				<xsl:if test="string-length($utc-event-time) &lt; 2">
+					<xsl:text>0</xsl:text>
+				</xsl:if>
+				<xsl:if test="string-length($utc-event-time) = 1">
+					<xsl:text>0</xsl:text>
+				</xsl:if>
+				<xsl:value-of select="$utc-event-time"/>
+			</xsl:otherwise>
+		</xsl:choose>
+
+		
+		<xsl:text>Z</xsl:text>
+	</xsl:otherwise>
+</xsl:choose>
 </xsl:template>
 
 </xsl:transform>

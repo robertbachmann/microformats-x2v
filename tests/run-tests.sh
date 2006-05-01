@@ -1,5 +1,5 @@
 #!/bin/bash
-# $Id: run-tests.sh 38 2006-04-22 16:42:03Z RobertBachmann $
+# $Id: run-tests.sh 41 2006-05-01 18:35:56Z RobertBachmann $
 #
 # Test script for hAtom2Atom
 # Requires: xmldiff <http://www.logilab.org/projects/xmldiff/>
@@ -39,6 +39,7 @@ function test_with_engine
             -D source-uri=$source_uri \
             -D content-type=$content_type \
             -D implicit-feed=$implicit_feed \
+            -D debug-comments=$debug_comments \
             $source_filename $xsl \
             > $tmp_file || die "Transformation failed"
     elif [[ "$1" == "xsltproc" ]]
@@ -47,6 +48,7 @@ function test_with_engine
             --stringparam source-uri $source_uri \
             --stringparam content-type $content_type \
             --param implicit-feed $implicit_feed \
+            --param debug-comments $debug_comments \
             $xsl $source_filename \
             > $tmp_file || die "Transformation failed"
     elif [[ "$1" == "xalan-j" ]]
@@ -55,6 +57,7 @@ function test_with_engine
             -param source-uri $source_uri \
             -param content-type $content_type \
             -param implicit-feed $implicit_feed \
+            -param debug-comments $debug_comments \
             > $tmp_file || die "Transformation failed"
     elif [[ "$1" == "saxon" ]]
     then
@@ -62,6 +65,7 @@ function test_with_engine
             source-uri=$source_uri \
             content-type=$content_type \
             implicit-feed=$implicit_feed \
+            debug-comments=$debug_comments \
             > $tmp_file || die "Transformation failed"
     fi
     
@@ -94,6 +98,7 @@ function default_values
   source_uri="http://example.com/$source_filename"
   content_type="text/html"
   implicit_feed=0
+  debug_comments=0
 }
 
 if [[ "$1" == "" ]] ; then show_usage ; fi
@@ -129,6 +134,13 @@ fi
 if [[ $test_file == "concatenation.html" || $test_file == "" ]]
 then
     default_values "concatenation.html"
+    run_test $engine
+fi
+
+# feed-updated.html
+if [[ $test_file == "feed-updated.html" || $test_file == "" ]]
+then
+    default_values "feed-updated.html"
     run_test $engine
 fi
 

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en"
       xml:base="http://example.com/singleEntry.html">
-  <updated/>
+  <updated>2006-04-20T21:10:16+02:00</updated>
    <id>http://example.com/singleEntry.html</id>
    <link rel="alternate" href="http://example.com/singleEntry.html" type="text/html"/>
   <title>Html Title</title>

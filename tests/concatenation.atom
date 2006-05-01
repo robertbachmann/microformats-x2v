@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en-UK" xml:base="http://example.com/abc">
-  <updated/>
+  <updated>2006-02-07T02:03:55+00:00</updated>
   <id>http://example.com/concatenation.html</id>
   <link rel="alternate" href="http://example.com/concatenation.html" type="text/html"/>
   <title>Feed Title</title>
