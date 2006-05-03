@@ -1,5 +1,5 @@
 #!/bin/bash
-# $Id: run-tests.sh 42 2006-05-03 20:55:02Z RobertBachmann $
+# $Id: run-tests.sh 43 2006-05-03 21:28:20Z RobertBachmann $
 #
 # Test script for hAtom2Atom
 # Requires: xmldiff <http://www.logilab.org/projects/xmldiff/>
@@ -41,6 +41,7 @@ function test_with_engine
             -D content-type=$content_type \
             -D implicit-feed=$implicit_feed \
             -D debug-comments=$debug_comments \
+            -D sanitize-html=$sanitize_html \
             $source_filename $xsl \
             > $tmp_file || die "Transformation failed"
     elif [[ "$1" == "xsltproc" ]]
@@ -50,6 +51,7 @@ function test_with_engine
             --stringparam content-type $content_type \
             --param implicit-feed $implicit_feed \
             --param debug-comments $debug_comments \
+            --param sanitize-html $sanitize_html \
             $xsl $source_filename \
             > $tmp_file || die "Transformation failed"
     elif [[ "$1" == "xalan-j" ]]
@@ -59,6 +61,7 @@ function test_with_engine
             -param content-type $content_type \
             -param implicit-feed $implicit_feed \
             -param debug-comments $debug_comments \
+            -param sanitize-html $sanitize_html \
             > $tmp_file || die "Transformation failed"
     elif [[ "$1" == "saxon" ]]
     then
@@ -67,6 +70,7 @@ function test_with_engine
             content-type=$content_type \
             implicit-feed=$implicit_feed \
             debug-comments=$debug_comments \
+            sanitize-html=$sanitize_html \
             > $tmp_file || die "Transformation failed"
     fi
     
@@ -86,7 +90,8 @@ function run_test
     echo " \$source-uri: '$source_uri'"
     echo " \$content-type: '$content_type'"
     echo " \$implicit-feed: $implicit_feed"
-
+    echo " \$sanitize-html: $sanitize_html"
+    
     if [[ "$1" == "all" ]]
     then
         test_with_engine "4xslt"
@@ -107,6 +112,7 @@ function default_values
   content_type="text/html"
   implicit_feed=0
   debug_comments=0
+  sanitize_html=1
 }
 
 if [[ "$1" == "" ]] ; then show_usage ; fi
@@ -136,6 +142,20 @@ if [[ $test_file == "baselang.html" || $test_file == "" ]]
 then
     default_values "baselang.html"
     run_test $engine
+fi
+
+# sanitize.html
+if [[ $test_file == "sanitize.html" || $test_file == "" ]]
+then
+    default_values "sanitize.html"
+    
+    result_filename="sanitize-on.atom"
+    sanitize_html=1
+    run_test $engine
+    
+    result_filename="sanitize-off.atom"
+    sanitize_html=0
+    run_test $engine    
 fi
 
 # concatenation.html
