@@ -1,5 +1,5 @@
 #!/bin/bash
-# $Id: run-tests.sh 41 2006-05-01 18:35:56Z RobertBachmann $
+# $Id: run-tests.sh 42 2006-05-03 20:55:02Z RobertBachmann $
 #
 # Test script for hAtom2Atom
 # Requires: xmldiff <http://www.logilab.org/projects/xmldiff/>
@@ -9,6 +9,7 @@ engine=$1
 test_file=$2
 tmp_file=/tmp/hatom2atom.$$.tmp
 xsl=../hAtom2Atom.xsl
+retval=0
 
 cd `dirname $0`
 
@@ -69,7 +70,14 @@ function test_with_engine
             > $tmp_file || die "Transformation failed"
     fi
     
-    xmldiff -c $result_filename $tmp_file && rm $tmp_file || echo " Test failed (results stored in $tmp_file)"
+    xmldiff -c $result_filename $tmp_file 
+    if [[ "$?" != "0" ]] 
+    then
+      echo " Test failed (results stored in $tmp_file)"
+      retval=1
+    else
+      rm $tmp_file
+    fi
 }
 
 function run_test
@@ -144,6 +152,44 @@ then
     run_test $engine
 fi
 
+# fragment.html
+if [[ $test_file == "fragment.html" || $test_file == "" ]]
+then
+    default_values "fragment.html"
+    result_filename="fragment-hfeed.atom"
+    run_test $engine
+
+    default_values "fragment.html"
+    result_filename="fragment-hfeed.atom"    
+    source_uri=$source_uri"#"
+    run_test $engine
+    
+    default_values "fragment.html"
+    result_filename="fragment-hfeed.atom"    
+    source_uri=$source_uri"#hfeed_container"
+    run_test $engine
+
+    default_values "fragment.html"
+    result_filename="fragment-hfeed.atom"    
+    source_uri=$source_uri"#hfeed_container"
+    run_test $engine    
+
+    default_values "fragment.html"
+    result_filename="fragment-hfeed.atom"    
+    source_uri=$source_uri"#feed1"
+    run_test $engine
+    
+    default_values "fragment.html"
+    result_filename="fragment-hentry.atom"    
+    source_uri=$source_uri"#hentry_container"
+    run_test $engine
+    
+    default_values "fragment.html"
+    result_filename="fragment-hentry.atom"    
+    source_uri=$source_uri"#entry1"
+    run_test $engine
+fi
+
 # id-link.html
 if [[ $test_file == "id-link.html" || $test_file == "" ]]
 then
@@ -192,3 +238,5 @@ then
     default_values "updated-published.html"
     run_test $engine
 fi
+
+exit $retval

@@ -2,7 +2,7 @@
                                 hAtom2Atom.xsl
    An XSLT stylesheet for transforming hAtom documents into Atom documents.
 
-            $Id: hAtom2Atom.xsl 41 2006-05-01 18:35:56Z RobertBachmann $
+            $Id: hAtom2Atom.xsl 42 2006-05-03 20:55:02Z RobertBachmann $
 
                             SUPPORTED XSLT ENGINES
 
@@ -104,6 +104,12 @@
 
 <xsl:output method="xml" indent="yes" encoding="UTF-8" />
 
+<xsl:variable name="fragment">
+  <xsl:if test="contains($source-uri,'#')">
+    <xsl:value-of select="substring-after($source-uri,'#')" />
+  </xsl:if>
+</xsl:variable>
+
 <xsl:variable name="source-uri-sans-fragment">
   <xsl:choose>
     <xsl:when test="contains($source-uri,'#')">
@@ -136,6 +142,26 @@
 <xsl:template match="xhtml:q|xhtml:blockquote" mode="extract-date" />
 
 <xsl:template match="/">
+  <xsl:choose>
+    <xsl:when test="$fragment != ''">
+      <xsl:choose>
+        <xsl:when test="descendant::*[@id = $fragment]">
+          <xsl:for-each select="descendant::*[@id = $fragment][1]">
+              <xsl:call-template name="main" />		  
+          </xsl:for-each>
+        </xsl:when>
+        <xsl:otherwise>
+          <xsl:message terminate="yes">ERROR: Invalid fragment</xsl:message>
+        </xsl:otherwise>
+      </xsl:choose>
+    </xsl:when>
+    <xsl:otherwise>
+      <xsl:call-template name="main" />    
+    </xsl:otherwise>
+  </xsl:choose>
+</xsl:template>
+
+<xsl:template name="main">
   <!--
   See if we can find feed elements within this document.
   Entries that are part of a feed are processed when we
@@ -150,24 +176,24 @@
   * inside an entry (entry)?
   -->
   <xsl:choose>
-    <xsl:when test="descendant::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' hfeed ')]">
-      <xsl:for-each select="descendant::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' hfeed ')][1]">
+    <xsl:when test="descendant-or-self::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' hfeed ')]">
+      <xsl:for-each select="descendant-or-self::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' hfeed ')][1]">
         <xsl:apply-templates select="."/>
       </xsl:for-each>
     </xsl:when>
-    <xsl:when test="descendant::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' hentry ')]">
-	  <xsl:choose>
+    <xsl:when test="descendant-or-self::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' hentry ')]">
+      <xsl:choose>
         <xsl:when test="$implicit-feed != 0">
-		  <xsl:for-each select="/child::*[1]">
-    	    <xsl:call-template name="feed" />
-	      </xsl:for-each>
+          <xsl:for-each select="/child::*[1]">
+            <xsl:call-template name="feed" />
+          </xsl:for-each>
         </xsl:when>
         <xsl:otherwise>
-		  <xsl:for-each select="descendant::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' hentry ')][1]">
-		    <xsl:call-template name="entry">
-	          <xsl:with-param name="where">stand-alone</xsl:with-param>
+          <xsl:for-each select="descendant-or-self::xhtml:*[contains(concat(' ',normalize-space(@class),' '),' hentry ')][1]">
+            <xsl:call-template name="entry">
+              <xsl:with-param name="where">stand-alone</xsl:with-param>
             </xsl:call-template>
-		  </xsl:for-each>
+          </xsl:for-each>
         </xsl:otherwise>
       </xsl:choose>
     </xsl:when>

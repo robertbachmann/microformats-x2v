@@ -1,0 +1,53 @@
+<?xml version="1.0"?>
+<!--DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.0 Transitional//EN'
+    'http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd'-->
+<html xmlns="http://www.w3.org/1999/xhtml"  xml:base="http://example.com/">
+<head>
+<title>Page title</title>
+</head>
+<body>
+<!--
+This test is intended to test the handling of fragments identifiers.
+
+Features tested:
+	- hAtom feed whose ancestor has @id = $fragment
+	- hAtom feed where @id = $fragment
+	- hAtom entry whose ancestor has @id = $fragment
+	- hAtom entry where @id = $fragment  
+    
+Features not tested:
+	- Interaction with <q> and <blockquote>
+    
+Scope of possible change:
+	- The output of this test case is not valid atom.
+	- Changes in the hAtom specification may invalidate this test case
+	- Comparisons between actual and controlled test output should not
+	  consider whitespace important, except where the atom specification
+	  indicates whitespace is important.
+
+-->
+
+<div id="hfeed_container">
+  <div>
+    <div class="hfeed" id="feed1">
+      <div id="foo">
+        <div id="hentry_container">
+          <div>
+            <div class="hentry" id="entry1">
+              <p class="entry-content entry-title">Feed 1/Entry 1</p> 
+              <span class="updated">2006-05-03T10:01+0100</span>
+            </div>    
+          </div>
+        </div>
+        <span class="hentry" id="entry2">
+          <span class="entry-content entry-title">Feed 1/Entry 2</span> 
+          <span class="updated">2006-05-03T10:02+0100</span>
+        </span>  
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
+
