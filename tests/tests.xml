@@ -1,0 +1,102 @@
+<tests>
+ <default-param name="content-type">text/html</default-param>
+ <default-param name="implicit-feed">0</default-param>
+ <default-param name="sanitize-html">1</default-param>
+ <test>
+  <input>supportedElements.html</input>
+  <output>supportedElements.atom</output>
+  <param name="source-uri">http://example.com/supportedElements.html</param>
+ </test>
+ <test>
+  <input>author.html</input>
+  <output>author.atom</output>
+  <param name="source-uri">http://example.com/author.html</param>
+ </test>
+ <test>
+  <input>baselang.html</input>
+  <output>baselang.atom</output>
+  <param name="source-uri">http://example.com/baselang.html</param>
+ </test>
+ <test>
+  <input>sanitize.html</input>
+  <output>sanitize-on.atom</output>
+  <param name="source-uri">http://example.com/sanitize.html</param>
+ </test>
+ <test>
+  <input>sanitize.html</input>
+  <output>sanitize-off.atom</output>
+  <param name="source-uri">http://example.com/sanitize.html</param>
+  <param name="sanitize-html">0</param>
+ </test>
+ <test>
+  <input>concatenation.html</input>
+  <output>concatenation.atom</output>
+  <param name="source-uri">http://example.com/concatenation.html</param>
+ </test>
+ <test>
+  <input>feed-updated.html</input>
+  <output>feed-updated.atom</output>
+  <param name="source-uri">http://example.com/feed-updated.html</param>
+ </test>
+ <test>
+  <input>fragment.html</input>
+  <output>fragment-hfeed.atom</output>
+  <param name="source-uri">http://example.com/fragment.html</param>
+ </test>
+ <test>
+  <input>fragment.html</input>
+  <output>fragment-hfeed.atom</output>
+  <param name="source-uri">http://example.com/fragment.html#</param>
+ </test>
+ <test>
+  <input>fragment.html</input>
+  <output>fragment-hfeed.atom</output>
+  <param name="source-uri">http://example.com/fragment.html#hfeed_container</param>
+ </test>
+ <test>
+  <input>fragment.html</input>
+  <output>fragment-hfeed.atom</output>
+  <param name="source-uri">http://example.com/fragment.html#feed1</param>
+ </test>
+ <test>
+  <input>fragment.html</input>
+  <output>fragment-hentry.atom</output>
+  <param name="source-uri">http://example.com/fragment.html#hentry_container</param>
+ </test>
+ <test>
+  <input>fragment.html</input>
+  <output>fragment-hentry.atom</output>
+  <param name="source-uri">http://example.com/fragment.html#entry1</param>
+ </test>
+ <test>
+  <input>id-link.html</input>
+  <output>id-link.atom</output>
+  <param name="source-uri">http://example.com/id-link.html</param>
+ </test>
+ <test>
+  <input>singleEntry.html</input>
+  <output>singleEntry-a.atom</output>
+  <param name="source-uri">http://example.com/singleEntry.html</param>
+ </test>
+ <test>
+  <input>singleEntry.html</input>
+  <output>singleEntry-b.atom</output>
+  <param name="source-uri">http://example.com/singleEntry.html</param>
+  <param name="implicit-feed">1</param>
+ </test>
+ <test>
+  <input>tag.html</input>
+  <output>tag.atom</output>
+  <param name="source-uri">http://example.com/tag.html</param>
+ </test>
+ <test>
+  <input>titles.html</input>
+  <output>titles.atom</output>
+  <param name="source-uri">http://example.com/titles.html</param>
+ </test>
+ <test>
+  <input>updated-published.html</input>
+  <output>updated-published.atom</output>
+  <param name="source-uri">http://example.com/updated-published.html</param>
+ </test>
+</tests>
