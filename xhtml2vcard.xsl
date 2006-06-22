@@ -24,8 +24,8 @@ brian@suda.co.uk
 http://suda.co.uk/
 
 XHTML-2-vCard
-Version 0.7.16.1
-2005-04-22
+Version 0.8
+2005-06-11
 
 Copyright 2005 Brian Suda
 This work is relicensed under The W3C Open Source License
@@ -44,7 +44,7 @@ I'm not an XSLT expert, so there are no guarantees to quality of this code!
 
 
 
-<xsl:param name="Prodid" select='"-//suda.co.uk//X2V 0.7.16.1 (BETA)//EN"' />
+<xsl:param name="Prodid" select='"-//suda.co.uk//X2V 0.8 (BETA)//EN"' />
 <xsl:param name="Source" >(Best Practices states this should be the URL the vcard was transformed from)</xsl:param>
 <xsl:param name="Encoding" >UTF-8</xsl:param>
 <xsl:param name="Anchor" />
@@ -57,7 +57,7 @@ I'm not an XSLT expert, so there are no guarantees to quality of this code!
 <xsl:variable name="ucase">ABCDEFGHIJKLMNOPQRSTUVWXYZ</xsl:variable>
 
 <!-- check for profile in head element -->
-<xsl:template match="head[contains(concat(' ',normalize-space(@profile),' '),' http://foobar ')]">
+<xsl:template match="head[contains(concat(' ',normalize-space(@profile),' '),' http://www.w3.org/2006/03/hcard ')]">
 <!-- 
 ==================== CURRENTLY DISABLED ====================
 This will call the vCard template, 
@@ -67,7 +67,7 @@ Without the correct profile you cannot assume the class values are intended for 
 </xsl:template>
 
 <!-- Each vCard is listed in succession -->
-<xsl:template match="*[contains(concat(' ',normalize-space(@class),' '),' vcard ')]">
+<xsl:template match="*[contains(concat(' ',normalize-space(@class),' '),' vcard ') and descendant::*[contains(concat(' ',normalize-space(@class),' '),' fn ')]]">
 	<xsl:if test="not($Anchor) or @id = $Anchor">		
 		<xsl:text>BEGIN:VCARD</xsl:text>
 		<xsl:text>&#x0A;PRODID:</xsl:text><xsl:value-of select="$Prodid"/>
@@ -121,7 +121,7 @@ Without the correct profile you cannot assume the class values are intended for 
 			<xsl:call-template name="n-prop" />
 		</xsl:when>
 		<xsl:when test="$is-org">
-			<xsl:text>&#x0A;N:;;;;;</xsl:text>		
+			<xsl:text>&#x0A;N:;;;;;</xsl:text>
 		</xsl:when>
 		<xsl:when test="not($n-elt) and not(string-length(normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ')])) &gt; 1+string-length(translate(normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ')]),' ','')))">
 			<xsl:call-template name="implied-n" />		
@@ -166,7 +166,7 @@ Without the correct profile you cannot assume the class values are intended for 
 		<xsl:with-param name="class">sort-string</xsl:with-param>
 	</xsl:call-template>
 
-	<xsl:call-template name="textPropLang">
+	<xsl:call-template name="concatTextPropLang">
 		<xsl:with-param name="label">NOTE</xsl:with-param>
 		<xsl:with-param name="class">note</xsl:with-param>
 	</xsl:call-template>
@@ -181,13 +181,13 @@ Without the correct profile you cannot assume the class values are intended for 
 		<xsl:when test="not($is-org)">
 			<!-- check to see it is only one word long -->
 			<xsl:choose>
-				<xsl:when test="((true() = normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ') and name() = 'img']/@alt) and (string-length(normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ') and name() = 'img']/@alt)) = string-length(translate(normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ') and name() = 'img']/@alt),' ','')))) or (true() = normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ') and name() = 'abbr']/@title) and (string-length(normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ') and name() = 'abbr']/@title)) = string-length(translate(normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ') and name() = 'abbr']/@title),' ','')))) or (true() = normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ') and not(name() = 'abbr' or name() = 'img')]) and (string-length(normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ') and not(name() = 'abbr' or name() = 'img')])) = string-length(translate(normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ') and not(name() = 'abbr' or name() = 'img')]),' ','')))))">
+				<xsl:when test="((true() = normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ') and (name() = 'img' or name() = 'area')]/@alt) and (string-length(normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ') and (name() = 'img' or name() = 'area')]/@alt)) = string-length(translate(normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ') and (name() = 'img' or name() = 'area')]/@alt),' ','')))) or (true() = normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ') and name() = 'abbr']/@title) and (string-length(normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ') and name() = 'abbr']/@title)) = string-length(translate(normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ') and name() = 'abbr']/@title),' ','')))) or (true() = normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ') and not(name() = 'abbr' or name() = 'img')]) and (string-length(normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ') and not(name() = 'abbr' or name() = 'img')])) = string-length(translate(normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ') and not(name() = 'abbr' or name() = 'img')]),' ','')))))">
 					<xsl:call-template name="multiTextPropLang">
 						<xsl:with-param name="label">NICKNAME</xsl:with-param>
 						<xsl:with-param name="class">nickname</xsl:with-param>
 						<xsl:with-param name="append">
 							<xsl:choose>
-								<xsl:when test="true() = normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ') and name() = 'img']/@alt)">
+								<xsl:when test="true() = normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ') and (name() = 'img' or name() = 'area')]/@alt)">
 									<xsl:value-of select=".//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ')]/@alt"/>
 								</xsl:when>
 								<xsl:when test="true() = normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ') and name() = 'abbr']/@title)">
@@ -216,11 +216,16 @@ Without the correct profile you cannot assume the class values are intended for 
 		</xsl:otherwise>
 	</xsl:choose>
 
-	<xsl:call-template name="textProp">
+	<xsl:call-template name="dateProp">
 		<xsl:with-param name="label">REV</xsl:with-param>
 		<xsl:with-param name="class">rev</xsl:with-param>
 	</xsl:call-template>
-	
+
+	<xsl:call-template name="dateProp">
+		<xsl:with-param name="label">BDAY</xsl:with-param>
+		<xsl:with-param name="class">bday</xsl:with-param>
+	</xsl:call-template>
+
 	<xsl:call-template name="textProp">
 		<xsl:with-param name="label">CLASS</xsl:with-param>
 		<xsl:with-param name="class">class</xsl:with-param>
@@ -243,25 +248,7 @@ Without the correct profile you cannot assume the class values are intended for 
 	<xsl:if test="$geo-elt">
 			<xsl:call-template name="geo-prop"/>
 	</xsl:if>
-
-	<!-- Templates that still need work -->
-
-	<!-- <xsl:apply-templates select=".//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' agent ')]" mode="agent"/> 	-->
-
-	<xsl:apply-templates select=".//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' bday ')]" mode="bday"/>
-
-	<!-- @@TYPE=PGP, TYPE=X509, ENCODING=b -->
-	<xsl:variable name="key-elt" select=".//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ', normalize-space(@class), ' '),' key ')]" />
-	<xsl:if test="$key-elt">
-			<xsl:call-template name="key-prop"/>
-	</xsl:if>
-
-	<!-- LABEL needs work! -->
-	<xsl:variable name="label-elt" select=".//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ', normalize-space(@class), ' '),' label ')]" />
-	<xsl:if test="$label-elt">
-			<xsl:call-template name="label-prop"/>
-	</xsl:if>
-
+	
 	<xsl:call-template name="blobProp">
 		<xsl:with-param name="label">PHOTO</xsl:with-param>
 		<xsl:with-param name="class">photo</xsl:with-param>
@@ -286,29 +273,23 @@ Without the correct profile you cannot assume the class values are intended for 
 		<xsl:with-param name="label">URL</xsl:with-param>
   		<xsl:with-param name="class">url</xsl:with-param>
 	</xsl:call-template>
+
+	<!-- Templates that still need work -->
+	<!-- <xsl:apply-templates select=".//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' agent ')]" mode="agent"/> 	-->
+
+	<!-- @@TYPE=PGP, TYPE=X509, ENCODING=b -->
+	<xsl:variable name="key-elt" select=".//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ', normalize-space(@class), ' '),' key ')]" />
+	<xsl:if test="$key-elt">
+			<xsl:call-template name="key-prop"/>
+	</xsl:if>
+
+	<!-- LABEL needs work! -->
+	<xsl:variable name="label-elt" select=".//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ', normalize-space(@class), ' '),' label ')]" />
+	<xsl:if test="$label-elt">
+			<xsl:call-template name="label-prop"/>
+	</xsl:if>
 		
 </xsl:template>
-
-<!-- BDAY property -->
-<xsl:template match="*[contains(@class,'bday')]" mode="bday">
-<xsl:text>
-BDAY:</xsl:text>
-<xsl:choose>
-	<xsl:when test="@title != '' and (local-name(.) = 'abbr' or 'img' = local-name(.))">
-		<xsl:variable name="textFormatted">
-		<xsl:apply-templates select="@title" mode="unFormatText" />
-		</xsl:variable>
-		<xsl:value-of select="normalize-space($textFormatted)"/>
-	</xsl:when>
-	<xsl:otherwise>
-		<xsl:variable name="textFormatted">
-		<xsl:apply-templates select="." mode="unFormatText" />
-		</xsl:variable>
-		<xsl:value-of select="normalize-space($textFormatted)"/>
-	</xsl:otherwise>
-</xsl:choose>
-</xsl:template>
-
 
 <!-- INDENTIFIER PROPERTY without LANGUAGE -->
 <xsl:template name="identifierProp">
@@ -442,7 +423,72 @@ BDAY:</xsl:text>
 				</xsl:variable>
 				<xsl:value-of select="normalize-space($textFormatted)"/>
 			</xsl:when>			
-			<xsl:when test='@alt and local-name(.) = "img"'>
+			<xsl:when test='@alt and (local-name(.) = "img" or local-name(.) = "area")'>
+				<xsl:variable name="textFormatted">
+				<xsl:apply-templates select="@alt" mode="unFormatText" />
+				</xsl:variable>
+				<xsl:value-of select="normalize-space($textFormatted)"/>
+			</xsl:when>
+			<xsl:when test=".//*[contains(concat(' ', normalize-space(@class), ' '),' value ')]">
+				<xsl:for-each select=".//*[contains(concat(' ', normalize-space(@class), ' '),' value ')]">
+					<xsl:variable name="textFormatted">
+					<xsl:apply-templates select="." mode="unFormatText" />
+					</xsl:variable>
+					<xsl:value-of select="normalize-space($textFormatted)"/>
+				</xsl:for-each>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:variable name="textFormatted">
+				<xsl:apply-templates select="." mode="unFormatText" />
+				</xsl:variable>
+				<xsl:value-of select="normalize-space($textFormatted)"/>
+			</xsl:otherwise>
+		</xsl:choose>
+	</xsl:if>
+	</xsl:for-each>
+</xsl:template>
+
+<!-- DATE PROPERTY without LANGUAGE -->
+<xsl:template name="dateProp">
+	<xsl:param name="label" />
+	<xsl:param name="class" />
+		
+	<xsl:for-each select=".//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ', @class, ' '),concat(' ', $class, ' '))]">
+	<xsl:if test="position() = 1">
+        <xsl:text>&#x0A;</xsl:text>
+		<xsl:value-of select="$label" />
+        <xsl:text>:</xsl:text>
+		<xsl:choose>
+			<xsl:when test='local-name(.) = "ol" or local-name(.) = "ul"'>
+				<xsl:for-each select="*">
+					<xsl:if test="not(position()=1)">
+						<xsl:text>,</xsl:text>
+					</xsl:if>
+					<xsl:choose>
+						<xsl:when test=".//*[contains(concat(' ', normalize-space(@class), ' '),' value ')]">
+							<xsl:for-each select=".//*[contains(concat(' ', normalize-space(@class), ' '),' value ')]">
+								<xsl:variable name="textFormatted">
+								<xsl:apply-templates select="." mode="unFormatText" />
+								</xsl:variable>
+								<xsl:value-of select="normalize-space($textFormatted)"/>
+							</xsl:for-each>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:variable name="textFormatted">
+							<xsl:apply-templates select="." mode="unFormatText" />
+							</xsl:variable>
+							<xsl:value-of select="normalize-space($textFormatted)"/>
+						</xsl:otherwise>
+					</xsl:choose>		
+				</xsl:for-each>
+			</xsl:when>
+			<xsl:when test='local-name(.) = "abbr" and @title'>
+				<xsl:variable name="textFormatted">
+				<xsl:apply-templates select="@title" mode="unFormatText" />
+				</xsl:variable>
+				<xsl:value-of select="normalize-space($textFormatted)"/>
+			</xsl:when>			
+			<xsl:when test='@alt and (local-name(.) = "img" or local-name(.) = "area")'>
 				<xsl:variable name="textFormatted">
 				<xsl:apply-templates select="@alt" mode="unFormatText" />
 				</xsl:variable>
@@ -682,7 +728,7 @@ BDAY:</xsl:text>
 							</xsl:variable>
 							<xsl:value-of select="normalize-space($textFormatted)"/>
 						</xsl:when>
-						<xsl:when test='@alt and local-name(.) = "img"'>
+						<xsl:when test='@alt and (local-name(.) = "img" or local-name(.) = "area")'>
 							<xsl:variable name="textFormatted">
 							<xsl:apply-templates select="@alt" mode="unFormatText" />
 							</xsl:variable>
@@ -715,7 +761,7 @@ BDAY:</xsl:text>
 						</xsl:variable>
 						<xsl:value-of select="normalize-space($textFormatted)"/>
 					</xsl:when>
-					<xsl:when test='@alt and local-name(.) = "img"'>
+					<xsl:when test='@alt and (local-name(.) = "img" or local-name(.) = "area")'>
 						<xsl:variable name="textFormatted">
 						<xsl:apply-templates select="@alt" mode="unFormatText" />
 						</xsl:variable>
@@ -862,66 +908,291 @@ BDAY:</xsl:text>
 			<xsl:text>:</xsl:text>
 			<xsl:choose>
 				<xsl:when test="local-name(.) = 'abbr' and @title">
-					<xsl:variable name="family-name">
-						<xsl:value-of select='substring-after(normalize-space(@title), " ")' />
-					</xsl:variable>
-					<xsl:call-template name="escapeText">
-						<xsl:with-param name="text-string" select="$family-name" />
-					</xsl:call-template>
-					<xsl:text>;</xsl:text>
 					<xsl:choose>
-						<xsl:when test='not(substring-before(normalize-space(@title), " "))'>
+						<xsl:when test='
+							(string-length(substring-after(normalize-space(@title), " ")) = 1) or
+							(
+							(string-length(substring-after(normalize-space(@title), " ")) = 2) and 
+							(substring(substring-after(normalize-space(@title), " "), 2,1) = ".")
+							) or
+							(
+								substring(
+										normalize-space(@title),
+										string-length(
+											(substring-before(
+												normalize-space(@title), " "
+											))
+										),
+										1
+								) = ","
+							)
+							'>
+							<xsl:variable name="given-name">
+								<xsl:value-of select='substring-after(normalize-space(@title), " ")' />
+							</xsl:variable>
+							<xsl:choose>
+								<xsl:when test='substring(
+											normalize-space(@title),
+											string-length(
+												(substring-before(
+													normalize-space(@title), " "
+												))
+											),
+											1
+										) = ","'>
+										<xsl:variable name="family-name">
+											<xsl:value-of select='substring(
+														normalize-space(@title),
+														1,
+														string-length(
+															(substring-before(
+																normalize-space(@title), " "
+															))
+														)-1
+													)' />
+										</xsl:variable>
+										<xsl:call-template name="escapeText">
+											<xsl:with-param name="text-string" select="$family-name" />
+										</xsl:call-template>
+								</xsl:when>
+								<xsl:otherwise>
+									<xsl:variable name="family-name">
+										<xsl:value-of select='substring-before(normalize-space(@title), " ")' />
+									</xsl:variable>
+									<xsl:call-template name="escapeText">
+										<xsl:with-param name="text-string" select="$family-name" />
+									</xsl:call-template>
+								</xsl:otherwise>
+							</xsl:choose>
+							<xsl:text>;</xsl:text>
 							<xsl:call-template name="escapeText">
-								<xsl:with-param name="text-string" select="normalize-space(@title)" />
+								<xsl:with-param name="text-string" select="$given-name" />
+							</xsl:call-template>
+							
+						</xsl:when>
+						<xsl:when test='not(substring-before(normalize-space(@title), " "))'>
+							<xsl:variable name="given-name">
+								<xsl:text />
+							</xsl:variable>
+							<xsl:variable name="family-name">
+								<xsl:value-of select='substring-before(normalize-space(@title), " ")' />
+							</xsl:variable>
+							<xsl:call-template name="escapeText">
+								<xsl:with-param name="text-string" select="$family-name" />
+							</xsl:call-template>
+							<xsl:text>;</xsl:text>
+							<xsl:call-template name="escapeText">
+								<xsl:with-param name="text-string" select="$given-name" />
 							</xsl:call-template>
 						</xsl:when>
 						<xsl:otherwise>
+							<xsl:variable name="given-name">
+								<xsl:value-of select='substring-before(normalize-space(@title), " ")' />
+							</xsl:variable>
+							<xsl:variable name="family-name">
+								<xsl:value-of select='substring-after(normalize-space(@title), " ")' />
+							</xsl:variable>
 							<xsl:call-template name="escapeText">
-								<xsl:with-param name="text-string" select='substring-before(normalize-space(@title), " ")' />
+								<xsl:with-param name="text-string" select="$family-name" />
 							</xsl:call-template>
+							<xsl:text>;</xsl:text>
+							<xsl:call-template name="escapeText">
+								<xsl:with-param name="text-string" select="$given-name" />
+							</xsl:call-template>							
 						</xsl:otherwise>
 					</xsl:choose>
 				</xsl:when>
-				<xsl:when test="local-name(.) = 'img' and @alt">
-					<xsl:variable name="family-name">
-						<xsl:value-of select='substring-after(normalize-space(@alt), " ")' />
-					</xsl:variable>
-					<xsl:call-template name="escapeText">
-						<xsl:with-param name="text-string" select="$family-name" />
-					</xsl:call-template>
-					<xsl:text>;</xsl:text>
+				<xsl:when test="(local-name(.) = 'img' or local-name(.) = 'area') and @alt">
 					<xsl:choose>
-						<xsl:when test='not(substring-before(normalize-space(@alt), " "))'>
+						<xsl:when test='
+							(string-length(substring-after(normalize-space(@alt), " ")) = 1) or
+							(
+							(string-length(substring-after(normalize-space(@alt), " ")) = 2) and 
+							(substring(substring-after(normalize-space(@alt), " "), 2,1) = ".")
+							) or
+							(
+								substring(
+										normalize-space(@alt),
+										string-length(
+											(substring-before(
+												normalize-space(@alt), " "
+											))
+										),
+										1
+								) = ","
+							)
+							'>
+							<xsl:variable name="given-name">
+								<xsl:value-of select='substring-after(normalize-space(@alt), " ")' />
+							</xsl:variable>
+							<xsl:choose>
+								<xsl:when test='substring(
+											normalize-space(@alt),
+											string-length(
+												(substring-before(
+													normalize-space(@alt), " "
+												))
+											),
+											1
+										) = ","'>
+										<xsl:variable name="family-name">
+											<xsl:value-of select='substring(
+														normalize-space(@alt),
+														1,
+														string-length(
+															(substring-before(
+																normalize-space(@alt), " "
+															))
+														)-1
+													)' />
+										</xsl:variable>
+										<xsl:call-template name="escapeText">
+											<xsl:with-param name="text-string" select="$family-name" />
+										</xsl:call-template>
+								</xsl:when>
+								<xsl:otherwise>
+									<xsl:variable name="family-name">
+										<xsl:value-of select='substring-before(normalize-space(@alt), " ")' />
+									</xsl:variable>
+									<xsl:call-template name="escapeText">
+										<xsl:with-param name="text-string" select="$family-name" />
+									</xsl:call-template>
+								</xsl:otherwise>
+							</xsl:choose>
+							<xsl:text>;</xsl:text>
 							<xsl:call-template name="escapeText">
-								<xsl:with-param name="text-string" select="normalize-space(@alt)" />
+								<xsl:with-param name="text-string" select="$given-name" />
+							</xsl:call-template>
+							
+						</xsl:when>
+						<xsl:when test='not(substring-before(normalize-space(@alt), " "))'>
+							<xsl:variable name="given-name">
+								<xsl:text />
+							</xsl:variable>
+							<xsl:variable name="family-name">
+								<xsl:value-of select='substring-before(normalize-space(@alt), " ")' />
+							</xsl:variable>
+							<xsl:call-template name="escapeText">
+								<xsl:with-param name="text-string" select="$family-name" />
+							</xsl:call-template>
+							<xsl:text>;</xsl:text>
+							<xsl:call-template name="escapeText">
+								<xsl:with-param name="text-string" select="$given-name" />
 							</xsl:call-template>
 						</xsl:when>
 						<xsl:otherwise>
+							<xsl:variable name="given-name">
+								<xsl:value-of select='substring-before(normalize-space(@alt), " ")' />
+							</xsl:variable>
+							<xsl:variable name="family-name">
+								<xsl:value-of select='substring-after(normalize-space(@alt), " ")' />
+							</xsl:variable>
 							<xsl:call-template name="escapeText">
-								<xsl:with-param name="text-string" select='substring-before(normalize-space(@alt), " ")' />
+								<xsl:with-param name="text-string" select="$family-name" />
 							</xsl:call-template>
+							<xsl:text>;</xsl:text>
+							<xsl:call-template name="escapeText">
+								<xsl:with-param name="text-string" select="$given-name" />
+							</xsl:call-template>							
 						</xsl:otherwise>
 					</xsl:choose>
 				</xsl:when>
 				<!-- might need to add case when data is on OBJECT element? -->
 				<xsl:otherwise>
-					<xsl:variable name="family-name">
-						<xsl:value-of select='substring-after(normalize-space(.), " ")' />
-					</xsl:variable>
-					<xsl:call-template name="escapeText">
-						<xsl:with-param name="text-string" select="$family-name" />
-					</xsl:call-template>
-					<xsl:text>;</xsl:text>
+					
 					<xsl:choose>
-						<xsl:when test='not(substring-before(normalize-space(.), " "))'>
+						<xsl:when test='
+							(string-length(substring-after(normalize-space(.), " ")) = 1) or
+							(
+							(string-length(substring-after(normalize-space(.), " ")) = 2) and 
+							(substring(substring-after(normalize-space(.), " "), 2,1) = ".")
+							) or
+							(
+								substring(
+										normalize-space(.),
+										string-length(
+											(substring-before(
+												normalize-space(.), " "
+											))
+										),
+										1
+								) = ","
+							)
+							'>
+							
+							<xsl:variable name="given-name">
+								<xsl:value-of select='substring-after(normalize-space(.), " ")' />
+							</xsl:variable>
+							<xsl:choose>
+								<xsl:when test='substring(
+											normalize-space(.),
+											string-length(
+												(substring-before(
+													normalize-space(.), " "
+												))
+											),
+											1
+										) = ","'>
+										<xsl:variable name="family-name">
+											<xsl:value-of select='substring(
+														normalize-space(.),
+														1,
+														string-length(
+															(substring-before(
+																normalize-space(.), " "
+															))
+														)-1
+													)' />
+										</xsl:variable>
+										<xsl:call-template name="escapeText">
+											<xsl:with-param name="text-string" select="$family-name" />
+										</xsl:call-template>
+								</xsl:when>
+								<xsl:otherwise>
+									<xsl:variable name="family-name">
+										<xsl:value-of select='substring-before(normalize-space(.), " ")' />
+									</xsl:variable>
+									<xsl:call-template name="escapeText">
+										<xsl:with-param name="text-string" select="$family-name" />
+									</xsl:call-template>
+								</xsl:otherwise>
+							</xsl:choose>
+
+							<xsl:text>;</xsl:text>
 							<xsl:call-template name="escapeText">
-								<xsl:with-param name="text-string" select="normalize-space(.)" />
+								<xsl:with-param name="text-string" select="$given-name" />
+							</xsl:call-template>
+							
+						</xsl:when>
+						<xsl:when test='not(substring-before(normalize-space(.), " "))'>
+							<xsl:variable name="given-name">
+								<xsl:text />
+							</xsl:variable>
+							<xsl:variable name="family-name">
+								<xsl:value-of select='substring-before(normalize-space(.), " ")' />
+							</xsl:variable>
+							<xsl:call-template name="escapeText">
+								<xsl:with-param name="text-string" select="$family-name" />
+							</xsl:call-template>
+							<xsl:text>;</xsl:text>
+							<xsl:call-template name="escapeText">
+								<xsl:with-param name="text-string" select="$given-name" />
 							</xsl:call-template>
 						</xsl:when>
 						<xsl:otherwise>
+							<xsl:variable name="given-name">
+								<xsl:value-of select='substring-before(normalize-space(.), " ")' />
+							</xsl:variable>
+							<xsl:variable name="family-name">
+								<xsl:value-of select='substring-after(normalize-space(.), " ")' />
+							</xsl:variable>
 							<xsl:call-template name="escapeText">
-								<xsl:with-param name="text-string" select='substring-before(normalize-space(.), " ")' />
+								<xsl:with-param name="text-string" select="$family-name" />
 							</xsl:call-template>
+							<xsl:text>;</xsl:text>
+							<xsl:call-template name="escapeText">
+								<xsl:with-param name="text-string" select="$given-name" />
+							</xsl:call-template>							
 						</xsl:otherwise>
 					</xsl:choose>
 				</xsl:otherwise>
@@ -979,7 +1250,7 @@ BDAY:</xsl:text>
 				</xsl:variable>
 				<xsl:value-of select="normalize-space($textFormatted)"/>
 			</xsl:when>
-			<xsl:when test='@alt and local-name(.) = "img"'>
+			<xsl:when test='@alt and (local-name(.) = "img" or local-name(.) = "area")'>
 				<xsl:variable name="textFormatted">
 				<xsl:apply-templates select="@alt" mode="unFormatText" />
 				</xsl:variable>
@@ -1001,6 +1272,78 @@ BDAY:</xsl:text>
 			</xsl:otherwise>
 		</xsl:choose>
 	</xsl:if>
+	</xsl:for-each>
+</xsl:template>
+
+<!-- CONCATENATE TEXT PROPERTY with LANGUAGE -->
+<xsl:template name="concatTextPropLang">
+	<!-- if label is left out, just computes the property value -->
+	<xsl:param name="label" />
+	<xsl:param name="class" />
+
+	<xsl:for-each select=".//*[contains(concat(' ', @class, ' '),concat(' ', $class, ' '))]">
+
+		<xsl:if test="position() = 1">
+			<xsl:if test="$label">
+				<xsl:text>&#x0A;</xsl:text>
+				<xsl:value-of select="$label" />
+				<xsl:call-template name="lang" />
+				<xsl:text>;CHARSET=</xsl:text><xsl:value-of select="$Encoding"/>
+				<xsl:text>:</xsl:text>
+			</xsl:if>
+		</xsl:if>
+
+		<xsl:choose>
+			<xsl:when test='local-name(.) = "ol" or local-name(.) = "ul"'>
+				<xsl:for-each select="*">
+					<xsl:if test="not(position()=1)">
+						<xsl:text>,</xsl:text>
+					</xsl:if>
+					<xsl:choose>
+						<xsl:when test=".//*[contains(concat(' ', normalize-space(@class), ' '),' value ')]">
+						<xsl:for-each select=".//*[contains(concat(' ', normalize-space(@class), ' '),' value ')]">
+								<xsl:variable name="textFormatted">
+								<xsl:apply-templates select="." mode="unFormatText" />
+								</xsl:variable>
+								<xsl:value-of select="normalize-space($textFormatted)"/>
+							</xsl:for-each>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:variable name="textFormatted">
+							<xsl:apply-templates select="." mode="unFormatText" />
+							</xsl:variable>
+							<xsl:value-of select="normalize-space($textFormatted)"/>
+						</xsl:otherwise>
+					</xsl:choose>		
+				</xsl:for-each>
+			</xsl:when>
+			<xsl:when test='local-name(.) = "abbr" and @title'>
+				<xsl:variable name="textFormatted">
+				<xsl:apply-templates select="@title" mode="unFormatText" />
+				</xsl:variable>
+				<xsl:value-of select="normalize-space($textFormatted)"/>
+			</xsl:when>
+			<xsl:when test='@alt and (local-name(.) = "img" or local-name(.) = "area")'>
+				<xsl:variable name="textFormatted">
+				<xsl:apply-templates select="@alt" mode="unFormatText" />
+				</xsl:variable>
+				<xsl:value-of select="normalize-space($textFormatted)"/>
+			</xsl:when>
+			<xsl:when test=".//*[contains(concat(' ', normalize-space(@class), ' '),' value ')]">
+				<xsl:for-each select=".//*[contains(concat(' ', normalize-space(@class), ' '),' value ')]">
+					<xsl:variable name="textFormatted">
+					<xsl:apply-templates select="." mode="unFormatText" />
+					</xsl:variable>
+					<xsl:value-of select="normalize-space($textFormatted)"/>						
+				</xsl:for-each>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:variable name="textFormatted">
+				<xsl:apply-templates select="." mode="unFormatText" />
+				</xsl:variable>
+				<xsl:value-of select="normalize-space($textFormatted)"/>
+			</xsl:otherwise>
+		</xsl:choose>
 	</xsl:for-each>
 </xsl:template>
 
@@ -1058,13 +1401,19 @@ BDAY:</xsl:text>
 					</xsl:choose>		
 				</xsl:for-each>
 			</xsl:when>
+			<xsl:when test="@rel = true() and contains(concat(' ', normalize-space(@rel), ' '),' tag ')">
+				<!-- need to extract only the tag, not the tagspace or the URL-->
+				<xsl:call-template name="tagFromTagspace">
+					<xsl:with-param name="text-string" select="@href" />
+				</xsl:call-template>
+			</xsl:when>
 			<xsl:when test='local-name(.) = "abbr" and @title'>
 				<xsl:variable name="textFormatted">
 				<xsl:apply-templates select="@title" mode="unFormatText" />
 				</xsl:variable>
 				<xsl:value-of select="normalize-space($textFormatted)"/>
 			</xsl:when>
-			<xsl:when test='@alt and local-name(.) = "img"'>
+			<xsl:when test='@alt and (local-name(.) = "img" or local-name(.) = "area")'>
 				<xsl:variable name="textFormatted">
 				<xsl:apply-templates select="@alt" mode="unFormatText" />
 				</xsl:variable>
@@ -1152,6 +1501,8 @@ BDAY:</xsl:text>
 	</xsl:for-each>
 </xsl:template>
 
+<!-- ================ HELPER TEMPLATE =================== -->
+
 <!-- Get the language for an property -->
 <xsl:template name="lang">
 	<xsl:variable name="langElt" select='ancestor-or-self::*[@xml:lang or @lang]' />
@@ -1177,7 +1528,6 @@ BDAY:</xsl:text>
 <!-- Get the base URL for the page if there is one -->
 <xsl:template name="baseURL">
 	<xsl:param name="Source" />
-	
 	<xsl:choose>
 		<xsl:when test="//*[@xml:base] = true()">
 			<xsl:value-of select="//*[@xml:base]/@xml:base" />
@@ -1226,7 +1576,7 @@ BDAY:</xsl:text>
 							</xsl:variable>
 							<xsl:value-of select="normalize-space($textFormatted)"/>
 						</xsl:when>
-						<xsl:when test='@alt and local-name(.) = "img"'>
+						<xsl:when test='@alt and (local-name(.) = "img" or local-name(.) = "area")'>
 							<xsl:variable name="textFormatted">
 							<xsl:apply-templates select="@alt" mode="unFormatText" />
 							</xsl:variable>
@@ -1612,6 +1962,23 @@ BDAY:</xsl:text>
 					<xsl:value-of select="$text-string"/>
 				</xsl:otherwise>
 			</xsl:choose>		
+		</xsl:otherwise>
+	</xsl:choose>
+</xsl:template>
+
+
+
+<!-- recursive function to escape text -->
+<xsl:template name="tagFromTagspace">
+	<xsl:param name="text-string"></xsl:param>
+	<xsl:choose>
+		<xsl:when test="substring-after($text-string,'/') = true()">
+			<xsl:call-template name="tagFromTagspace">
+				<xsl:with-param name="text-string"><xsl:value-of select="substring-after($text-string,'/')"/></xsl:with-param>
+			</xsl:call-template>
+		</xsl:when>
+		<xsl:otherwise>
+			<xsl:value-of select="$text-string"/>
 		</xsl:otherwise>
 	</xsl:choose>
 </xsl:template>

@@ -37,12 +37,12 @@ if (isSet($_GET['error'])){
 }
 ?>
 		<h2 id="introduction">Introduction</h2>
-		<p>This is a <em>BETA</em> implementation of an <abbr title="XML Stylesheet Language Transformation" class="initialism">XSLT</abbr> file to transform and hCa* encoded <abbr title="eXtensible Hyper Text Markup Language" class="initialism">XHTML</abbr> file into the corresponding <abbr title="Virtual Card">vCard</abbr>/<abbr title="Internet Calendar">iCalendar</abbr> file. The DRAFT specification for hCa* encodings can be found at the Technorati Delevoper Wiki.</p>
+		<p>This is a <em>BETA</em> implementation of an <abbr title="eXtensible Stylesheet Language Transformation" class="initialism">XSLT</abbr> file to transform and hCa* encoded <abbr title="eXtensible Hyper Text Markup Language" class="initialism">XHTML</abbr> file into the corresponding <abbr title="Virtual Card">vCard</abbr>/<abbr title="Internet Calendar">iCalendar</abbr> file. The DRAFT specification for hCa* encodings can be found at the Technorati Delevoper Wiki.</p>
 		<ul>
 		<li><a href="http://microformats.org/wiki/hcalendar" title="Technorati Wiki entry about hCalendar" class="external">http://microformats.org/wiki/hcalendar</a></li>
 		<li><a href="http://microformats.org/wiki/hcard" title="Technorati Wiki entry about hCard" class="external">http://microformats.org/wiki/hcard</a></li>
 		</ul>
-		<p>As the specification become less of a moving target the <abbr title="XML Stylesheet Language Transformation" class="initialism">XSLT</abbr> file will solidify and a proper html profile created.
+		<p>As the specification become less of a moving target the <abbr title="eXtensible Stylesheet Language Transformation" class="initialism">XSLT</abbr> file will solidify and a proper html profile created.
 		</p>
 		<h2 id="H2I"><abbr title="HTML iCalendar">hCalendar</abbr>-2-<abbr title="Internet Calendar">iCalendar</abbr></h2>
 		<form action="get-vcal.php" method="get">
@@ -71,7 +71,7 @@ if (isSet($_GET['error'])){
 				<p>Drag this bookmarklet to the bookmarks bar so you can grab <abbr title="Internet Calendar">iCal</abbr> data from any <abbr title="HTML iCalendar">hCal</abbr> participating <abbr title="Universal Resource Locator" class="initialism">URL</abbr>.<br />
 		<a href="javascript:location.href='http://suda.co.uk/projects/X2V/get-vcal.php?uri='+escape(location.href)">Extract <abbr title="Internet Calendar">iCal</abbr> data</a> (Drag link to the Bookmarks Bar).
 		</p>
-		<p>The <abbr title="XML Stylesheet Language Transformation" class="initialism">XSLT</abbr> file used to transform the data is available at:</p>
+		<p>The <abbr title="eXtensible Stylesheet Language Transformation" class="initialism">XSLT</abbr> file used to transform the data is available at:</p>
 		<ul>
 		<li><a href="http://suda.co.uk/projects/X2V/xhtml2vcal.xsl" title="XSLT file for the transformation">http://suda.co.uk/projects/X2V/xhtml2vcal.xsl</a></li>
 		</ul>
@@ -81,20 +81,20 @@ if (isSet($_GET['error'])){
 		<p>Drag this bookmarklet to the bookmarks bar so you can grab <abbr title="Virtual Card">vCard</abbr> data from any <abbr title="HTML vCard">hCard</abbr> participating <abbr title="Universal Resource Locator" class="initialism">URL</abbr>.<br />
 		<a href="javascript:location.href='http://suda.co.uk/projects/X2V/get-vcard.php?uri='+escape(location.href)">Extract <abbr title="Virtual Card">vCard</abbr> data</a> (Drag link to the Bookmarks Bar)
 		</p>
-				<p>The <abbr title="XML Stylesheet Language Transformation" class="initialism">XSLT</abbr> file used to transform the data is available at:</p>
+				<p>The <abbr title="eXtensible Stylesheet Language Transformation" class="initialism">XSLT</abbr> file used to transform the data is available at:</p>
 		<ul>
 		<li><a href="http://suda.co.uk/projects/X2V/xhtml2vcard.xsl" title="XSLT file for the transformation">http://suda.co.uk/projects/X2V/xhtml2vcard.xsl</a></li>
 		</ul>
 		</dd>
 		</dl>
 		<h2 id="implementations">Implementations</h2>
-		<p><a href="http://technorati.com/" class="external">Technorati</a> uses these files in two of their feed services. They are using slightly older, stable versions of the <abbr title="XML Stylesheet Language Transformation" class="initialism">XSLT</abbr> files, but their servers are faster and more reliable than my site. Feel free to use either of our web services.</p>
+		<p><a href="http://technorati.com/" class="external">Technorati</a> uses these files in two of their feed services. They are using slightly older, stable versions of the <abbr title="eXtensible Stylesheet Language Transformation" class="initialism">XSLT</abbr> files, but their servers are faster and more reliable than my site. Feel free to use either of our web services.</p>
 		<ul>
 			<li><a href="http://feeds.technorati.com/contacts/" class="external">http://feeds.technorati.org/contacts/</a></li>
 			<li><a href="http://feeds.technorati.com/events/" class="external">http://feeds.technorati.com/events/</a></li>
 		</ul>
 		<h2 id="copyright">Copyleft</h2>
-		<p>The <abbr title="XML Stylesheet Language Transformation" class="initialism">XSLT</abbr> files have been relicensed and are available for download under the <a class="external"
+		<p>The <abbr title="eXtensible Stylesheet Language Transformation" class="initialism">XSLT</abbr> files have been relicensed and are available for download under the <a class="external"
 href="http://www.w3.org/Consortium/Legal/copyright-software-19980720">
 W3C Open Source License</a>.</p>
 		<?php
