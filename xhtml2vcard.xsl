@@ -121,13 +121,13 @@ Without the correct profile you cannot assume the class values are intended for 
 			<xsl:call-template name="n-prop" />
 		</xsl:when>
 		<xsl:when test="$is-org">
-			<xsl:text>&#x0A;N:;;;;;</xsl:text>
+			<xsl:text>&#x0A;N:;;;;</xsl:text>
 		</xsl:when>
 		<xsl:when test="not($n-elt) and not(string-length(normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ')])) &gt; 1+string-length(translate(normalize-space(.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ')]),' ','')))">
 			<xsl:call-template name="implied-n" />		
 		</xsl:when>
 		<xsl:otherwise>
-			<xsl:text>&#x0A;N:;;;;;</xsl:text>
+			<xsl:text>&#x0A;N:;;;;</xsl:text>
 		</xsl:otherwise>
 	</xsl:choose>
 	
@@ -1197,7 +1197,6 @@ Without the correct profile you cannot assume the class values are intended for 
 					</xsl:choose>
 				</xsl:otherwise>
 			</xsl:choose>
-			<xsl:text>;</xsl:text>
 			<xsl:text>;;;</xsl:text>
 		</xsl:if>
 	</xsl:for-each>
