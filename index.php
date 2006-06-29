@@ -93,6 +93,8 @@ if (isSet($_GET['error'])){
 			<li><a href="http://feeds.technorati.com/contacts/" class="external">http://feeds.technorati.org/contacts/</a></li>
 			<li><a href="http://feeds.technorati.com/events/" class="external">http://feeds.technorati.com/events/</a></li>
 		</ul>
+		<h2 id="download">Download</h2>
+		<p>All of the PHP code and XSLT files are available for download through our Hg versioning system, <a href="http://hg.microformats.org/" class="external">http://hg.microformats.org/</a></p>
 		<h2 id="copyright">Copyleft</h2>
 		<p>The <abbr title="eXtensible Stylesheet Language Transformation" class="initialism">XSLT</abbr> files have been relicensed and are available for download under the <a class="external"
 href="http://www.w3.org/Consortium/Legal/copyright-software-19980720">

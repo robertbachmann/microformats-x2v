@@ -24,8 +24,8 @@ brian@suda.co.uk
 http://suda.co.uk/
 
 XHTML-2-vCard
-Version 0.8
-2005-06-11
+Version 0.8.1
+2005-06-29
 
 Copyright 2005 Brian Suda
 This work is relicensed under The W3C Open Source License
@@ -1267,7 +1267,12 @@ Without the correct profile you cannot assume the class values are intended for 
 				<xsl:variable name="textFormatted">
 				<xsl:apply-templates select="." mode="unFormatText" />
 				</xsl:variable>
-				<xsl:value-of select="normalize-space($textFormatted)"/>
+				<xsl:value-of select="normalize-space($textFormatted)"/>						
+				<!--
+				<xsl:call-template name="escapeText">
+					<xsl:with-param name="text-string" select="normalize-space($textFormatted)" />
+				</xsl:call-template>
+				-->
 			</xsl:otherwise>
 		</xsl:choose>
 	</xsl:if>
@@ -1715,7 +1720,6 @@ Without the correct profile you cannot assume the class values are intended for 
 <xsl:template match="*" mode="unFormatText">
 	<xsl:for-each select="node()">
 		<xsl:choose>
-
 			<xsl:when test="name() = 'p'">
 				<xsl:apply-templates select="." mode="unFormatText"/>
 				<xsl:text>\n\n</xsl:text>
@@ -1782,7 +1786,6 @@ Without the correct profile you cannot assume the class values are intended for 
 				<xsl:apply-templates select="." mode="unFormatText"/>
 			</xsl:when>
 			<xsl:when test="text()">
-				
 				<xsl:call-template name="normalize-spacing">
 					<xsl:with-param name="text-string">
 						<xsl:call-template name="escapeText">
@@ -1793,12 +1796,11 @@ Without the correct profile you cannot assume the class values are intended for 
 					</xsl:with-param>
 				</xsl:call-template>
 			</xsl:when>
-			<xsl:otherwise>				
+			<xsl:otherwise>										
 				<xsl:choose>
 					<!--
 					<xsl:when test="normalize-space(.) = '' and not(contains(.,' '))"><xsl:text>^</xsl:text></xsl:when>-->
 					<xsl:when test="contains(.,' ') and normalize-space(.) = ''">
-						
 						<xsl:text> </xsl:text>
 					</xsl:when>
 					<xsl:when test="substring(.,1,1) = $tb or substring(.,1,1) = ' '">
@@ -1814,7 +1816,11 @@ Without the correct profile you cannot assume the class values are intended for 
 						</xsl:choose>
 					</xsl:when>
 					<xsl:when test="substring(.,string-length(.),1) = $tb or substring(.,string-length(.),1) = ' '">
-						<xsl:value-of select="normalize-space(.)"/>
+						<xsl:call-template name="escapeText">
+							<xsl:with-param name="text-string">
+								<xsl:value-of select="normalize-space(.)"/>
+							</xsl:with-param>
+						</xsl:call-template>	
 						<xsl:text> </xsl:text>
 					</xsl:when>
 					<xsl:otherwise>
