@@ -1631,11 +1631,20 @@ Without the correct profile you cannot assume the class values are intended for 
 			<xsl:when test="translate(normalize-space(.),$ucase,$lcase) = $value">
 				<xsl:value-of select="normalize-space($value)"/>
 			</xsl:when>
-			<xsl:when test="local-name(.) = 'abbr'">
-				<xsl:if test=".//*[contains(translate(concat(' ', translate(@title,',',' '), ' '),$ucase,$lcase), concat(' ', $value, ' '))]">
+			<xsl:when test="local-name(.) = 'abbr' and @title">
+				<xsl:if test="contains(translate(concat(' ', translate(@title,',',' '), ' '),$ucase,$lcase), concat(' ', $value, ' ')) = true()">
 					<xsl:value-of select="normalize-space($value)"/>
 				</xsl:if>
+				<!--
+				<xsl:text>2</xsl:text>
+				<xsl:value-of select="translate(concat(' ', translate(@title,',',' '), ' '),$ucase,$lcase)"/>
+			    -->
 			</xsl:when>
+			<!--
+			<xsl:otherwise>
+				<xsl:value-of select="normalize-space($value)"/>
+			</xsl:otherwise>
+			-->
 		</xsl:choose>
 	</xsl:for-each>
 
@@ -1656,7 +1665,6 @@ Without the correct profile you cannot assume the class values are intended for 
 			<xsl:with-param name="value" select='$first' />
 		</xsl:call-template>
 	</xsl:variable>
-
 	<xsl:variable name="ff">
 		<xsl:choose>
 			<xsl:when test='normalize-space($v) and normalize-space($found)'>
