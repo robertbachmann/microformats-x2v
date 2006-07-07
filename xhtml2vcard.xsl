@@ -24,8 +24,8 @@ brian@suda.co.uk
 http://suda.co.uk/
 
 XHTML-2-vCard
-Version 0.8.1
-2005-06-29
+Version 0.8.3
+2005-07-06
 
 Copyright 2005 Brian Suda
 This work is relicensed under The W3C Open Source License
@@ -1784,7 +1784,11 @@ Without the correct profile you cannot assume the class values are intended for 
 			<xsl:when test="descendant::*">
 				<xsl:apply-templates select="." mode="unFormatText"/>
 			</xsl:when>
-			<xsl:when test="text()">
+			<xsl:when test="self::comment()">
+				<!-- do nothing -->
+			</xsl:when>
+			<!--
+			<xsl:when test="self::text()">
 				<xsl:call-template name="normalize-spacing">
 					<xsl:with-param name="text-string">
 						<xsl:call-template name="escapeText">
@@ -1795,22 +1799,31 @@ Without the correct profile you cannot assume the class values are intended for 
 					</xsl:with-param>
 				</xsl:call-template>
 			</xsl:when>
-			<xsl:otherwise>										
+			-->
+			<xsl:otherwise>
 				<xsl:choose>
 					<!--
 					<xsl:when test="normalize-space(.) = '' and not(contains(.,' '))"><xsl:text>^</xsl:text></xsl:when>-->
 					<xsl:when test="contains(.,' ') and normalize-space(.) = ''">
 						<xsl:text> </xsl:text>
-					</xsl:when>
+					</xsl:when>					
 					<xsl:when test="substring(.,1,1) = $tb or substring(.,1,1) = ' '">
 						<xsl:text> </xsl:text>
 						<xsl:choose>
 							<xsl:when test="substring(.,string-length(.),1) = $tb or substring(.,string-length(.),1) = ' '">
-								<xsl:value-of select="normalize-space(.)"/>
+								<xsl:call-template name="escapeText">
+									<xsl:with-param name="text-string">
+										<xsl:value-of select="normalize-space(.)"/>
+									</xsl:with-param>
+								</xsl:call-template>	
 								<xsl:text> </xsl:text>	
 							</xsl:when>	
 							<xsl:otherwise>
-								<xsl:value-of select="normalize-space(.)"/>
+								<xsl:call-template name="escapeText">
+									<xsl:with-param name="text-string">
+										<xsl:value-of select="normalize-space(.)"/>
+									</xsl:with-param>
+								</xsl:call-template>	
 							</xsl:otherwise>						
 						</xsl:choose>
 					</xsl:when>
@@ -1970,8 +1983,6 @@ Without the correct profile you cannot assume the class values are intended for 
 	</xsl:choose>
 </xsl:template>
 
-
-
 <!-- recursive function to escape text -->
 <xsl:template name="tagFromTagspace">
 	<xsl:param name="text-string"></xsl:param>
@@ -1986,6 +1997,8 @@ Without the correct profile you cannot assume the class values are intended for 
 		</xsl:otherwise>
 	</xsl:choose>
 </xsl:template>
+
+<xsl:template match="comment()"></xsl:template>
 
 <!-- don't pass text thru -->
 <xsl:template match="text()"></xsl:template>
