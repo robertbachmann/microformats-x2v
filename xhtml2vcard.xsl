@@ -297,7 +297,7 @@ Without the correct profile you cannot assume the class values are intended for 
 	<xsl:param name="class" />
 		
 	<xsl:for-each select=".//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ', @class, ' '),concat(' ', $class, ' '))]">
-	<xsl:if test="position() = 1">
+	<!--<xsl:if test="position() = 1"> -->
         <xsl:text>&#x0A;</xsl:text>
 		<xsl:value-of select="$label" />
         <xsl:text>:</xsl:text>
@@ -378,7 +378,7 @@ Without the correct profile you cannot assume the class values are intended for 
 				<xsl:value-of select="normalize-space($textFormatted)"/>
 			</xsl:otherwise>
 		</xsl:choose>
-	</xsl:if>
+	<!--</xsl:if>-->
 	</xsl:for-each>
 </xsl:template>
 
@@ -1635,16 +1635,7 @@ Without the correct profile you cannot assume the class values are intended for 
 				<xsl:if test="contains(translate(concat(' ', translate(@title,',',' '), ' '),$ucase,$lcase), concat(' ', $value, ' ')) = true()">
 					<xsl:value-of select="normalize-space($value)"/>
 				</xsl:if>
-				<!--
-				<xsl:text>2</xsl:text>
-				<xsl:value-of select="translate(concat(' ', translate(@title,',',' '), ' '),$ucase,$lcase)"/>
-			    -->
 			</xsl:when>
-			<!--
-			<xsl:otherwise>
-				<xsl:value-of select="normalize-space($value)"/>
-			</xsl:otherwise>
-			-->
 		</xsl:choose>
 	</xsl:for-each>
 
