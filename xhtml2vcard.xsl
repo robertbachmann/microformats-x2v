@@ -297,7 +297,7 @@ Without the correct profile you cannot assume the class values are intended for 
 	<xsl:param name="class" />
 		
 	<xsl:for-each select=".//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ', @class, ' '),concat(' ', $class, ' '))]">
-	<!--<xsl:if test="position() = 1"> -->
+	<xsl:if test="(position() = 1 and $class = 'uid') or not($class =  'uid')">
         <xsl:text>&#x0A;</xsl:text>
 		<xsl:value-of select="$label" />
         <xsl:text>:</xsl:text>
@@ -378,7 +378,7 @@ Without the correct profile you cannot assume the class values are intended for 
 				<xsl:value-of select="normalize-space($textFormatted)"/>
 			</xsl:otherwise>
 		</xsl:choose>
-	<!--</xsl:if>-->
+	</xsl:if>
 	</xsl:for-each>
 </xsl:template>
 
@@ -388,7 +388,7 @@ Without the correct profile you cannot assume the class values are intended for 
 	<xsl:param name="class" />
 		
 	<xsl:for-each select=".//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ', @class, ' '),concat(' ', $class, ' '))]">
-	<xsl:if test="position() = 1">
+	<xsl:if test="(position() = 1 and ($class = 'tz' or $class='class')) or not($class =  'tz' or $class='class')">
         <xsl:text>&#x0A;</xsl:text>
 		<xsl:value-of select="$label" />
 		<xsl:text>;CHARSET=</xsl:text><xsl:value-of select="$Encoding"/>
@@ -674,20 +674,22 @@ Without the correct profile you cannot assume the class values are intended for 
 <xsl:template name="geo-prop" >
 	<xsl:text>&#x0A;GEO:</xsl:text>
 	<xsl:for-each select=".//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ', @class, ' '),concat(' ', 'geo', ' '))]">
-		<xsl:choose>
-			<xsl:when test="local-name(.) = 'abbr' and @title">
-				<xsl:value-of select="normalize-space(@title)"/>
-			</xsl:when>
-			<xsl:otherwise>
-				<xsl:call-template name="sub-prop">
-					<xsl:with-param name="class" select='"latitude"' />
-				</xsl:call-template>
-				<xsl:text>;</xsl:text>
-				<xsl:call-template name="sub-prop">
-					<xsl:with-param name="class" select='"longitude"' />
-				</xsl:call-template>
-			</xsl:otherwise>
-		</xsl:choose>
+		<xsl:if test="position() = 1">
+			<xsl:choose>
+				<xsl:when test="local-name(.) = 'abbr' and @title">
+					<xsl:value-of select="normalize-space(@title)"/>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:call-template name="sub-prop">
+						<xsl:with-param name="class" select='"latitude"' />
+					</xsl:call-template>
+					<xsl:text>;</xsl:text>
+					<xsl:call-template name="sub-prop">
+						<xsl:with-param name="class" select='"longitude"' />
+					</xsl:call-template>
+				</xsl:otherwise>
+			</xsl:choose>
+		</xsl:if>
 	</xsl:for-each>
 </xsl:template>
 
@@ -1210,7 +1212,7 @@ Without the correct profile you cannot assume the class values are intended for 
 
 	<xsl:for-each select=".//*[contains(concat(' ', @class, ' '),concat(' ', $class, ' '))]">
 
-	<xsl:if test="position() = 1">
+	<xsl:if test="(position() = 1 and ($class = 'fn' or $class='sort-string')) or not($class =  'fn' or $class='sort-string')">
 
 	  <xsl:if test="$label">
 	    <xsl:text>&#x0A;</xsl:text>
@@ -1573,7 +1575,8 @@ Without the correct profile you cannot assume the class values are intended for 
 			<xsl:otherwise>
 			-->
 				<xsl:for-each select=".//*[contains(concat(' ', @class, ' '), concat(' ', $class , ' '))]">
-				<xsl:choose>
+					<xsl:if test="(position() = 1 and not($class = 'additional-name' or $class='honorific-prefix' or $class='honorific-suffix' or $class = 'street-address' or $class = 'organization-unit')) or ($class = 'additional-name' or $class='honorific-prefix' or $class='honorific-suffix' or $class = 'street-address' or $class = 'organization-unit')">
+					<xsl:choose>
 						<xsl:when test='local-name(.) = "abbr" and @title'>
 							<xsl:variable name="textFormatted">
 							<xsl:apply-templates select="@title" mode="unFormatText" />
@@ -1600,11 +1603,11 @@ Without the correct profile you cannot assume the class values are intended for 
 							</xsl:variable>
 							<xsl:value-of select="normalize-space($textFormatted)"/>
 						</xsl:otherwise>
-				</xsl:choose>
-				<xsl:if test="not(position()=last())">
-					<xsl:text>,</xsl:text>
-				</xsl:if>
-				
+					</xsl:choose>
+					<xsl:if test="not(position()=last()) and ($class = 'additional-name' or $class='honorific-prefix' or $class='honorific-suffix' or $class = 'street-address' or $class = 'organization-unit')">
+						<xsl:text>,</xsl:text>
+					</xsl:if>
+					</xsl:if>
 				</xsl:for-each>	
 				<!--			
 			</xsl:otherwise>
