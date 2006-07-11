@@ -83,9 +83,9 @@ Without the correct profile you cannot assume the class values are intended for 
 			</xsl:call-template>
 		</xsl:if>
 
-		<!-- check for object elements with data references to IDs -->
-		<xsl:if test=".//*[ancestor-or-self::*[name() = 'del'] = false()] and .//*[descendant-or-self::*[name() = 'object'] = true() and contains(normalize-space(@data),'#')]">
-			<xsl:for-each select=".//*[descendant-or-self::*[name() = 'object'] = true() and contains(normalize-space(@data),'#') and contains(concat(' ',normalize-space(@class),' '),' include ')]">
+		<!-- check for object/a elements with data references to IDs -->
+		<xsl:if test=".//*[ancestor-or-self::*[name() = 'del'] = false()] and .//*[descendant-or-self::*[name() = 'object' or name() = 'a'] = true() and contains(normalize-space(@data),'#')]">
+			<xsl:for-each select=".//*[descendant-or-self::*[name() = 'object' or name() = 'a'] = true() and contains(normalize-space(@data),'#') and contains(concat(' ',normalize-space(@class),' '),' include ')]">
 				<xsl:variable name="header-id"><xsl:value-of select="substring-after(@data,'#')"/></xsl:variable>
 				<xsl:for-each select="//*[@id=$header-id]">
 					<xsl:call-template name="vcardProperties"/>
@@ -102,7 +102,15 @@ Without the correct profile you cannot assume the class values are intended for 
 <!-- ============== working templates ================= -->
 <xsl:template name="vcardProperties">
 	<!--  Implied "N" Optimization -->
-	<xsl:variable name="n-elt" select=".//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ', normalize-space(@class), ' '),' n ')]" />
+	<xsl:variable name="n-elt" select="
+		.//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ', normalize-space(@class), ' '),' n ')]
+		or 
+		(
+		.//*[ancestor-or-self::*[name() = 'del'] = false() and not(contains(concat(' ', normalize-space(@class), ' '),' n '))]
+		and
+		.//*[ancestor-or-self::*[name() = 'del'] = false() and ancestor::*[contains(concat(' ', normalize-space(@class), ' '),' fn ')] and (contains(concat(' ', normalize-space(@class), ' '),' given-name ') or contains(concat(' ', normalize-space(@class), ' '),' family-name '))]		
+		)		
+		" />	
 	<xsl:variable name="fn-val">
 	  <xsl:call-template name="textPropLang">
 	    <xsl:with-param name="class">fn</xsl:with-param>

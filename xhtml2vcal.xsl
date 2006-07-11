@@ -22,8 +22,8 @@ brian@suda.co.uk
 http://suda.co.uk/
 
 XHTML-2-iCal
-Version 0.8
-2006-06-11
+Version 0.8.1
+2006-07-10
 
 Copyright 2005 Brian Suda
 This work is relicensed under The W3C Open Source License
@@ -41,10 +41,10 @@ I'm not an XSLT expert, so there are no guarantees to quality of this code!
 
 <xsl:param name="Debug" select="0"/>
 
-<xsl:variable name="lowalpha" select='"abcdefghijklmnopqrstuvwxyz"'/>
-<xsl:variable name="upalpha" select='"ABCDEFGHIJKLMNOPQRSTUVWXYZ"'/>
+<xsl:variable name="lcase" select='"abcdefghijklmnopqrstuvwxyz"'/>
+<xsl:variable name="ucase" select='"ABCDEFGHIJKLMNOPQRSTUVWXYZ"'/>
 <xsl:variable name="digit" select='"01234567890"'/>
-<xsl:variable name="alpha" select='concat($lowalpha, $upalpha)'/>
+<xsl:variable name="alpha" select='concat($lcase, $ucase)'/>
 <xsl:param name="Encoding" >UTF-8</xsl:param>
 <xsl:variable name="nl"><xsl:text>
 </xsl:text></xsl:variable>
@@ -76,8 +76,8 @@ I'm not an XSLT expert, so there are no guarantees to quality of this code!
 			</xsl:call-template>
 		</xsl:if>
 		
-		<xsl:if test=".//*[ancestor-or-self::*[name() = 'del'] = false()] and .//*[descendant-or-self::*[name() = 'object'] = true() and contains(normalize-space(@data),'#')]">
-			<xsl:for-each select=".//*[descendant-or-self::*[name() = 'object'] = true() and contains(normalize-space(@data),'#') and contains(concat(' ',normalize-space(@class),' '),' include ')]">
+		<xsl:if test=".//*[ancestor-or-self::*[name() = 'del'] = false()] and .//*[descendant-or-self::*[name() = 'object' or name() = 'a'] = true() and contains(normalize-space(@data),'#')]">
+			<xsl:for-each select=".//*[descendant-or-self::*[name() = 'object' or name() = 'a'] = true() and contains(normalize-space(@data),'#') and contains(concat(' ',normalize-space(@class),' '),' include ')]">
 				<xsl:variable name="header-id"><xsl:value-of select="substring-after(@data,'#')"/></xsl:variable>
 				<xsl:for-each select="//*[@id=$header-id]">
 					<xsl:call-template name="veventProperties"/>
@@ -121,10 +121,16 @@ I'm not an XSLT expert, so there are no guarantees to quality of this code!
 		<xsl:with-param name="class">contact</xsl:with-param>
 	</xsl:call-template>
 	
-	<xsl:call-template name="textProp">
-		<xsl:with-param name="label">DURATION</xsl:with-param>
-		<xsl:with-param name="class">duration</xsl:with-param>
-	</xsl:call-template>
+	<xsl:variable name="duration-val">
+	  <xsl:call-template name="textProp">
+	    <xsl:with-param name="class">duration</xsl:with-param>
+	  </xsl:call-template>
+	</xsl:variable>
+	<xsl:if test="not($duration-val = '')">
+	    <xsl:text>&#x0A;DURATION;CHARSET=</xsl:text><xsl:value-of select="$Encoding"/>
+	    <xsl:text>:</xsl:text>
+		<xsl:value-of select="translate(normalize-space($duration-val),$lcase,$ucase)"/>
+	</xsl:if>
 
 	<xsl:call-template name="dateProp">
 		<xsl:with-param name="label">DTSTART</xsl:with-param>
@@ -223,11 +229,17 @@ I'm not an XSLT expert, so there are no guarantees to quality of this code!
 		<xsl:with-param name="label">TRANSP</xsl:with-param>
 		<xsl:with-param name="class">transp</xsl:with-param>
 	</xsl:call-template>
-
-	<xsl:call-template name="textProp">
-		<xsl:with-param name="label">DURATION</xsl:with-param>
-		<xsl:with-param name="class">duration</xsl:with-param>
-	</xsl:call-template>
+	
+	<xsl:variable name="duration-val">
+	  <xsl:call-template name="textProp">
+	    <xsl:with-param name="class">duration</xsl:with-param>
+	  </xsl:call-template>
+	</xsl:variable>
+	<xsl:if test="not($duration-val = '')">
+	    <xsl:text>&#x0A;DURATION;CHARSET=</xsl:text><xsl:value-of select="$Encoding"/>
+	    <xsl:text>:</xsl:text>
+		<xsl:value-of select="translate(normalize-space($duration-val),$lcase,$ucase)"/>
+	</xsl:if>
 
 	<xsl:call-template name="dateProp">
 		<xsl:with-param name="label">DTSTART</xsl:with-param>
@@ -339,10 +351,12 @@ I'm not an XSLT expert, so there are no guarantees to quality of this code!
 		
 	<xsl:for-each select=".//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ', @class, ' '),concat(' ', $class, ' '))]">
 	<xsl:if test="position() = 1">
-        <xsl:text>&#x0A;</xsl:text>
-		<xsl:value-of select="$label" />
-		<xsl:text>;CHARSET=</xsl:text><xsl:value-of select="$Encoding"/>
-        <xsl:text>:</xsl:text>
+	  <xsl:if test="$label">
+	    <xsl:text>&#x0A;</xsl:text>
+	    <xsl:value-of select="$label" />
+	    <xsl:text>;CHARSET=</xsl:text><xsl:value-of select="$Encoding"/>
+	    <xsl:text>:</xsl:text>
+	  </xsl:if>
 		<xsl:choose>
 			<xsl:when test='local-name(.) = "ol" or local-name(.) = "ul"'>
 				<xsl:for-each select="*">
