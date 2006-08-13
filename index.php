@@ -39,8 +39,8 @@ if (isSet($_GET['error'])){
 		<h2 id="introduction">Introduction</h2>
 		<p>This is a <em>BETA</em> implementation of an <abbr title="eXtensible Stylesheet Language Transformation" class="initialism">XSLT</abbr> file to transform and hCa* encoded <abbr title="eXtensible Hyper Text Markup Language" class="initialism">XHTML</abbr> file into the corresponding <abbr title="Virtual Card">vCard</abbr>/<abbr title="Internet Calendar">iCalendar</abbr> file. The DRAFT specification for hCa* encodings can be found at the Technorati Delevoper Wiki.</p>
 		<ul>
-		<li><a href="http://microformats.org/wiki/hcalendar" title="Technorati Wiki entry about hCalendar" class="external">http://microformats.org/wiki/hcalendar</a></li>
-		<li><a href="http://microformats.org/wiki/hcard" title="Technorati Wiki entry about hCard" class="external">http://microformats.org/wiki/hcard</a></li>
+		<li><a href="http://microformats.org/wiki/hcalendar" title="Microformats Wiki entry about hCalendar" class="external">http://microformats.org/wiki/hcalendar</a></li>
+		<li><a href="http://microformats.org/wiki/hcard" title="Microformats Wiki entry about hCard" class="external">http://microformats.org/wiki/hcard</a></li>
 		</ul>
 		<p>As the specification become less of a moving target the <abbr title="eXtensible Stylesheet Language Transformation" class="initialism">XSLT</abbr> file will solidify and a proper html profile created.
 		</p>
@@ -94,10 +94,10 @@ if (isSet($_GET['error'])){
 			<li><a href="http://feeds.technorati.com/events/" class="external">http://feeds.technorati.com/events/</a></li>
 		</ul>
 		<h2 id="download">Download</h2>
-		<p>All of the PHP code and XSLT files are available for download through our Hg versioning system, <a href="http://hg.microformats.org/" class="external">http://hg.microformats.org/</a></p>
+		<p>All of the <abbr title="PHP Hypertext Preprocessor" class="initialism">PHP</abbr> code and <abbr title="eXtensible Stylesheet Language Transformation" class="initialism">XSLT</abbr> files are available for download through our Hg versioning system, <a href="http://hg.microformats.org/" class="external">http://hg.microformats.org/</a></p>
 		<h2 id="copyright">Copyleft</h2>
 		<p>The <abbr title="eXtensible Stylesheet Language Transformation" class="initialism">XSLT</abbr> files have been relicensed and are available for download under the <a class="external"
-href="http://www.w3.org/Consortium/Legal/copyright-software-19980720">
+href="http://www.w3.org/Consortium/Legal/copyright-software-19980720" rel="license">
 W3C Open Source License</a>.</p>
 		<?php
 			include '../../includes/foot.inc';
