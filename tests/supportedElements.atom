@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xml:lang="en" xml:base="http://example.com/blog/">
+  <updated>2006-02-13T22:21:55+01:00</updated>
+  <id>http://example.com/supportedElements.html</id>
+  <link rel="alternate" href="http://example.com/supportedElements.html" type="text/html"/>
+  <title>Html Title</title>
+  <entry>
+    <title>Entry One</title>
+    <id>http://example.com/entryOne</id>
+    <link rel="alternate" href="http://example.com/entryOne" hreflang="en-GB" type="application/xhtml" title="Entry One Bookmark Title" length="100"/>
+    <published>2005-12-22T10:34:00+10:00</published>
+    <updated>2005-12-22T10:35:00+10:00</updated>
+    <summary type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">
+Entry One, Summary
+</div>
+    </summary>
+    <content type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">
+<p>Entry One, Paragraph One</p>
+<p>Entry One, Paragraph Two</p>
+</div>
+    </content>
+    <author>
+      <name>Author One</name>
+      <uri>http://example.com/authorOne</uri>
+      <email>authorOne@example.com</email>
+    </author>
+    <author>
+      <name>Author Two</name>
+      <uri>http://example.com/authorTwo</uri>
+      <email>authorTwo@example.com</email>
+    </author>
+  </entry>
+  <entry xml:base="http://example.org/news/2005/12/21">
+    <title>Entry Two</title>
+    <id>http://example.com/entryTwo</id>
+    <link rel="alternate" href="http://example.com/entryTwo" hreflang="en-GB" type="application/xhtml" title="Entry Two Bookmark Title" length="100"/>
+    <published>2005-12-21T10:34:00+10:00</published>
+    <updated>2005-12-21T10:35:00+10:00</updated>
+    <summary type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">
+<p>Entry Two, Summary</p>
+</div>
+    </summary>
+    <content type="xhtml">
+      <div xmlns="http://www.w3.org/1999/xhtml">
+<p>Entry Two, Paragraph One</p>
+<p>Entry Two, Paragraph Two</p>
+</div>
+    </content>
+    <author>
+      <name>Author Three</name>
+      <uri>http://example.com/authorThree</uri>
+      <email>authorThree@example.com</email>
+    </author>
+    <author>
+      <name>Author Four</name>
+      <uri>http://example.com/authorFour</uri>
+      <email>authorFour@example.com</email>
+    </author>
+  </entry>
+</feed>

@@ -1,0 +1,136 @@
+<?xml version="1.0"?>
+<!--DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.0 Transitional//EN'
+    'http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd'-->
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<title>Page title</title>
+</head>
+<body>
+<!--
+This test is intended to that all variations of author and contributor input
+are handled correctly.
+
+Features tested:
+	- class=author+vcard elements
+	- vcards with separate and combined url+name fields
+	- vcards nested within class=author elements
+    - "Nearest in parent" vcard pickup.
+    
+Features not tested:
+
+Scope of possible change:
+	- The output of this test case is not valid atom.
+	- Changes in the hAtom specification may invalidate this test case
+	- Comparisons between actual and controlled test output should not
+	  take order into consideration, except where the atom specification
+	  indicates order is important.
+	- Comparisons between actual and controlled test output should not
+	  consider whitespace important, except where the atom specification
+	  indicates whitespace is important.
+
+-->
+
+<address class="author">
+  <span class="vcard">
+    <span class="fn">John Doe</span>
+    <b class="email">john@example.com</b>
+  </span>
+</address>
+
+<div>
+<address class="vcard"><span class="fn">Bill Doe (ignored: has no class author)</span></address>
+<address><span class="vcard"><span class="fn">Frank Doe (ignored: has no class author)</span></span></address>
+</div>
+
+<span class="author vcard"><span class="fn">John Black (ignored: isn't &lt;address&gt;)</span></span>
+
+<div class="hfeed">
+  <h2 class="title">Feed Title</h2>
+  <p class="updated">2005-12-25T00:00:00Z</p>
+  
+  <div class="hentry" id="e1">
+    <h3>Entry One Title</h3>
+    <p class="updated">2005-12-25T00:00:00Z</p>
+    <a rel="bookmark" href="http://example.com/entry"/>
+    <span class="author">
+        <span class="vcard"><span class="fn">Entry One Author One</span></span> and
+        <span class="vcard"><span class="fn">Entry One Author Two</span></span>    
+    </span>
+    <span class="author vcard"><span class="fn">Entry One Author Three</span></span>
+  </div>
+
+  <div class="hentry" id="e2">
+    <h3>Entry Two Title</h3>
+    <p class="updated">2005-12-25T00:00:00Z</p>
+    <span class="author vcard fn">Entry Two Author One<!-- must be ignored --></span>
+    <span class="author vcard fn">Entry Two Author Two<!-- must be ignored --></span>
+  </div>
+
+  <div class="hentry" id="e3">
+    <h3>Entry Three Title</h3>
+    <p class="updated">2005-12-25T00:00:00Z</p>
+    <span class="author vcard">
+        <span class="fn">Entry Three Author One</span>
+        <span class="url">http://example.com/authorOne</span>
+        <span class="email">authorOne@example.com</span>
+    </span>
+    <span class="author vcard">
+        <span class="fn">Entry Three Author Two</span>
+        <span class="url">http://example.com/authorTwo</span>
+        <span class="email">authorTwo@example.com</span>
+    </span>
+    <span class="contributor vcard">
+        <span class="fn">Entry Three Contributor One</span>
+        <span class="url">http://example.com/contributorOne</span>
+        <span class="email">contributorOne@example.com</span>
+    </span>
+    <span class="contributor vcard">
+        <span class="fn">Entry Three Contributor Two</span>
+        <span class="url">http://example.com/contributorTwo</span>
+        <span class="email">contributorTwo@example.com</span>
+    </span>
+  </div>
+
+  <div class="hentry" id="e4">
+    <h3>Entry Four Title</h3>
+    <p class="updated">2005-12-25T00:00:00Z</p>
+    <span class="author vcard">
+        <a class="fn url" href="http://example.com/authorOne">Entry Four Author One</a>
+        <abbr class="email" title="authorOne@example.com">...</abbr>
+    </span>
+    <span class="author vcard">
+        <a class="fn url" href="http://example.com/authorTwo">Entry Four Author Two</a>
+        <a href="mailto:authorTwo@example.com" class="email">...</a>
+    </span>
+    <span class="author vcard">
+        <a class="fn url" href="http://example.com/authorThree">Entry Four Author Three</a>
+        <a href="mailto:authorThree@example.com?Subject=test" class="email">...</a>
+    </span>
+    <span class="vcard">
+        <span class="fn">John Black</span>
+        ignored: has no class="author"
+    </span>
+  </div>
+  
+  <div class="hentry" id="e5">
+  <h3>Entry Five Title</h3>
+  <p class="updated">2005-12-25T00:00:00Z</p>
+  <span class="author"><span class="vcard">
+    <a class="fn url" href="http://example.com/authorOne">Entry Five Author One</a>
+    <span class="email">authorOne@example.com</span>
+  </span></span>
+  <span class="author"><span class="vcard">
+    <a class="fn url" href="http://example.com/authorTwo">Entry Five Author Two</a>
+    <span class="email">authorTwo@example.com</span>
+  </span></span>
+  </div>
+  
+            <div class="hentry" id="e6">
+                <h3>Entry Six Title</h3>
+                <p class="updated">2005-12-25T00:00:00Z</p>
+            </div>
+</div>
+<address class="vcard author"><span class="fn">Jane Doe</span>, <b class="email">jane@example.com</b></address>
+</body>
+</html>
+

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom" xml:base="http://example.org/foo/">
+  <updated>2006-02-07T01:02:05+00:00</updated>
+  <id>http://example.com/id-link.html</id>
+  <link rel="alternate" href="http://example.com/id-link.html" type="text/html"/>
+  <title>Page title</title>
+  <entry>
+    <title>Title ...</title>
+    <id>http://example.org/foo/entry1</id>
+    <link rel="alternate" href="http://example.org/foo/entry1" hreflang="de" type="text/html"/>
+    <updated>2006-02-07T01:02:03+00:00</updated>
+  </entry>
+  <entry>
+    <title>Title ...</title>
+    <id>http://example.com/id-link.html#e2</id>
+    <link rel="alternate" href="http://example.com/id-link.html#e2" type="text/html"/>
+    <updated>2006-02-07T01:02:04+00:00</updated>
+  </entry>
+  <entry>
+    <title>Title ...</title>
+    <id/>
+    <updated>2006-02-07T01:02:05+00:00</updated>
+  </entry>
+</feed>
