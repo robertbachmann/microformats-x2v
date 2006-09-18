@@ -1,0 +1,52 @@
+.hcard { }
+.n { font-weight: bold; }
+.fn {}
+.nickname {}
+.photo { border: 0; }
+.bday {}
+.adr .Post-Office-Box { display: block; }
+.adr .Extended-Address { display: block; }
+.adr .Street-Address { display: block; }
+.adr .Locality { display: inline; }
+.adr .Region { display: inline; }
+.adr .Postal-Code { display: inline; }
+.adr .Country { display: block; }
+
+.label {}
+.tel {}
+.tel .home {}
+.tel .work {}
+.tel .pref { font-weight: bold; }
+.tel .voice {}
+.tel .fax {}
+.tel .msg {}
+.tel .cell {}
+.tel .pager {}
+.tel .modem {}
+.tel .car {}
+.tel .isdn {}
+.tel .video {}
+.tel .pcs {}
+
+.email {}
+.email .pref { font-weight: bold; }
+.mailer {}
+.title{}
+.role{}
+.logo{ border: 0; }
+.org{ font-weight: bold; }
+.org .Organization-Name { font-weight: bold; }
+.org .Organization-Unit { font-weight: bold; }
+
+.categories{}
+.note{}
+.rev{}
+.sort-string{ border-bottom: 1px dotted #CCC; font-style: normal;}
+.sound{}
+.url{}
+.class{}
+.key{}
+.key .pgp {}
+.key .x509 {}
+.tz{}
+.geo{}
