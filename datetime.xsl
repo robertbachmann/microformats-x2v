@@ -338,7 +338,7 @@
 			<xsl:text>T</xsl:text>
 
 			<xsl:choose>
-				<xsl:when test="$utc-event-time = 240000">
+				<xsl:when test="$utc-event-time = 240000 or $utc-event-time = 0">
 					<xsl:text>000000</xsl:text>
 				</xsl:when>
 				<xsl:otherwise>
