@@ -22,8 +22,8 @@ brian@suda.co.uk
 http://suda.co.uk/
 
 XHTML-2-iCal
-Version 0.8.1
-2006-07-10
+Version 0.8.2
+2006-10-07
 
 Copyright 2005 Brian Suda
 This work is relicensed under The W3C Open Source License
@@ -35,7 +35,7 @@ Until the hCal spec has been finalised this is a work in progress.
 I'm not an XSLT expert, so there are no guarantees to quality of this code!
 
 -->
-<xsl:param name="Prodid">-//suda.co.uk//X2V 0.8 (BETA)//EN</xsl:param>
+<xsl:param name="Prodid">-//suda.co.uk//X2V 0.8.2 (BETA)//EN</xsl:param>
 <xsl:param name="Source">(Best Practice: should be URL that this was ripped from)</xsl:param>
 <xsl:param name="Anchor" />
 
@@ -147,12 +147,15 @@ I'm not an XSLT expert, so there are no guarantees to quality of this code!
 		<xsl:with-param name="class">dtstamp</xsl:with-param>
 	</xsl:call-template>
 	
-	<xsl:call-template name="textProp">
+	<xsl:call-template name="identifierProp">
 		<xsl:with-param name="label">UID</xsl:with-param>
-		<xsl:with-param name="class">uid</xsl:with-param>
+  		<xsl:with-param name="class">uid</xsl:with-param>
 	</xsl:call-template>
 
-	<xsl:apply-templates select=".//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' url ')]" mode="url"/>
+	<xsl:call-template name="identifierProp">
+		<xsl:with-param name="label">URL</xsl:with-param>
+  		<xsl:with-param name="class">url</xsl:with-param>
+	</xsl:call-template>
 
 	<xsl:call-template name="personProp">
 		<xsl:with-param name="label">ATTENDEE</xsl:with-param>
@@ -180,9 +183,14 @@ I'm not an XSLT expert, so there are no guarantees to quality of this code!
 		<xsl:with-param name="class">class</xsl:with-param>
 	</xsl:call-template>
 
-	<xsl:call-template name="textProp">
+	<xsl:call-template name="identifierProp">
 		<xsl:with-param name="label">UID</xsl:with-param>
-		<xsl:with-param name="class">uid</xsl:with-param>
+  		<xsl:with-param name="class">uid</xsl:with-param>
+	</xsl:call-template>
+
+	<xsl:call-template name="identifierProp">
+		<xsl:with-param name="label">URL</xsl:with-param>
+  		<xsl:with-param name="class">url</xsl:with-param>
 	</xsl:call-template>
 
 	<xsl:call-template name="textPropLang">
@@ -290,7 +298,6 @@ I'm not an XSLT expert, so there are no guarantees to quality of this code!
 	<!-- These are all unique: custom templates -->
 	<xsl:apply-templates select=".//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' related-to ')]" mode="related-to"/>
 	<xsl:apply-templates select=".//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' attach ')]" mode="attach"/>
-	<xsl:apply-templates select=".//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' url ')]" mode="url"/>
 	<xsl:apply-templates select=".//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' rdate ')]" mode="rdate"/>
 	<xsl:apply-templates select=".//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' exdate ')]" mode="exdate"/>
 
@@ -791,67 +798,96 @@ RELATED-TO</xsl:text>
 </xsl:choose>
 </xsl:template>
 
-<!-- URL property -->
-<xsl:template match="*[contains(@class,'url')]" mode="url">
-<xsl:text>
-URL</xsl:text>
-<xsl:choose>
-	<xsl:when test="@href != ''">
-			<xsl:choose>
-			<xsl:when test="substring-before(@href,':') = true()">
-				<xsl:text>:</xsl:text>
-				<xsl:value-of select="@href" />
-			</xsl:when>
+
+<!-- INDENTIFIER PROPERTY without LANGUAGE -->
+<xsl:template name="identifierProp">
+	<xsl:param name="label" />
+	<xsl:param name="class" />
+		
+	<xsl:for-each select=".//*[ancestor-or-self::*[local-name() = 'del'] = false() and contains(concat(' ', @class, ' '),concat(' ', $class, ' '))]">
+	<xsl:if test="(position() = 1 and $class = 'uid') or not($class =  'uid')">
+        <xsl:text>&#x0A;</xsl:text>
+		<xsl:value-of select="$label" />
+        <xsl:text>:</xsl:text>
+
+		<xsl:choose>
 			<xsl:when test="@href != ''">
-				<xsl:text>:</xsl:text>
-				<!-- convert to absolute url -->
-				<xsl:call-template name="uri:expand">
-					<xsl:with-param name="base"><xsl:value-of select="$Source" /></xsl:with-param>
-					<xsl:with-param name="there"><xsl:value-of select="@href"/></xsl:with-param>
-				</xsl:call-template>
+				<xsl:choose>
+					<xsl:when test="substring-before(@href,':') = 'http'">
+						<xsl:value-of select="normalize-space(@href)" />
+					</xsl:when>
+					<xsl:otherwise>
+						<!-- convert to absolute url -->
+						<xsl:call-template name="uri:expand">
+							<xsl:with-param name="base">
+
+								<xsl:call-template name="baseURL">
+									<xsl:with-param name="Source"><xsl:value-of select="$Source" /></xsl:with-param>
+								</xsl:call-template>
+
+							</xsl:with-param>
+							<xsl:with-param name="there"><xsl:value-of select="@href"/></xsl:with-param>
+						</xsl:call-template>
+					</xsl:otherwise>
+				</xsl:choose>
 			</xsl:when>
+			<xsl:when test="@src != ''">
+				<xsl:choose>
+					<xsl:when test="substring-before(@src,':') = 'http'">
+						<xsl:value-of select="normalize-space(@src)" />
+					</xsl:when>
+					<xsl:otherwise>
+						<!-- convert to absolute url -->
+						<xsl:call-template name="uri:expand">
+							<xsl:with-param name="base">
+
+								<xsl:call-template name="baseURL">
+									<xsl:with-param name="Source"><xsl:value-of select="$Source" /></xsl:with-param>
+								</xsl:call-template>
+
+							</xsl:with-param>
+							<xsl:with-param name="there"><xsl:value-of select="@src"/></xsl:with-param>
+						</xsl:call-template>
+
+					</xsl:otherwise>
+				</xsl:choose>
+			</xsl:when>
+			<xsl:when test="@data != ''">
+				<xsl:choose>
+					<xsl:when test="substring-before(@data,':') = 'http'">
+						<xsl:value-of select="normalize-space(@data)" />
+					</xsl:when>
+					<xsl:otherwise>
+						<!-- convert to absolute url -->
+						<xsl:call-template name="uri:expand">
+							<xsl:with-param name="base">
+
+								<xsl:call-template name="baseURL">
+									<xsl:with-param name="Source"><xsl:value-of select="$Source" /></xsl:with-param>
+								</xsl:call-template>
+
+							</xsl:with-param>
+							<xsl:with-param name="there"><xsl:value-of select="@data"/></xsl:with-param>
+						</xsl:call-template>
+
+					</xsl:otherwise>
+				</xsl:choose>
+			</xsl:when>
+			<xsl:when test='local-name(.) = "abbr" and @title'>
+				<xsl:variable name="textFormatted">
+				<xsl:apply-templates select="@title" mode="unFormatText" />
+				</xsl:variable>
+				<xsl:value-of select="normalize-space($textFormatted)"/>
+			</xsl:when>			
 			<xsl:otherwise>
-				<xsl:text>:</xsl:text>
-				<xsl:value-of select="normalize-space(.)"/>
+				<xsl:variable name="textFormatted">
+				<xsl:apply-templates select="." mode="unFormatText" />
+				</xsl:variable>
+				<xsl:value-of select="normalize-space($textFormatted)"/>
 			</xsl:otherwise>
 		</xsl:choose>
-	</xsl:when>
-	<xsl:when test="@longdesc != ''">
-			<xsl:choose>
-			<xsl:when test="substring-before(@longdesc,':') = true()">
-				<xsl:text>:</xsl:text>
-				<xsl:value-of select="@href" />
-			</xsl:when>
-			<xsl:when test="@longdesc != ''">
-				<xsl:text>:</xsl:text>
-				<!-- convert to absolute url -->
-				<xsl:call-template name="uri:expand">
-					<xsl:with-param name="base" ><xsl:value-of select="$Source" /></xsl:with-param>
-					<xsl:with-param name="there" ><xsl:value-of select="@longdesc" /></xsl:with-param>
-				</xsl:call-template>
-			</xsl:when>
-			<xsl:otherwise>
-				<xsl:text>:</xsl:text>
-				<xsl:value-of select="normalize-space(.)"/>
-			</xsl:otherwise>
-		</xsl:choose>
-	</xsl:when>
-	<xsl:when test="@alt != ''">
-		<xsl:call-template name="escapeText">
-			<xsl:with-param name="text-string"><xsl:value-of select="normalize-space(@alt)" /></xsl:with-param>
-		</xsl:call-template>
-	</xsl:when>
-	<xsl:when test="@title != ''">
-		<xsl:call-template name="escapeText">
-			<xsl:with-param name="text-string"><xsl:value-of select="normalize-space(@title)" /></xsl:with-param>
-		</xsl:call-template>
-	</xsl:when>
-	<xsl:otherwise>
-		<xsl:call-template name="escapeText">
-			<xsl:with-param name="text-string"><xsl:value-of select="normalize-space(.)" /></xsl:with-param>
-		</xsl:call-template>
-	</xsl:otherwise>
-</xsl:choose>
+	</xsl:if>
+	</xsl:for-each>
 </xsl:template>
 
 <!-- ATTACH property -->
@@ -1208,6 +1244,23 @@ UID:</xsl:text>
 		</xsl:otherwise>		
 	</xsl:choose>
 
+</xsl:template>
+
+<!-- Get the base URL for the page if there is one -->
+<xsl:template name="baseURL">
+	<xsl:param name="Source" />
+	<xsl:choose>
+		<xsl:when test="//*[@xml:base] = true()">
+			<xsl:value-of select="//*[@xml:base]/@xml:base" />
+		</xsl:when>
+	
+		<xsl:when test="//*[local-name() = 'base'] = true()">
+			<xsl:value-of select="//*[local-name() = 'base']/@href" />
+		</xsl:when>
+		<xsl:otherwise>
+			<xsl:value-of select="$Source" />
+		</xsl:otherwise>
+	</xsl:choose>
 </xsl:template>
 
 <!-- don't pass text thru -->
