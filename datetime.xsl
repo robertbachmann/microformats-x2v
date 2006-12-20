@@ -1,18 +1,26 @@
 <xsl:transform
     xmlns:xsl      ="http://www.w3.org/1999/XSL/Transform" version="1.0"
-    xmlns:datetime ="http://suda.co.uk/projects/X2V/datetime.xsl?template="
+    xmlns:datetime ="http://suda.co.uk/projects/microformats/datetime.xsl?template="
     xmlns:html     ="http://www.w3.org/1999/xhtml"
     exclude-result-prefixes="datetime html"
 	>
 	
+	<!--
+		Copyright 2006 Brian Suda
+		This work is licensed under The W3C Open Source License
+		http://www.w3.org/Consortium/Legal/copyright-software-19980720	
+		
+		VERSION: 0.1
+	-->
+	
 	<!-- convert all times to UTC Times -->
 	<!-- RFC2426 mandates that iCal dates are in UTC without dashes or colons as separators -->
 	<xsl:template name="datetime:utc-time-converter">
-	<xsl:param name="time-string"></xsl:param>
+	<xsl:param name="time-string"/>
 	<xsl:choose>
 		<xsl:when test="substring-before($time-string,'Z') = true()">
+			<xsl:value-of select="translate(translate(substring-before($time-string,'Z'), ':' ,''), '-' ,'')"/>			
 			<!-- need to pad with 0000s if needed -->
-			<xsl:value-of select="translate(translate(substring-before($time-string,'Z'), ':' ,''), '-' ,'')"/>
 			<xsl:if test="string-length(translate(translate(substring-before($time-string,'Z'), ':' ,''), '-' ,''))  &lt; 10">
 				<xsl:text>0</xsl:text>
 			</xsl:if>
@@ -30,7 +38,7 @@
 			</xsl:if>
 			<xsl:if test="string-length(translate(translate(substring-before($time-string,'Z'), ':' ,''), '-' ,''))  &lt; 15">
 				<xsl:text>0</xsl:text>
-			</xsl:if>
+			</xsl:if>			
 			<xsl:text>Z</xsl:text>
 		</xsl:when>
 		<xsl:when test="substring-before($time-string,'T') = false()">
@@ -184,6 +192,11 @@
 					<xsl:value-of select="normalize-space($event-month)"/>
 					<xsl:value-of select="normalize-space($event-day)"/>
 					<xsl:text>T</xsl:text>
+					<!-- hmm, does format-number pad the front or back of the string? -->
+					<!--
+					<xsl:value-of select="format-number(normalize-space(substring-after(translate($time-string, ':' ,''),'T')),'000000')"/>
+					-->
+					
 					<xsl:if test="string-length(normalize-space(substring-after(translate($time-string, ':' ,''),'T'))) &lt; 6">
 						<xsl:text>0</xsl:text>
 					</xsl:if>
@@ -372,31 +385,31 @@
 
 	<!-- recursive function to get all the RDATE times and check them for UTC -->
 	<xsl:template name="datetime:rdate-comma-utc">
-	<xsl:param name="text-string"></xsl:param>
-	<xsl:choose>
-		<xsl:when test="substring-before($text-string,',') = true()">
-			<xsl:call-template name="datetime:utc-time-converter">
-				<xsl:with-param name="time-string"><xsl:value-of select="normalize-space(substring-before(substring-before($text-string,','),'/'))" /></xsl:with-param>
-			</xsl:call-template>
-			<xsl:text>/</xsl:text>
-			<xsl:call-template name="datetime:utc-time-converter">
-				<xsl:with-param name="time-string"><xsl:value-of select="normalize-space(substring-after(substring-before($text-string,','),'/'))" /></xsl:with-param>
-			</xsl:call-template>
-			<xsl:text>,</xsl:text>
-			<xsl:call-template name="datetime:rdate-comma-utc">
-				<xsl:with-param name="text-string"><xsl:value-of select="substring-after($text-string,',')"/></xsl:with-param>
-			</xsl:call-template>
-		</xsl:when>
-		<xsl:otherwise>
-			<xsl:call-template name="datetime:utc-time-converter">
-				<xsl:with-param name="time-string"><xsl:value-of select="normalize-space(substring-before($text-string,'/'))" /></xsl:with-param>
-			</xsl:call-template>
-			<xsl:text>/</xsl:text>
-			<xsl:call-template name="datetime:utc-time-converter">
-				<xsl:with-param name="time-string"><xsl:value-of select="normalize-space(substring-after($text-string,'/'))" /></xsl:with-param>
-			</xsl:call-template>
-		</xsl:otherwise>
-	</xsl:choose>
+		<xsl:param name="text-string"/>
+		<xsl:choose>
+			<xsl:when test="substring-before($text-string,',') = true()">
+				<xsl:call-template name="datetime:utc-time-converter">
+					<xsl:with-param name="time-string"><xsl:value-of select="normalize-space(substring-before(substring-before($text-string,','),'/'))" /></xsl:with-param>
+				</xsl:call-template>
+				<xsl:text>/</xsl:text>
+				<xsl:call-template name="datetime:utc-time-converter">
+					<xsl:with-param name="time-string"><xsl:value-of select="normalize-space(substring-after(substring-before($text-string,','),'/'))" /></xsl:with-param>
+				</xsl:call-template>
+				<xsl:text>,</xsl:text>
+				<xsl:call-template name="datetime:rdate-comma-utc">
+					<xsl:with-param name="text-string"><xsl:value-of select="substring-after($text-string,',')"/></xsl:with-param>
+				</xsl:call-template>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:call-template name="datetime:utc-time-converter">
+					<xsl:with-param name="time-string"><xsl:value-of select="normalize-space(substring-before($text-string,'/'))" /></xsl:with-param>
+				</xsl:call-template>
+				<xsl:text>/</xsl:text>
+				<xsl:call-template name="datetime:utc-time-converter">
+					<xsl:with-param name="time-string"><xsl:value-of select="normalize-space(substring-after($text-string,'/'))" /></xsl:with-param>
+				</xsl:call-template>
+			</xsl:otherwise>
+		</xsl:choose>
 	</xsl:template>	
 	
 </xsl:transform>
