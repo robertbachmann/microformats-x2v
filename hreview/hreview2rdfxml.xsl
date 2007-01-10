@@ -2,7 +2,7 @@
 <xsl:stylesheet 
 	xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
 	xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#"
-	xmlns:review="http:/www.purl.org/stuff/rev#" 
+	xmlns:review="http://www.purl.org/stuff/rev#" 
 	xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" 
 	xmlns:mf="http://suda.co.uk/projects/microformats/mf-templates.xsl?template="
 	xmlns:xhtml="http://www.w3.org/1999/xhtml" 
@@ -10,7 +10,7 @@
 	xmlns:dcterms="http://purl.org/dc/dcmitype/" 
 	xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" 
 	xmlns:foaf="http://xmlns.com/foaf/0.1/" 
-	xmlns:vcard="http://www.w3.org/2001/vcard-rdf/3.0#"
+	xmlns:vcard="http://www.w3.org/2006/vcard/ns#"
 	version="1.0"
 >
 
@@ -33,30 +33,105 @@
 
 <xsl:template match="/xhtml:html/xhtml:body">
 	<rdf:RDF>
-	<xsl:element name="Description" namespace="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
-		<xsl:attribute name="about" namespace="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
-			<xsl:call-template name="mf:baseURL">
-				<xsl:with-param name="Source"><xsl:value-of select="$Source"/></xsl:with-param>
-			</xsl:call-template>
-		</xsl:attribute>
+		<!-- loop through for hReview data -->
 		<xsl:for-each select="//*[contains(concat(' ',normalize-space(@class),' '),' hreview ')]">
 			<xsl:if test="
 			(descendant::*[contains(concat(' ',normalize-space(@class),' '),' summary ')] or descendant::*[contains(concat(' ',normalize-space(@class),' '),' item ')]/descendant::*[contains(concat(' ',normalize-space(@class),' '),' fn ')])
 			and (not($Anchor) or @id = $Anchor)
 			">
-	  			<review:Review>
-					<xsl:call-template name="mf:doIncludes"/>
-					<xsl:call-template name="properties"/>
-				</review:Review>
+				<xsl:element name="Description" namespace="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+					<xsl:attribute name="about" namespace="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
+						<xsl:choose>
+							<!-- use URL -->
+							<!--
+							<xsl:when test="(descendant::*[contains(concat(' ',normalize-space(@class),' '),' summary ')] or descendant::*[contains(concat(' ',normalize-space(@class),' '),' item ')]/descendant::*[contains(concat(' ',normalize-space(@class),' '),' url ')])">
+								<xsl:value-of select="descendant::*[contains(concat(' ',normalize-space(@class),' '),' item ')]/descendant::*[contains(concat(' ',normalize-space(@class),' '),' url ')]/@href"/>
+							</xsl:when>
+							-->
+							<!-- use local ID -->
+							<xsl:when test="@id">
+								<xsl:value-of select="@id"/>
+							</xsl:when>
+							<!-- use base-param -->
+							<!--
+							<xsl:call-template name="mf:baseURL">
+								<xsl:with-param name="Source"><xsl:value-of select="$Source"/></xsl:with-param>
+							</xsl:call-template>
+							-->
+						</xsl:choose>
+					</xsl:attribute>
+					
+					<xsl:call-template name="properties"/>						
+					
+					<review:hasReview>
+						<review:Review>
+							<xsl:call-template name="hReviewProperties"/>						
+						</review:Review>
+					</review:hasReview>
+				</xsl:element>
 			</xsl:if>
-  		</xsl:for-each>
-	</xsl:element>
+  		</xsl:for-each>		
 	</rdf:RDF>
 </xsl:template>		
-		
-		
-		
-<xsl:template name="properties">		
+
+<xsl:template name="properties">
+	<!-- Item being Reviewed (required) :: 1 instance -->
+	  <xsl:for-each select="descendant::*[contains(concat(' ',normalize-space(@class),' '),' item ')][1]">
+
+		<xsl:choose>
+			<xsl:when test="self::*[contains(concat(' ',normalize-space(@class),' '),' vevent ')]">
+				<!-- get vevent data -->
+
+
+			</xsl:when>
+			<!-- beware of vCards nested in vevents -->
+			<xsl:when test="self::*[contains(concat(' ',normalize-space(@class),' '),' vcard ')]">
+				<!-- get vCard data -->
+				<!-- (optional) :: single instance -->
+				<xsl:for-each select="descendant::*[contains(concat(' ',normalize-space(@class),' '),' fn ')][1]">					
+					<vcard:FN><xsl:call-template name="mf:extractText"/></vcard:FN>
+				</xsl:for-each>
+
+				<!-- (optional) :: multiple instances -->
+				<xsl:for-each select="descendant::*[contains(concat(' ',normalize-space(@class),' '),' url ')]">					
+					<xsl:variable name="url">
+						<xsl:call-template name="mf:extractUrl"/>
+					</xsl:variable>
+					<vcard:URL rdf:resource="{$url}"/>
+				</xsl:for-each>
+
+				<!-- (optional) :: multiple instances -->
+				<xsl:for-each select="descendant::*[contains(concat(' ',normalize-space(@class),' '),' photo ')]">					
+					<vcard:PHOTO><xsl:call-template name="mf:extractUrl"/></vcard:PHOTO>
+				</xsl:for-each>						
+
+				<!-- (optional) :: multiple instances -->
+				<xsl:for-each select="descendant::*[contains(concat(' ',normalize-space(@class),' '),' adr ')]">
+					<xsl:call-template name="mf:extractAdr"/>
+				</xsl:for-each>
+
+				<!-- (optional) :: single instance -->
+				<xsl:for-each select=".//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ', @class, ' '),concat(' ', 'geo', ' '))][1]">
+					<xsl:call-template name="mf:extractGeo"/>
+				</xsl:for-each>
+
+			</xsl:when>
+			<xsl:otherwise>						
+				<!-- (optional) :: multiple instances -->
+				<xsl:for-each select="descendant::*[contains(concat(' ',normalize-space(@class),' '),' url ')]">					
+					<dc:identifier><xsl:call-template name="mf:extractUrl"/></dc:identifier>
+				</xsl:for-each>
+
+				<!-- (optional) :: multiple instances -->
+				<xsl:for-each select="descendant::*[contains(concat(' ',normalize-space(@class),' '),' photo ')]">					
+					<dcterms:Image><xsl:call-template name="mf:extractUrl"/></dcterms:Image>
+				</xsl:for-each>
+			</xsl:otherwise>
+		</xsl:choose>				
+	  </xsl:for-each>
+</xsl:template>
+
+<xsl:template name="hReviewProperties">		
 	<!-- Review Summary (optional) :: 1 instance -->
 	<xsl:choose>
 		<xsl:when test="descendant::*[contains(concat(' ',normalize-space(@class),' '),' summary ')][1]">
@@ -114,74 +189,21 @@
 	  </xsl:choose>
 	</xsl:for-each>
 
-
-
-
-  <!-- Item being Reviewed (required) :: 1 instance -->
-  <xsl:for-each select="descendant::*[contains(concat(' ',normalize-space(@class),' '),' item ')][1]">
-
-	<xsl:choose>
-		<xsl:when test="self::*[contains(concat(' ',normalize-space(@class),' '),' vevent ')]">
-			<!-- get vevent data -->
-			
-			
-		</xsl:when>
-		<!-- beware of vCards nested in vevents -->
-		<xsl:when test="self::*[contains(concat(' ',normalize-space(@class),' '),' vcard ')]">
-			<!-- get vCard data -->
-			<!-- (optional) :: single instance -->
-			<xsl:for-each select="descendant::*[contains(concat(' ',normalize-space(@class),' '),' fn ')][1]">					
-				<vcard:FN><xsl:call-template name="mf:extractText"/></vcard:FN>
-			</xsl:for-each>
-			
-			<!-- (optional) :: multiple instances -->
-			<xsl:for-each select="descendant::*[contains(concat(' ',normalize-space(@class),' '),' url ')]">					
-				<xsl:variable name="url">
-					<xsl:call-template name="mf:extractUrl"/>
-				</xsl:variable>
-				<vcard:URL rdf:resource="{$url}"/>
-			</xsl:for-each>
-			
-			<!-- (optional) :: multiple instances -->
-			<xsl:for-each select="descendant::*[contains(concat(' ',normalize-space(@class),' '),' photo ')]">					
-				<vcard:PHOTO><xsl:call-template name="mf:extractUrl"/></vcard:PHOTO>
-			</xsl:for-each>						
-
-			<!-- (optional) :: multiple instances -->
-			<xsl:for-each select="descendant::*[contains(concat(' ',normalize-space(@class),' '),' adr ')]">
-				<xsl:call-template name="mf:extractAdr"/>
-			</xsl:for-each>
-
-			<!-- (optional) :: single instance -->
-			<xsl:for-each select=".//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ', @class, ' '),concat(' ', 'geo', ' '))][1]">
-				<xsl:call-template name="mf:extractGeo"/>
-			</xsl:for-each>
-			
-		</xsl:when>
-		<xsl:otherwise>						
-			<!-- (optional) :: multiple instances -->
-			<xsl:for-each select="descendant::*[contains(concat(' ',normalize-space(@class),' '),' url ')]">					
-				<dc:identifier><xsl:call-template name="mf:extractUrl"/></dc:identifier>
-			</xsl:for-each>
-
-			<!-- (optional) :: multiple instances -->
-			<xsl:for-each select="descendant::*[contains(concat(' ',normalize-space(@class),' '),' photo ')]">					
-				<dcterms:Image><xsl:call-template name="mf:extractUrl"/></dcterms:Image>
-			</xsl:for-each>
-		</xsl:otherwise>
-	</xsl:choose>				
-  </xsl:for-each>
-			
   <!-- Review Date (optional) ISO Timestamp :: 1 instance -->
   <xsl:for-each select="descendant::*[contains(concat(' ',normalize-space(@class),' '),' dtreviewed ')][1]">
-	<dc:date><xsl:call-template name="mf:extractDate"/></dc:date>
+	<review:createdOn><xsl:call-template name="mf:extractDate"/></review:createdOn>
   </xsl:for-each>
 
   <!-- Rating and Rating scale (optional) :: 1 instance -->
   <xsl:for-each select="descendant::*[contains(concat(' ',normalize-space(@class),' '),' rating ')][1]">
 	<review:rating><xsl:call-template name="mf:extractText"/></review:rating>
+
+	<!-- check that these are nested in rating! -->
 	<xsl:for-each select="descendant::*[contains(concat(' ',normalize-space(@class),' '),' best ')][1]">
 		<review:maxRating><xsl:call-template name="mf:extractText"/></review:maxRating>
+	</xsl:for-each>
+	<xsl:for-each select="descendant::*[contains(concat(' ',normalize-space(@class),' '),' worst ')][1]">
+		<review:minRating><xsl:call-template name="mf:extractText"/></review:minRating>
 	</xsl:for-each>
   </xsl:for-each>
 
@@ -206,13 +228,13 @@
 	<dc:license rdf:resource="{@href}" />
   </xsl:for-each>
 
-
   <!-- Reviewer (optional) :: 1 instance -->
   <xsl:for-each select="descendant::*[
 	 (contains(concat(' ',normalize-space(@class),' '),' reviewer ') and
 	  contains(concat(' ',normalize-space(@class),' '),' vcard '))
 	][1]">
 	<review:reviewer>
+		<!-- Range = http://xmlns.com/foaf/0.1/Agent -->
 	  <!-- import a hCard2FoaF xslt and call that here -->
 	  <foaf:Person>
 		<xsl:for-each select="descendant::*[contains(concat(' ',normalize-space(@class),' '),' fn ')][1]">
