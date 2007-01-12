@@ -11,6 +11,7 @@
 	xmlns:rdfs="http://www.w3.org/2000/01/rdf-schema#" 
 	xmlns:foaf="http://xmlns.com/foaf/0.1/" 
 	xmlns:vcard="http://www.w3.org/2006/vcard/ns#"
+	xmlns:tag="http://www.holygoat.co.uk/owl/redwood/0.1/tags/"
 	version="1.0"
 >
 
@@ -42,16 +43,20 @@
 				<xsl:element name="Description" namespace="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
 					<xsl:attribute name="about" namespace="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
 						<xsl:choose>
+							<!-- use permalink -->
+							<xsl:when test="descendant::*[contains(concat(' ',normalize-space(@rel),' '),' permalink ')]">
+								<xsl:value-of select="descendant::*[contains(concat(' ',normalize-space(@rel),' '),' permalink ')]/@href"/>
+							</xsl:when>
+							<!-- use local ID -->
+							<xsl:when test="@id">
+								<xsl:value-of select="@id"/>
+							</xsl:when>
 							<!-- use URL -->
 							<!--
 							<xsl:when test="(descendant::*[contains(concat(' ',normalize-space(@class),' '),' summary ')] or descendant::*[contains(concat(' ',normalize-space(@class),' '),' item ')]/descendant::*[contains(concat(' ',normalize-space(@class),' '),' url ')])">
 								<xsl:value-of select="descendant::*[contains(concat(' ',normalize-space(@class),' '),' item ')]/descendant::*[contains(concat(' ',normalize-space(@class),' '),' url ')]/@href"/>
 							</xsl:when>
 							-->
-							<!-- use local ID -->
-							<xsl:when test="@id">
-								<xsl:value-of select="@id"/>
-							</xsl:when>
 							<!-- use base-param -->
 							<!--
 							<xsl:call-template name="mf:baseURL">
@@ -61,13 +66,13 @@
 						</xsl:choose>
 					</xsl:attribute>
 					
+					<!-- look for the THING to review -->
 					<xsl:call-template name="properties"/>						
 					
-					<review:hasReview>
-						<review:Review>
-							<xsl:call-template name="hReviewProperties"/>						
-						</review:Review>
-					</review:hasReview>
+					<!-- extract Review Data -->
+					<xsl:call-template name="hReviewProperties"/>						
+
+
 				</xsl:element>
 			</xsl:if>
   		</xsl:for-each>		
@@ -116,12 +121,20 @@
 				</xsl:for-each>
 
 			</xsl:when>
-			<xsl:otherwise>						
+			<xsl:otherwise>
+				<!-- (Required) :: single instances -->
+				<xsl:for-each select="descendant::*[contains(concat(' ',normalize-space(@class),' '),' fn ')]">					
+					<rdfs:label><xsl:call-template name="mf:extractText"/></rdfs:label>
+				</xsl:for-each>
+
 				<!-- (optional) :: multiple instances -->
+				<!-- need General Link, seeAlso or seeMore, not RDF at the end just URI -->
+				<!--
 				<xsl:for-each select="descendant::*[contains(concat(' ',normalize-space(@class),' '),' url ')]">					
 					<dc:identifier><xsl:call-template name="mf:extractUrl"/></dc:identifier>
 				</xsl:for-each>
-
+				-->
+			
 				<!-- (optional) :: multiple instances -->
 				<xsl:for-each select="descendant::*[contains(concat(' ',normalize-space(@class),' '),' photo ')]">					
 					<dcterms:Image><xsl:call-template name="mf:extractUrl"/></dcterms:Image>
@@ -131,17 +144,32 @@
 	  </xsl:for-each>
 </xsl:template>
 
-<xsl:template name="hReviewProperties">		
+<xsl:template name="hReviewProperties">
+	<review:hasReview>
+		<xsl:variable name="reviewAbout">
+			<xsl:choose>
+				<xsl:when test="descendant::*[contains(concat(' ',normalize-space(@class),' '),' item ')][1]/descendant::*[contains(concat(' ',normalize-space(@class),' '),' url ')][1]">
+					<xsl:call-template name="mf:baseURL">
+						<xsl:with-param name="Source"><xsl:value-of select="descendant::*[contains(concat(' ',normalize-space(@class),' '),' item ')][1]/descendant::*[contains(concat(' ',normalize-space(@class),' '),' url ')][1]/@href"/></xsl:with-param>
+					</xsl:call-template>
+				</xsl:when>
+			</xsl:choose>
+		</xsl:variable>
+		
+		<review:Review rdf:about="{$reviewAbout}">
+		<!-- add rdf:about here with the URL of the item -->
+	
+	
 	<!-- Review Summary (optional) :: 1 instance -->
 	<xsl:choose>
 		<xsl:when test="descendant::*[contains(concat(' ',normalize-space(@class),' '),' summary ')][1]">
 			<xsl:for-each select="descendant::*[contains(concat(' ',normalize-space(@class),' '),' summary ')][1]">
-				<dc:title><xsl:call-template name="mf:extractText" /></dc:title>
+				<rdfs:label><xsl:call-template name="mf:extractText" /></rdfs:label>
 			</xsl:for-each>
 		</xsl:when>
 		<xsl:when test="false() = descendant::*[contains(concat(' ',normalize-space(@class),' '),' summary ')]">
-			<xsl:for-each select="descendant::*[contains(concat(' ',normalize-space(@class),' '),' fn ')][1]">
-				<dc:title><xsl:call-template name="mf:extractText" /></dc:title>
+			<xsl:for-each select="descendant::*[contains(concat(' ',normalize-space(@class),' '),' item ')][1]/descendant::*[contains(concat(' ',normalize-space(@class),' '),' fn ')][1]">
+				<rdfs:label><xsl:call-template name="mf:extractText" /></rdfs:label>
 			</xsl:for-each>
 		</xsl:when>
 	</xsl:choose>
@@ -196,32 +224,33 @@
 
   <!-- Rating and Rating scale (optional) :: 1 instance -->
   <xsl:for-each select="descendant::*[contains(concat(' ',normalize-space(@class),' '),' rating ')][1]">
-	<review:rating><xsl:call-template name="mf:extractText"/></review:rating>
-
-	<!-- check that these are nested in rating! -->
-	<xsl:for-each select="descendant::*[contains(concat(' ',normalize-space(@class),' '),' best ')][1]">
-		<review:maxRating><xsl:call-template name="mf:extractText"/></review:maxRating>
-	</xsl:for-each>
-	<xsl:for-each select="descendant::*[contains(concat(' ',normalize-space(@class),' '),' worst ')][1]">
-		<review:minRating><xsl:call-template name="mf:extractText"/></review:minRating>
-	</xsl:for-each>
+	<review:rating rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"><xsl:call-template name="mf:extractText"/></review:rating>
   </xsl:for-each>
+
+  <!-- check that these are nested in rating! -->
+  <xsl:for-each select="descendant::*[contains(concat(' ',normalize-space(@class),' '),' best ')][1]">
+  	<review:maxRating rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"><xsl:call-template name="mf:extractText"/></review:maxRating>
+  </xsl:for-each>
+  <xsl:for-each select="descendant::*[contains(concat(' ',normalize-space(@class),' '),' worst ')][1]">
+  	<review:minRating rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"><xsl:call-template name="mf:extractText"/></review:minRating>
+  </xsl:for-each>
+
 
   <!-- Review Description (optional) :: 1 instance -->
   <xsl:for-each select="descendant::*[contains(concat(' ',normalize-space(@class),' '),' description ')][1]">
-	<dc:description><xsl:call-template name="mf:extractText"/></dc:description>
+	<review:text><xsl:call-template name="mf:extractText"/></review:text>
   </xsl:for-each>
 
-  <!-- Review Tags (optional) :: multiple instances -->
-  <!-- http://www.holygoat.co.uk/owl/redwood/0.1/tags/tags.n3 -->
-
   <!-- Review Permalink (optional) :: 1 instance -->
+  <!-- this might get moved to rdf:about="" -->
+  <!--
   <xsl:for-each select="descendant::*[
 	 (contains(concat(' ',normalize-space(@rel),' '),' bookmark ') and
 	  contains(concat(' ',normalize-space(@rel),' '),' self '))
 	][1]">
 	<dc:identifier><xsl:call-template name="mf:extractUrl"/></dc:identifier>
   </xsl:for-each>
+  -->
 
   <!-- Review License (optional) :: multiple instances -->
   <xsl:for-each select="descendant::*[contains(concat(' ',normalize-space(@rel),' '),' license ')][1]">
@@ -235,7 +264,7 @@
 	][1]">
 	<review:reviewer>
 		<!-- Range = http://xmlns.com/foaf/0.1/Agent -->
-	  <!-- import a hCard2FoaF xslt and call that here -->
+	  <!-- import a hCard2FoaF xslt and call that here? -->
 	  <foaf:Person>
 		<xsl:for-each select="descendant::*[contains(concat(' ',normalize-space(@class),' '),' fn ')][1]">
 			<foaf:name><xsl:call-template name="mf:extractText"/></foaf:name>
@@ -251,6 +280,22 @@
 	  </foaf:Person>
 	</review:reviewer>
   </xsl:for-each>
+
+  <!-- Review Tags (optional) :: multiple instances -->
+  <!-- http://www.holygoat.co.uk/owl/redwood/0.1/tags/tags.n3 -->
+	<xsl:if test="descendant::*[contains(concat(' ', normalize-space(@rel), ' '),' tag ')]">
+		<tag:taggedWithTag>
+			<xsl:for-each select=".//*[contains(concat(' ', normalize-space(@rel), ' '),' tag ')]">
+				<tag:Tag>
+					<tag:name><xsl:call-template name="mf:extractKeywords"/></tag:name>
+				</tag:Tag>
+			</xsl:for-each>
+		</tag:taggedWithTag>
+	</xsl:if>
+
+	</review:Review>
+</review:hasReview>
+
 </xsl:template>
 
 <!-- output Address information -->
