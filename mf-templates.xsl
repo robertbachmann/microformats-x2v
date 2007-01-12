@@ -194,7 +194,6 @@
 				<xsl:variable name="longitude" select="normalize-space(substring-after(@title,';'))" />
 				<xsl:variable name="latitude" select="normalize-space(substring-before(@title,';'))" />
 				<xsl:variable name="altitude" select="0" />
-				
 				<!-- call display Function -->
 				<xsl:call-template name="geoCallBack">
 					<xsl:with-param name="latitude"><xsl:value-of select="$latitude"/></xsl:with-param>

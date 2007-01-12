@@ -39,36 +39,47 @@ http://www.w3.org/Consortium/Legal/copyright-software-19980720
 			<title><xsl:value-of select="//*[name() = 'title']" /></title>
 			<link><xsl:text>http://suda.co.uk/projects/microformats/geo/get-geo.php?type=georss&amp;amp;url=</xsl:text><xsl:value-of select="$Source" /></link>
 			<description/>
-			<xsl:apply-templates select=".//*[contains(concat(' ',normalize-space(@class),' '),' vcard ') and descendant::*[contains(concat(' ',normalize-space(@class),' '),' fn ')]]"/>
+			<xsl:apply-templates select="//*[contains(concat(' ',normalize-space(@class),' '),' geo ')]"/>
 		</channel>
 	</rss>
 </xsl:template>
 
 <!-- Each vCard is listed in succession -->
-<xsl:template match="*[contains(concat(' ',normalize-space(@class),' '),' vcard ') and descendant::*[contains(concat(' ',normalize-space(@class),' '),' fn ')] and descendant::*[contains(concat(' ',normalize-space(@class),' '),' geo ')]]">
+<xsl:template match="*[contains(concat(' ',normalize-space(@class),' '),' geo ')]">
 	<xsl:if test="not($Anchor) or @id = $Anchor">
 		<item>
 			<link><xsl:value-of select="$Source" /></link>
 
 			<xsl:call-template name="mf:doIncludes"/>
 			
-		<xsl:call-template name="properties"/>
+			<xsl:call-template name="properties"/>
 		</item>
 	</xsl:if>
 </xsl:template>
 
 
-<xsl:template name="properties">
+<xsl:template name="properties">	
+	<title>
+	<xsl:choose>
+		<!-- if this is an abbr element, use the value -->
+		<xsl:when test="name() = 'abbr'">
+			<xsl:value-of select="."/>
+		</xsl:when>
+		<!-- if this is inside an hCard, use the hCard FN -->
+		<xsl:when test="ancestor::*[name() = 'del' = false() and contains(concat(' ', normalize-space(@class), ' '),' vcard ')]//*[name() = 'del' = false() and contains(concat(' ', normalize-space(@class), ' '),' fn ')]">
+			<xsl:for-each select="ancestor::*[name() = 'del' = false() and contains(concat(' ', normalize-space(@class), ' '),' vcard ')]//*[name() = 'del' = false() and contains(concat(' ', normalize-space(@class), ' '),' fn ')][1]">
+				<xsl:call-template name="mf:extractText" />
+			</xsl:for-each>
+		</xsl:when>
+		<!-- default: use the co-ordinates -->
+		<xsl:otherwise>
+			<!-- not perfect because of issues with a delimiter -->
+			<xsl:call-template name="mf:extractGeo"/>
+		</xsl:otherwise>
+	</xsl:choose>
+	</title>
 	
-	<xsl:for-each select=".//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ', normalize-space(@class), ' '),' fn ')][1]">
-		<title><xsl:call-template name="mf:extractText"/></title>
-	</xsl:for-each>
-
-	<xsl:for-each select=".//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ', normalize-space(@class), ' '),' geo ')][1]">
-		<xsl:call-template name="mf:extractGeo">
-			<xsl:with-param name="callBackTemplate">geoCallBack</xsl:with-param>
-		</xsl:call-template>
-	</xsl:for-each>	
+	<xsl:call-template name="mf:extractGeo"/>
 </xsl:template>
 
 <xsl:template name="geoCallBack">
@@ -77,7 +88,6 @@ http://www.w3.org/Consortium/Legal/copyright-software-19980720
 	<xsl:param name="altitude"/>
 	<geo:long><xsl:value-of select="$longitude"/></geo:long>
 	<geo:lat><xsl:value-of select="$latitude"/></geo:lat>
-		
 </xsl:template>
 
 <xsl:template match="comment()"></xsl:template>
