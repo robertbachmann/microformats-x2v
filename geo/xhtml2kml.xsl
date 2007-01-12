@@ -21,8 +21,8 @@ brian@suda.co.uk
 http://suda.co.uk/
 
 XHTML-2-KML
-Version 0.2
-2006-11-08
+Version 0.3
+2007-01-12
 
 Copyright 2006 Brian Suda
 This work is relicensed under The W3C Open Source License
@@ -39,13 +39,13 @@ http://www.w3.org/Consortium/Legal/copyright-software-19980720
 <name>
 <xsl:value-of select="//*[name() = 'title']" />
 </name>
-	<xsl:apply-templates select=".//*[contains(concat(' ',normalize-space(@class),' '),' vcard ') and descendant::*[contains(concat(' ',normalize-space(@class),' '),' fn ')]]"/>
+	<xsl:apply-templates select=".//*[contains(concat(' ',normalize-space(@class),' '),' geo ')]"/>
 </Folder>
 </kml>
 </xsl:template>
 
 <!-- Each vCard is listed in succession -->
-<xsl:template match="*[contains(concat(' ',normalize-space(@class),' '),' vcard ') and descendant::*[contains(concat(' ',normalize-space(@class),' '),' fn ')] and descendant::*[contains(concat(' ',normalize-space(@class),' '),' geo ')]]">
+<xsl:template match="*[contains(concat(' ',normalize-space(@class),' '),' geo ')]">
 	<xsl:if test="not($Anchor) or @id = $Anchor">
 		<Placemark>
 			<Style>
@@ -62,17 +62,34 @@ http://www.w3.org/Consortium/Legal/copyright-software-19980720
 </xsl:template>
 
 <xsl:template name="properties">
-	<xsl:for-each select=".//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ', normalize-space(@class), ' '),' fn ')][1]">
-		<name><xsl:call-template name="mf:extractText" /></name>
-	</xsl:for-each>
+	<xsl:variable name="latLon">
+		<xsl:call-template name="mf:extractGeo"/>
+	</xsl:variable>
 	
-	<xsl:for-each select=".//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ', normalize-space(@class), ' '),' geo ')][1]">
-		<Point>
-			<coordinates>
-				<xsl:call-template name="mf:extractGeo"/>
-			</coordinates>
-		</Point>
-	</xsl:for-each>
+	<name>
+	<xsl:choose>
+		<!-- if this is an abbr element, use the value -->
+		<xsl:when test="name() = 'abbr'">
+			<xsl:value-of select="."/>
+		</xsl:when>
+		<!-- if this is inside an hCard, use the hCard FN -->
+		<xsl:when test="ancestor::*[name() = 'del' = false() and contains(concat(' ', normalize-space(@class), ' '),' vcard ')]//*[name() = 'del' = false() and contains(concat(' ', normalize-space(@class), ' '),' fn ')]">
+			<xsl:for-each select="ancestor::*[name() = 'del' = false() and contains(concat(' ', normalize-space(@class), ' '),' vcard ')]//*[name() = 'del' = false() and contains(concat(' ', normalize-space(@class), ' '),' fn ')][1]">
+				<xsl:call-template name="mf:extractText" />
+			</xsl:for-each>
+		</xsl:when>
+		<!-- default: use the co-ordinates -->
+		<xsl:otherwise>
+			<xsl:value-of select="$latLon"/>
+		</xsl:otherwise>
+	</xsl:choose>
+	</name>
+
+	<Point>
+		<coordinates>
+			<xsl:value-of select="$latLon"/>
+		</coordinates>
+	</Point>
 </xsl:template>
 
 <xsl:template name="geoCallBack">
