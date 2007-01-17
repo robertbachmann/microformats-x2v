@@ -279,7 +279,9 @@ I'm not an XSLT expert, so there are no guarantees to quality of this code!
 	<xsl:for-each select=".//*[contains(concat(' ',normalize-space(@class),' '),' url ')]">
 		<xsl:if test="position() = 1">
 			<xsl:text>&#x0D;&#x0A;URL:</xsl:text>
-			<xsl:call-template name="mf:extractUrl"/>
+			<xsl:call-template name="mf:extractUrl">
+				<xsl:with-param name="Source"><xsl:value-of select="$Source"/></xsl:with-param>
+			</xsl:call-template>
 		</xsl:if>
 	</xsl:for-each>
 
