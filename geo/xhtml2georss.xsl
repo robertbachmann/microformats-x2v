@@ -71,6 +71,13 @@ http://www.w3.org/Consortium/Legal/copyright-software-19980720
 				<xsl:call-template name="mf:extractText" />
 			</xsl:for-each>
 		</xsl:when>
+		<!-- if this is inside an hCalendar, use the hCalendar Summary -->
+		<xsl:when test="ancestor::*[name() = 'del' = false() and contains(concat(' ', normalize-space(@class), ' '),' vevent ')]//*[name() = 'del' = false() and contains(concat(' ', normalize-space(@class), ' '),' summary ')]">
+			<xsl:for-each select="ancestor::*[name() = 'del' = false() and contains(concat(' ', normalize-space(@class), ' '),' vevent ')]//*[name() = 'del' = false() and contains(concat(' ', normalize-space(@class), ' '),' summary ')][1]">
+				<xsl:call-template name="mf:extractText" />
+			</xsl:for-each>
+		</xsl:when>
+		
 		<!-- default: use the co-ordinates -->
 		<xsl:otherwise>
 			<!-- not perfect because of issues with a delimiter -->

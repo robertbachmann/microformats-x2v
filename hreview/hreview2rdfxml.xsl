@@ -283,6 +283,7 @@
 
   <!-- Review Tags (optional) :: multiple instances -->
   <!-- http://www.holygoat.co.uk/owl/redwood/0.1/tags/tags.n3 -->
+  <!--
 	<xsl:if test="descendant::*[contains(concat(' ', normalize-space(@rel), ' '),' tag ')]">
 		<tag:taggedWithTag>
 			<xsl:for-each select=".//*[contains(concat(' ', normalize-space(@rel), ' '),' tag ')]">
@@ -292,7 +293,7 @@
 			</xsl:for-each>
 		</tag:taggedWithTag>
 	</xsl:if>
-
+  -->
 	</review:Review>
 </review:hasReview>
 
@@ -327,7 +328,8 @@
 	<geo:long><xsl:value-of select="$longitude"/></geo:long>
 	<geo:lat><xsl:value-of select="$latitude"/></geo:lat>
 </xsl:template>
-<!--
+
+<!-- unused templates, but without these XSLT 2.0 throws errors -->
 <xsl:template name="nCallBack">
 	<xsl:param name="family-name"/>
 	<xsl:param name="given-name"/>
@@ -348,7 +350,7 @@
 	<xsl:param name="value"/>
 	
 </xsl:template>
--->
+
 <!-- don't pass text thru -->
 <xsl:template match="text()"></xsl:template>
 
