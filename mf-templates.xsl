@@ -201,19 +201,44 @@
 					<xsl:with-param name="altitude"><xsl:value-of select="$altitude"/></xsl:with-param>
 				</xsl:call-template>
 			</xsl:when>
+			<xsl:when test="local-name(.) = 'img' and @alt">
+				<xsl:variable name="longitude" select="normalize-space(substring-after(@alt,';'))" />
+				<xsl:variable name="latitude" select="normalize-space(substring-before(@alt,';'))" />
+				<xsl:variable name="altitude" select="0" />
+				<!-- call display Function -->
+				<xsl:call-template name="geoCallBack">
+					<xsl:with-param name="latitude"><xsl:value-of select="$latitude"/></xsl:with-param>
+					<xsl:with-param name="longitude"><xsl:value-of select="$longitude"/></xsl:with-param>
+					<xsl:with-param name="altitude"><xsl:value-of select="$altitude"/></xsl:with-param>
+				</xsl:call-template>
+			</xsl:when>
 			<!-- look for child elements -->
 			<xsl:otherwise>				
 				<xsl:variable name="longitude">
-					<xsl:for-each select=".//*[contains(concat(' ', normalize-space(@class), ' '),' longitude ')]">
-						<xsl:call-template name="mf:extractText"/>
-					</xsl:for-each>
+					<xsl:choose>
+						<xsl:when test=".//*[contains(concat(' ', normalize-space(@class), ' '),' longitude ')]">
+							<xsl:for-each select=".//*[contains(concat(' ', normalize-space(@class), ' '),' longitude ')]">
+								<xsl:call-template name="mf:extractText"/>
+							</xsl:for-each>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:value-of select="normalize-space(substring-after(.,';'))"/>
+						</xsl:otherwise>
+					</xsl:choose>
 				</xsl:variable>
 
 				<xsl:variable name="latitude">
-					<xsl:for-each select=".//*[contains(concat(' ', normalize-space(@class), ' '),' latitude ')]">
-						<xsl:call-template name="mf:extractText"/>
-					</xsl:for-each>
-				</xsl:variable>
+					<xsl:choose>
+						<xsl:when test=".//*[contains(concat(' ', normalize-space(@class), ' '),' latitude ')]">
+							<xsl:for-each select=".//*[contains(concat(' ', normalize-space(@class), ' '),' latitude ')]">
+								<xsl:call-template name="mf:extractText"/>
+							</xsl:for-each>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:value-of select="normalize-space(substring-before(.,';'))"/>
+						</xsl:otherwise>
+					</xsl:choose>
+				</xsl:variable>				
 
 				<xsl:variable name="altitude" select="0" />
 				

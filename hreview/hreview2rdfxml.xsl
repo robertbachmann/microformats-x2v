@@ -43,9 +43,15 @@
 				<xsl:element name="Description" namespace="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
 					<xsl:attribute name="about" namespace="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
 						<xsl:choose>
+							<!-- this is the about of the @id? or the $Source? -->
 							<!-- use permalink -->
 							<xsl:when test="descendant::*[contains(concat(' ',normalize-space(@rel),' '),' permalink ')]">
 								<xsl:value-of select="descendant::*[contains(concat(' ',normalize-space(@rel),' '),' permalink ')]/@href"/>
+							</xsl:when>
+							<xsl:when test="$Source">
+								<xsl:call-template name="mf:baseURL">
+									<xsl:with-param name="Source"><xsl:value-of select="$Source"/></xsl:with-param>
+								</xsl:call-template>
 							</xsl:when>
 							<!-- use local ID -->
 							<xsl:when test="@id">
@@ -59,9 +65,6 @@
 							-->
 							<!-- use base-param -->
 							<!--
-							<xsl:call-template name="mf:baseURL">
-								<xsl:with-param name="Source"><xsl:value-of select="$Source"/></xsl:with-param>
-							</xsl:call-template>
 							-->
 						</xsl:choose>
 					</xsl:attribute>
@@ -100,14 +103,20 @@
 				<!-- (optional) :: multiple instances -->
 				<xsl:for-each select="descendant::*[contains(concat(' ',normalize-space(@class),' '),' url ')]">					
 					<xsl:variable name="url">
-						<xsl:call-template name="mf:extractUrl"/>
+						<xsl:call-template name="mf:extractUrl">
+							<xsl:with-param name="Source"><xsl:value-of select="$Source"/></xsl:with-param>
+						</xsl:call-template>
 					</xsl:variable>
 					<vcard:URL rdf:resource="{$url}"/>
 				</xsl:for-each>
 
 				<!-- (optional) :: multiple instances -->
 				<xsl:for-each select="descendant::*[contains(concat(' ',normalize-space(@class),' '),' photo ')]">					
-					<vcard:PHOTO><xsl:call-template name="mf:extractUrl"/></vcard:PHOTO>
+					<vcard:PHOTO>
+						<xsl:call-template name="mf:extractUrl">
+							<xsl:with-param name="Source"><xsl:value-of select="$Source"/></xsl:with-param>
+						</xsl:call-template>	
+					</vcard:PHOTO>
 				</xsl:for-each>						
 
 				<!-- (optional) :: multiple instances -->
@@ -131,13 +140,21 @@
 				<!-- need General Link, seeAlso or seeMore, not RDF at the end just URI -->
 				<!--
 				<xsl:for-each select="descendant::*[contains(concat(' ',normalize-space(@class),' '),' url ')]">					
-					<dc:identifier><xsl:call-template name="mf:extractUrl"/></dc:identifier>
+					<dc:identifier>
+						<xsl:call-template name="mf:extractUrl">
+							<xsl:with-param name="Source"><xsl:value-of select="$Source"/></xsl:with-param>
+						</xsl:call-template>
+					</dc:identifier>
 				</xsl:for-each>
 				-->
 			
 				<!-- (optional) :: multiple instances -->
 				<xsl:for-each select="descendant::*[contains(concat(' ',normalize-space(@class),' '),' photo ')]">					
-					<dcterms:Image><xsl:call-template name="mf:extractUrl"/></dcterms:Image>
+					<dcterms:Image>
+						<xsl:call-template name="mf:extractUrl">
+							<xsl:with-param name="Source"><xsl:value-of select="$Source"/></xsl:with-param>
+						</xsl:call-template>
+					</dcterms:Image>
 				</xsl:for-each>
 			</xsl:otherwise>
 		</xsl:choose>				
@@ -146,6 +163,9 @@
 
 <xsl:template name="hReviewProperties">
 	<review:hasReview>
+		
+		<!-- this is the about of the @id? or the $Source? -->
+		<!-- maybe change this to rdf:seeAlso -->
 		<xsl:variable name="reviewAbout">
 			<xsl:choose>
 				<xsl:when test="descendant::*[contains(concat(' ',normalize-space(@class),' '),' item ')][1]/descendant::*[contains(concat(' ',normalize-space(@class),' '),' url ')][1]">
@@ -156,7 +176,8 @@
 			</xsl:choose>
 		</xsl:variable>
 		
-		<review:Review rdf:about="{$reviewAbout}">
+<!--		<review:Review rdf:about="{$reviewAbout}"> -->
+		<review:Review>
 		<!-- add rdf:about here with the URL of the item -->
 	
 	
@@ -273,7 +294,9 @@
 		<xsl:for-each select="descendant::*[contains(concat(' ',normalize-space(@class),' '),' url ')]">
 			<!-- need absolute URL -->
 			<xsl:variable name="reviewerUrl">
-				<xsl:call-template name="mf:extractUrl"/>
+				<xsl:call-template name="mf:extractUrl">
+					<xsl:with-param name="Source"><xsl:value-of select="$Source"/></xsl:with-param>
+				</xsl:call-template>
 			</xsl:variable>
 			<foaf:homepage rdf:resource="{$reviewerUrl}"/>
 		</xsl:for-each>
