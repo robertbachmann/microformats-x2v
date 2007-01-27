@@ -106,7 +106,7 @@
                exclude-result-prefixes="xhtml uri h2a">
 
 <!-- Downloaded from http://www.w3.org/2000/07/uri43/uri.xsl -->
-<xsl:import href="uri.xsl" />
+<xsl:import href="../uri.xsl" />
 
 <xsl:param name="source-uri" />
 <xsl:param name="content-type">text/html</xsl:param>
