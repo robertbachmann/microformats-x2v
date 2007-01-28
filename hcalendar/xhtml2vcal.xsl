@@ -1024,4 +1024,14 @@ ATTACH</xsl:text>
 
 <!-- don't pass text thru -->
 <xsl:template match="text()"></xsl:template>
+
+<!-- Empty templates required by Saxon -->
+<!-- @@TODO: refactor mf-templates.xsl to use node-set() -->
+<xsl:template name="nCallBack" />
+<xsl:template name="orgCallBack" />
+<xsl:template name="adrCallBack" />
+<xsl:template name="uidCallBack" />
+<xsl:template name="vtodoProperties" />
+<xsl:template name="vfreebusyProperties" />
+
 </xsl:stylesheet>
