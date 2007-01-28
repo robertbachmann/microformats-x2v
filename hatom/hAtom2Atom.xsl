@@ -114,7 +114,7 @@
 <xsl:param name="debug-comments">1</xsl:param>
 <xsl:param name="sanitize-html">1</xsl:param>
 
-<xsl:output method="xml" indent="yes" encoding="UTF-8" />
+<xsl:output method="xml" indent="no" encoding="UTF-8" />
 
 <xsl:variable name="fragment">
   <xsl:if test="contains($source-uri,'#')">
