@@ -100,6 +100,15 @@ sub parse_cmdline_args {    # Parse the commandline arguments from ARGV
         exit 0;
     }
 
+    if ( $opt{'list-tests'} ) {
+        print "Test list\n\n";
+        for my $test (@{ $self->{all_tests} }) {
+            printf "%2d  %s\n", $test->{number}, $test->{test_name};
+        }
+        print "\n";
+        exit 0;
+    }
+    
     $self->{quiet} = 1 if ( $opt{q} );
 
     $self->{engines}->{'4XSLT'}   = 1 if ( $opt{'4xslt'} );
@@ -116,15 +125,29 @@ sub parse_cmdline_args {    # Parse the commandline arguments from ARGV
 
     foreach (@ARGV) {
         my $max_nr = $#{ $self->{all_tests} };
-        if (/^\d+$/) {
+        if (/^(\d+)$/) {
             $numbers_were_given = 1;
-            if ( $_ <= 0 or $_ >= $max_nr ) {
-                print STDERR "$0: Invalid test number: $_\n"
+            my $no1 = $1;
+            if ( $no1 <= 0 or $no1 >= $max_nr ) {
+                print STDERR "$0: Invalid test number: $no1\n"
                     . "Valid numbers are in the range from 1 to $max_nr \n";
                 exit 1;
             }
             push @{ $self->{selected_tests} },
-                @{ $self->{all_tests} }[ $_ - 1 ];
+                @{ $self->{all_tests} }[ $no1 - 1 ];
+        }
+        elsif (/^(\d+)-(\d+)$/) {
+            $numbers_were_given = 1;
+            my ($no1, $no2) = ($1, $2);
+
+            if ( $no1 <= 0 or $no2 <= $no1 or $no2 >= $max_nr) {
+                print STDERR "$0: Invalid test range: $no1-$no2\n"
+                    . "Valid numbers are in the range from 1 to $max_nr \n";
+                exit 1;
+            }
+            my @numbers = ($no1 - 1) .. ($no2 - 1);
+            push @{ $self->{selected_tests} },
+                @{ $self->{all_tests} }[ @numbers ];
         }
         else {
             print STDERR "$0: unrecognized option `$_'\n"
@@ -232,7 +255,7 @@ sub run {    # Run all tests
 
     chdir( $self->{test_dir} ) || die "Couldn't chdir to tests directory";
 
-    foreach my $test ( @{ $self->{all_tests} } ) {
+    foreach my $test ( @{ $self->{selected_tests} } ) {
 
         # get the expected result
         my $expected = do {
@@ -526,12 +549,14 @@ sub get_file_names_and_params {
     my %params = ( Source => "http://example.com/" );
 
     @file_names = glob('hcard/*.html');
-
+    
+    my $i = 1;
     for (@file_names) {
         my ( $output, $input, $test ) = ( $_, $_, $_ );
         $output =~ s/\.html$/.vcf/;
         $test   =~ s/\.html$//;
         my $entry = {
+            number          => $i,
             test_name       => basename($test),
             input_filename  => $input,
             result_filename => $output,
@@ -539,6 +564,7 @@ sub get_file_names_and_params {
         };
 
         push @list, $entry;
+        ++ $i;
     }
 
     return @list;
@@ -560,11 +586,13 @@ sub get_file_names_and_params {
 
     @file_names = glob('hcalendar/*.html');
 
+    my $i = 1;
     for (@file_names) {
         my ( $output, $input, $test ) = ( $_, $_, $_ );
         $output =~ s/\.html$/.ics/;
         $test   =~ s/\.html$//;
         my $entry = {
+            number          => $i,
             test_name       => basename($test),
             input_filename  => $input,
             result_filename => $output,
@@ -572,6 +600,7 @@ sub get_file_names_and_params {
         };
 
         push @list, $entry;
+        ++ $i;
     }
 
     return @list;
@@ -666,6 +695,7 @@ sub get_file_names_and_params {
         }
 
         my $entry = {
+            number          => $i,
             test_name       => $name,
             input_filename  => 'hatom/' . $input,
             result_filename => 'hatom/' . $output,
