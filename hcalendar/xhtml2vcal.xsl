@@ -49,7 +49,8 @@ I'm not an XSLT expert, so there are no guarantees to quality of this code!
 	<xsl:text>BEGIN:VCALENDAR</xsl:text>
 	<xsl:text>&#x0D;&#x0A;PRODID:</xsl:text><xsl:value-of select="$Prodid"/>
 	<xsl:text>&#x0D;&#x0A;X-ORIGINAL-URL:</xsl:text><xsl:value-of select="normalize-space($Source)"/>
-	<xsl:text>&#x0D;&#x0A;X-WR-CALNAME:</xsl:text>
+	<xsl:text>&#x0D;&#x0A;X-WR-CALNAME</xsl:text>
+	<xsl:text>;CHARSET=</xsl:text><xsl:value-of select="$Encoding"/><xsl:text>:</xsl:text>
 	<xsl:call-template name="escapeText">
 		<xsl:with-param name="text-string"><xsl:value-of select="normalize-space(//*[name() = 'title'])" /></xsl:with-param>
 	</xsl:call-template>
