@@ -16,6 +16,7 @@ use FindBin;
 use Data::Dumper;
 use Cwd;
 use utf8;
+use POSIX qw(isatty);
 
 sub new {    # Constructor
     my $class = shift;
@@ -75,20 +76,33 @@ sub new {    # Constructor
 
     $self->parse_cmdline_args();
 
+    if ( $self->{use_color} eq 'auto') {
+        if (isatty(\*STDOUT)) {
+            $self->{use_color} = 1;
+        }
+        else {
+            $self->{use_color} = 0;
+        }
+    }
+    if ($self->{use_color} && $^O eq "MSWin32") {
+        eval { require Win32::Console::ANSI };
+        $self->{use_color} = 1 unless ($@);
+    }
+
     return $self;
 }
 
 sub parse_cmdline_args {    # Parse the commandline arguments from ARGV
     my $self               = shift;
-    my $p                  = Getopt::Long::Parser->new();
+    my $p = Getopt::Long::Parser->new( config => ['bundling'] );
     my $numbers_were_given = 0;
-    my %opt;
+    my %opt; $opt{color} = 'auto';
 
     if (@ARGV) {
         $p->getoptions(
             \%opt,          '4xslt',   'libxslt|x', 'saxon',
             'xalan-c',      'xalan-j', 'q|quiet',   'all|A',
-            'list-tests|l', 'exclude|e=s@' ,'help'
+            'list-tests|l', 'exclude|e=s@', 'color:1' ,'help'
         );
     }
     else {
@@ -108,7 +122,8 @@ sub parse_cmdline_args {    # Parse the commandline arguments from ARGV
         print "\n";
         exit 0;
     }
-    
+
+    $self->{use_color} = $opt{color};
     $self->{quiet} = 1 if ( $opt{q} );
 
     $self->{engines}->{'4XSLT'}   = 1 if ( $opt{'4xslt'} );
@@ -202,6 +217,69 @@ sub parse_cmdline_args {    # Parse the commandline arguments from ARGV
 
     for (@numbers_to_exclude) {
         $self->{test_list}[ $_ - 1 ]->{enabled} = 0;
+    }
+}
+
+sub color_print { # print with colors if appropriate
+    my ($self, $text, $text_color)  = @_;
+    my %color  = (
+        black   => "\e[0;30;47m",
+        maroon  => "\e[0;31;40m",
+        green   => "\e[0;32;40m",
+        olive   => "\e[0;33;40m",
+        navy    => "\e[0;34;40m",
+        purple  => "\e[0;35;40m",
+        teal    => "\e[0;36;40m",
+        silver  => "\e[0;37;40m",
+        grey    => "\e[1;30;40m",
+        red     => "\e[1;31;40m",
+        lime    => "\e[1;32;40m",
+        yellow  => "\e[1;33;40m",
+        blue    => "\e[1;34;40m",
+        fuchsia => "\e[1;35;40m",
+        aqua    => "\e[1;36;40m",
+        white   => "\e[1;37;40m",
+    );
+
+    if ($self->{use_color}) {
+        if (!exists $color{$text_color}) {
+            warn ('Unknown color ',$text_color)
+        }
+        print $color{$text_color}, $text, "\e[0m";
+    }
+    else {
+        print $text;
+    }
+}
+
+sub print_diff { # print unified diff output
+    my $self = shift;
+    my @lines = split /\r?\n/, $_[0];
+    my $screen_width = 80 - 4;
+
+    if ($self->{use_color}) {
+        for (@lines) {
+            my $color;
+
+            if    (/^\+\+\+/ || /^---/) { $color = "\e[0;30;43m" }
+            elsif (/^\+/)               { $color = "\e[0;30;42m" }
+            elsif (/^-/)                { $color = "\e[0;30;41m" }
+
+            if ($color) {
+                my $line = $_;
+                my $len = length($line);
+                if ($len < $screen_width) {
+                    $line .= ' ' x ($screen_width - $len);
+                }
+                print "    $color$line\e[m\n";
+            } 
+            else {
+                print "    $_\n";
+            }
+        }
+    }
+    else {
+        print "    $_\n" for @lines;
     }
 }
 
@@ -341,16 +419,18 @@ sub run {    # Run all tests
             $got = $self->normalize_data($got);
 
             if ( $self->compare_result( $got, $expected ) ) {
-                print "PASS ", $test->{test_name}, " [$engine]\n";
+                $self->color_print("PASS", 'lime');
+                print " ", $test->{test_name}, " [$engine]\n";
                 $passed = 1;
             }
             else {
-                print "FAIL ", $test->{test_name}, " [$engine]\n";
+                $self->color_print("FAIL", 'red');
+                print " ", $test->{test_name}, " [$engine]\n";
                 unless ( $self->{quiet} ) {
                     my $diff = $self->make_diff( $expected, $got );
                     $test_results->{ $test->{test_name} }
                         ->{ $engine . "-diff" } = $diff;
-                    print $diff;
+                    $self->print_diff($diff);
                 }
                 $passed = 0;
             }
