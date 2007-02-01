@@ -70,8 +70,8 @@ sub new {    # Constructor
 
     chdir( $self->{test_dir} ) || die "Couldn't chdir to tests directory";
 
-    my @all_tests = $self->get_file_names_and_params();
-    $self->{all_tests} = \@all_tests;
+    my @test_list = $self->get_file_names_and_params();
+    $self->{test_list} = \@test_list;
 
     $self->parse_cmdline_args();
 
@@ -88,7 +88,7 @@ sub parse_cmdline_args {    # Parse the commandline arguments from ARGV
         $p->getoptions(
             \%opt,          '4xslt',   'libxslt|x', 'saxon',
             'xalan-c',      'xalan-j', 'q|quiet',   'all|A',
-            'list-tests|l', 'help'
+            'list-tests|l', 'exclude|e=s@' ,'help'
         );
     }
     else {
@@ -102,7 +102,7 @@ sub parse_cmdline_args {    # Parse the commandline arguments from ARGV
 
     if ( $opt{'list-tests'} ) {
         print "Test list\n\n";
-        for my $test (@{ $self->{all_tests} }) {
+        for my $test (@{ $self->{test_list} }) {
             printf "%2d  %s\n", $test->{number}, $test->{test_name};
         }
         print "\n";
@@ -123,31 +123,30 @@ sub parse_cmdline_args {    # Parse the commandline arguments from ARGV
         }
     }
 
+    my $max_nr = @{ $self->{test_list} };
     foreach (@ARGV) {
-        my $max_nr = $#{ $self->{all_tests} };
         if (/^(\d+)$/) {
             $numbers_were_given = 1;
             my $no1 = $1;
-            if ( $no1 <= 0 or $no1 >= $max_nr ) {
+            if ( $no1 <= 0 or $no1 > $max_nr ) {
                 print STDERR "$0: Invalid test number: $no1\n"
                     . "Valid numbers are in the range from 1 to $max_nr \n";
                 exit 1;
             }
-            push @{ $self->{selected_tests} },
-                @{ $self->{all_tests} }[ $no1 - 1 ];
+            $self->{test_list}[ $no1 - 1 ]->{enabled} = 1;
         }
         elsif (/^(\d+)-(\d+)$/) {
             $numbers_were_given = 1;
             my ($no1, $no2) = ($1, $2);
 
-            if ( $no1 <= 0 or $no2 <= $no1 or $no2 >= $max_nr) {
+            if ( $no1 <= 0 or $no2 <= $no1 or $no2 > $max_nr) {
                 print STDERR "$0: Invalid test range: $no1-$no2\n"
                     . "Valid numbers are in the range from 1 to $max_nr \n";
                 exit 1;
             }
-            my @numbers = ($no1 - 1) .. ($no2 - 1);
-            push @{ $self->{selected_tests} },
-                @{ $self->{all_tests} }[ @numbers ];
+            for ( $no1 .. $no2 ) {
+                $self->{test_list}[ $_ - 1 ]->{enabled} = 1;
+            }
         }
         else {
             print STDERR "$0: unrecognized option `$_'\n"
@@ -156,18 +155,65 @@ sub parse_cmdline_args {    # Parse the commandline arguments from ARGV
         }
     }
 
-    $self->{selected_tests} = $self->{all_tests} if ( !$numbers_were_given );
+    if ( !$numbers_were_given ) {
+        $_->{enabled} = 1 for @{ $self->{test_list} };
+    }
+
+    unless ( grep {$_ == 1} values %{$self->{engines}} ){
+        print STDERR "$0: No engine selected\n"
+            . "Try `$0 --help' for more information.\n";
+        exit 1;
+    }
+
+    return unless ($opt{exclude});
+    
+    my @numbers_to_exclude;
+    
+    for my $compound_rule (@{ $opt{exclude} }) {
+        $compound_rule =~ s/,/ /g;
+        my @rules = split /\s+/, $compound_rule;
+        for (@rules) {
+            if (/^(\d+)$/) {
+                my $no1 = $1;
+                if ( $no1 <= 0 or $no1 > $max_nr ) {
+                    print STDERR "$0: Invalid test number: $no1\n"
+                        . "Valid numbers are in the range from 1 to $max_nr \n";
+                    exit 1;
+                }
+                push @numbers_to_exclude, $no1;
+            }
+            elsif (/^(\d+)-(\d+)$/) {
+                my ($no1, $no2) = ($1, $2);
+
+                if ( $no1 <= 0 or $no2 <= $no1 or $no2 > $max_nr) {
+                    print STDERR "$0: Invalid test range: $no1-$no2\n"
+                        . "Valid numbers are in the range from 1 to $max_nr \n";
+                    exit 1;
+                }
+                push @numbers_to_exclude, $no1 .. $no2;
+            }
+            else {
+                print STDERR "$0: Not a number `$_'\n"
+                    . "Try `$0 --help' for more information.\n";
+                exit 1;
+            }
+        }
+    }
+
+    for (@numbers_to_exclude) {
+        $self->{test_list}[ $_ - 1 ]->{enabled} = 0;
+    }
 }
 
 sub display_help {    # Show help and exit
     print <<"HELP";
-Usage: $0: [OPTIONS] [TEST-NUMBER]...
+Usage: $0: [OPTIONS] [TEST-NUMBERS]...
 Run the test suite with the supported XSLT engines.
 
   -l, --list-tests         List test numbers and exit
-
+  -e, --exclude            Exclude test(s)
   -q, --quiet              Supress uppress nonessential output
-
+      --color [1|0]        Display colors if value is ommited or 1.
   -A, --all                Run the tests with all engines
   -x, --libxslt            Run the tests with libxslt (via `XML::LibXSLT')
       --4xslt              Run the tests with 4XSLT
@@ -175,6 +221,15 @@ Run the test suite with the supported XSLT engines.
       --xalan-c            Run the tests with Xalan-C
       --xalan-j            Run the tests with Xalan-J
       --help               Display this help and exit
+      
+Examples:
+ $0 -x               
+    Run all tests with libxslt
+ $0 --saxon --4xslt  1-3 12 15
+    Run test 1,2,3,12,15 with Saxon and 4XSLT
+ $0 --xalan-c 8-18 -e 12-14
+    Run test 8-11 and 15-18 with Xalan-C
+
 HELP
 }
 
@@ -255,8 +310,8 @@ sub run {    # Run all tests
 
     chdir( $self->{test_dir} ) || die "Couldn't chdir to tests directory";
 
-    foreach my $test ( @{ $self->{selected_tests} } ) {
-
+    foreach my $test ( @{ $self->{test_list} } ) {
+        next unless $test->{enabled};
         # get the expected result
         my $expected = do {
             my $s = $self->read_file( $test->{result_filename} );
@@ -306,10 +361,6 @@ sub run {    # Run all tests
         unlink('tmp-in');
         unlink('tmp-out');
     }
-
-    $Data::Dumper::Indent = 1;
-    do { my $x = Dumper($test_results); $self->write_file( "x.txt", $x ) };
-
 }
 
 sub make_diff {    # Generate an unified diff
