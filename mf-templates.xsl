@@ -91,8 +91,10 @@
 
 				<xsl:variable name="organization-unit">
 					<xsl:for-each select=".//*[contains(concat(' ', normalize-space(@class), ' '),' organization-unit ')]">
+						<xsl:if test="position() != 1">
+							<xsl:text>;</xsl:text>
+						</xsl:if>
 						<xsl:call-template name="mf:extractText"/>
-						<xsl:text>;</xsl:text>
 					</xsl:for-each>
 				</xsl:variable>
 				
