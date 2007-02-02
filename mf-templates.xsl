@@ -91,8 +91,10 @@
 
 				<xsl:variable name="organization-unit">
 					<xsl:for-each select=".//*[contains(concat(' ', normalize-space(@class), ' '),' organization-unit ')]">
+						<xsl:if test="position() != 1">
+							<xsl:text>;</xsl:text>
+						</xsl:if>
 						<xsl:call-template name="mf:extractText"/>
-						<xsl:text>;</xsl:text>
 					</xsl:for-each>
 				</xsl:variable>
 				
@@ -576,9 +578,11 @@
 	<xsl:template name="mf:tagFromTagspace">
 		<xsl:param name="text-string"></xsl:param>
 		<xsl:choose>
-			<xsl:when test="substring($text-string,string-length($text-string)-1,1) = '/'">
+			<xsl:when test="substring($text-string,string-length($text-string),1) = '/'">
 				<xsl:call-template name="mf:tagFromTagspace">
-					<xsl:with-param name="text-string"><xsl:value-of select="substring($text-string,1,string-length($text-string)-1)"/></xsl:with-param>
+					<xsl:with-param name="text-string">
+						<xsl:value-of select="substring($text-string,1,string-length($text-string)-1)"/>
+					</xsl:with-param>
 				</xsl:call-template>
 			</xsl:when>
 			<xsl:when test="substring-after($text-string,'/') = true()">
