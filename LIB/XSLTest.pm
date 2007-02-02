@@ -619,13 +619,10 @@ sub normalize_data {
     my $data_ref = do { my @a = split /\r?\n/, $data; \@a };
     my @data = $self->_sort_object($data_ref);
 
-    my $reg2 = qr/\Q$source/;
-
     foreach (@data) {
         $_ =~ s{\$PRODID\$}{$product_id}g;
-        $_ =~ s{\$SOURCE\$([^\$]*)$}{$source$1}g;
-
-        #$_ =~ s{\$SOURCE\$}{$source}g;
+        $_ =~ s{\$SOURCE\$/([^\$]+)\$}{$source$1}g;
+        $_ =~ s{\$SOURCE\$}{$source}g;
     }
     return join( "\n", @data );
 }
