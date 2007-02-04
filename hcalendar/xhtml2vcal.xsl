@@ -623,8 +623,8 @@ I'm not an XSLT expert, so there are no guarantees to quality of this code!
          effect, any others being ignored." -->
         <xsl:text>&#x0D;&#x0A;</xsl:text>
 		<xsl:value-of select="$label" />
-    	<xsl:call-template name="lang" />
-        <xsl:text>;</xsl:text>
+    	<!--<xsl:call-template name="lang" />-->
+        <xsl:text>:</xsl:text>
 		
 		
 		<!-- @@ get all the possible parameters -->
