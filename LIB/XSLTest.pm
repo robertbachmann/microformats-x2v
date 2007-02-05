@@ -526,6 +526,11 @@ sub execute_saxon {
         push( @cmd, $name . '=' . $value );
     }
 
+    # make sure there's always a 'tmp-out'
+    # even if Saxon doesn't create one 
+    # because the XSLT ouputs nothing
+    $self->write_file('tmp-out','');
+
     unless ( system(@cmd) == 0 ) {
         warn "Could not execute Saxon";
         return;
