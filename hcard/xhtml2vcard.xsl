@@ -3,7 +3,8 @@
  xmlns:xsl ="http://www.w3.org/1999/XSL/Transform"
  xmlns:mf  ="http://suda.co.uk/projects/microformats/mf-templates.xsl?template="
  xmlns:uri ="http://www.w3.org/2000/07/uri43/uri.xsl?template="
- version="2.0"
+ xmlns:common="http://exslt.org/common" 
+ version="1.0"
 >
 
 <xsl:import href="../mf-templates.xsl" />
@@ -110,7 +111,7 @@ Without the correct profile you cannot assume the class values are intended for 
 			</xsl:for-each>
 		</xsl:variable>
 		
-		<xsl:value-of select="$orgData/organization-name"/>
+		<xsl:value-of select="common:node-set($orgData)/organization-name"/>
 	</xsl:variable>
 
 	<xsl:variable name="is-org" select="$fn-val = $org-val and not($fn-val = '')" />
@@ -119,9 +120,10 @@ Without the correct profile you cannot assume the class values are intended for 
 		<xsl:when test="$n-elt">
 			<xsl:for-each select=".//*[contains(concat(' ',normalize-space(@class),' '),' n ')]">
 				<xsl:if test="position() = 1">
-					<xsl:variable name="nData">
+					<xsl:variable name="nData-RTF">
 						<xsl:call-template name="mf:extractN"/>
 					</xsl:variable>
+					<xsl:variable name="nData" select="common:node-set($nData-RTF)" />
 					
 					<xsl:text>&#x0D;&#x0A;N</xsl:text>
 					<xsl:call-template name="lang" />
@@ -181,9 +183,10 @@ Without the correct profile you cannot assume the class values are intended for 
 			<xsl:text>&#x0D;&#x0A;ORG</xsl:text>
 			<xsl:text>;CHARSET=</xsl:text><xsl:value-of select="$Encoding"/>
 	    	<xsl:text>:</xsl:text>
-			<xsl:variable name="orgData">
+			<xsl:variable name="orgData-RTF">
 				<xsl:call-template name="mf:extractOrg"/>
 			</xsl:variable>
+			<xsl:variable name="orgData" select="common:node-set($orgData-RTF)" />
 			
 			<xsl:call-template name="escapeText">
 				<xsl:with-param name="text-string"><xsl:value-of select="$orgData/organization-name"/></xsl:with-param>
@@ -328,12 +331,13 @@ Without the correct profile you cannot assume the class values are intended for 
 	
 	<xsl:for-each select=".//*[contains(concat(' ', normalize-space(@class), ' '),' email ')]">
 		<xsl:text>&#x0D;&#x0A;EMAIL</xsl:text>
-		<xsl:variable name="emailData">
+		<xsl:variable name="emailData-RTF">
 			<xsl:call-template name="mf:extractUid">
 				<xsl:with-param name="protocol">mailto</xsl:with-param>
 				<xsl:with-param name="type-list">internet x400 pref</xsl:with-param>
 			</xsl:call-template>
 		</xsl:variable>
+		<xsl:variable name="emailData" select="common:node-set($emailData-RTF)" />
 		<xsl:if test="$emailData/type != ''">
 			<xsl:text>;TYPE=</xsl:text>
 			<xsl:value-of select="$emailData/type"/>
@@ -344,11 +348,12 @@ Without the correct profile you cannot assume the class values are intended for 
 	</xsl:for-each>
 	
 	<xsl:for-each select=".//*[contains(concat(' ', normalize-space(@class), ' '),' adr ')]">
-		<xsl:variable name="adrData">
+		<xsl:variable name="adrData-RTF">
 			<xsl:call-template name="mf:extractAdr">
 				<xsl:with-param name="type-list">dom intl postal parcel home work pref</xsl:with-param>
 			</xsl:call-template>
 		</xsl:variable>
+		<xsl:variable name="adrData" select="common:node-set($adrData-RTF)" />
 			<xsl:text>&#x0D;&#x0A;ADR</xsl:text>
 			<xsl:call-template name="lang" />
 			<xsl:text>;CHARSET=</xsl:text><xsl:value-of select="$Encoding"/>
@@ -378,12 +383,13 @@ Without the correct profile you cannot assume the class values are intended for 
 
 	<xsl:for-each select=".//*[contains(concat(' ', normalize-space(@class), ' '),' tel ')]">
 		<xsl:text>&#x0D;&#x0A;TEL</xsl:text>
-		<xsl:variable name="telData">
+		<xsl:variable name="telData-RTF">
 			<xsl:call-template name="mf:extractUid">
 				<xsl:with-param name="protocol">tel fax</xsl:with-param>
 				<xsl:with-param name="type-list">home work pref voice fax msg cell pager bbs modem car isdn video pcs</xsl:with-param>
 			</xsl:call-template>
 		</xsl:variable>
+		<xsl:variable name="telData" select="common:node-set($telData-RTF)" />
 		
 		<xsl:if test="$telData/type != ''">
 			<xsl:text>;TYPE=</xsl:text>
@@ -400,9 +406,9 @@ Without the correct profile you cannot assume the class values are intended for 
 			<xsl:call-template name="mf:extractGeo"/>
 		</xsl:variable>
 
-		<xsl:value-of select="$geoData/latitude"/>
+		<xsl:value-of select="common:node-set($geoData)/latitude"/>
 		<xsl:text>;</xsl:text>
-		<xsl:value-of select="$geoData/longitude"/>
+		<xsl:value-of select="common:node-set($geoData)/longitude"/>
 	</xsl:for-each>
 	
 	<xsl:for-each select=".//*[contains(concat(' ',normalize-space(@class),' '),' note ')]">

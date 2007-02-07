@@ -1,8 +1,9 @@
 <xsl:transform
-    xmlns:xsl  ="http://www.w3.org/1999/XSL/Transform" version="2.0"
+    xmlns:xsl  ="http://www.w3.org/1999/XSL/Transform" version="1.0"
     xmlns:mf   ="http://suda.co.uk/projects/microformats/mf-templates.xsl?template="
  	xmlns:datetime ="http://suda.co.uk/projects/microformats/datetime.xsl?template="
  	xmlns:uri ="http://www.w3.org/2000/07/uri43/uri.xsl?template="
+    xmlns:common="http://exslt.org/common"
     xmlns:html ="http://www.w3.org/1999/xhtml"
     exclude-result-prefixes="mf html"
 	>

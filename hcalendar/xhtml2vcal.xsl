@@ -3,7 +3,8 @@
  xmlns:xsl ="http://www.w3.org/1999/XSL/Transform"
  xmlns:mf  ="http://suda.co.uk/projects/microformats/mf-templates.xsl?template="
  xmlns:uri ="http://www.w3.org/2000/07/uri43/uri.xsl?template="
- version="2.0"
+ xmlns:common="http://exslt.org/common" 
+ version="1.0"
 >
 
 <xsl:import href="../mf-templates.xsl" />
@@ -443,9 +444,9 @@ I'm not an XSLT expert, so there are no guarantees to quality of this code!
 			<xsl:call-template name="mf:extractGeo"/>
 		</xsl:variable>
 
-		<xsl:value-of select="$geoData/latitude"/>
+		<xsl:value-of select="common:node-set($geoData)/latitude"/>
 		<xsl:text>;</xsl:text>
-		<xsl:value-of select="$geoData/longitude"/>
+		<xsl:value-of select="common:node-set($geoData)/longitude"/>
 	</xsl:for-each>
 	
 	<xsl:call-template name="personProp">
