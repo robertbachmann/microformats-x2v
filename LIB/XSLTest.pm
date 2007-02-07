@@ -112,7 +112,7 @@ sub parse_cmdline_args {    # Parse the commandline arguments from ARGV
         $p->getoptions(
             \%opt,          '4xslt',   'libxslt|x', 'saxon',
             'xalan-c',      'xalan-j', 'q|quiet',   'all|A',
-            'list-tests|l', 'color:1', 'dump=s',    'exclude|e=s@',
+            'list-tests|l', 'color|c:1', 'dump=s',  'exclude|e=s@',
             'help'
         );
     }
@@ -303,7 +303,7 @@ Run the test suite with the supported XSLT engines.
   -l, --list-tests         List test numbers and exit
   -e, --exclude            Exclude test(s)
   -q, --quiet              Supress uppress nonessential output
-      --color [1|0]        Display colors if value is ommited or 1.
+  -c, --color [1|0]        Display colors if value is ommited or 1.
       --dump FILENAME      Write machine-readable test results to FILENAME
   -A, --all                Run the tests with all engines
   -x, --libxslt            Run the tests with libxslt (via `XML::LibXSLT')
