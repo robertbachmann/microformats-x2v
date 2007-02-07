@@ -14,7 +14,9 @@ use strict;
 
 use FindBin;
 use Data::Dumper;
-use File::Basename;
+use File::Basename qw(basename);
+use File::Spec qw();
+use File::Temp qw(mktemp);
 use Cwd qw(cwd);
 use utf8;
 use POSIX qw(isatty);
@@ -98,6 +100,15 @@ sub new {    # Constructor
         eval { require Win32::Console::ANSI };
         $self->{use_color} = 1 unless ($@);
     }
+
+    $self->{temp_in}  = File::Spec->catfile(
+                            File::Spec->tmpdir,
+                            mktemp('mftest-INPUT-TMP-XXXX')
+                        );
+    $self->{temp_out}  = File::Spec->catfile(
+                            File::Spec->tmpdir,
+                            mktemp('mftest-OUTPUT-TMP-XXXX')
+                        );
 
     return $self;
 }
@@ -430,7 +441,7 @@ sub run {    # Run all tests
         do {
             my $input = $self->read_file( $test->{input_filename} );
             $self->remove_doctype( \$input );
-            $self->write_file( 'tmp-in', $input );
+            $self->write_file( $self->{temp_in}, $input );
         };
 
         foreach ( sort keys %{ $self->{engines} } ) {
@@ -463,8 +474,8 @@ sub run {    # Run all tests
             }
         }
         push @results, \%test_result;
-        unlink('tmp-in');
-        unlink('tmp-out');
+        unlink($self->{temp_in});
+        unlink($self->{temp_out});
     }
     $self->dump_results(\@results) if ($self->{dump_file});
 }
@@ -506,16 +517,16 @@ sub execute_4xslt {
         push( @cmd, $name . '=' . $value );
     }
     push @cmd, '-o';
-    push @cmd, 'tmp-out';
-    push @cmd, 'tmp-in';
+    push @cmd, $self->{temp_out};
+    push @cmd, $self->{temp_in};
     push @cmd, $self->{xslt_filename};
 
     unless ( system(@cmd) == 0 ) {
         warn "Could not execute 4XSLT";
         return;
     }
-    my $s = $self->read_file('tmp-out');
-    unlink('tmp-out');
+    my $s = $self->read_file($self->{temp_out});
+    unlink($self->{temp_out});
 
     return $s;
 }
@@ -530,7 +541,7 @@ sub execute_libxslt {
     }
 
     my $results = $self->{libxslt}
-        ->transform_file( 'tmp-in', XML::LibXSLT::xpath_to_string(@params) );
+        ->transform_file( $self->{temp_in}, XML::LibXSLT::xpath_to_string(@params) );
 
     my $result_string = $self->{libxslt}->output_string($results);
 
@@ -544,26 +555,26 @@ sub execute_saxon {
     push @cmd, qw(java net.sf.saxon.Transform);
     push @cmd, '-novw';
     push @cmd, '-o';
-    push @cmd, 'tmp-out';
-    push @cmd, 'tmp-in';
+    push @cmd, $self->{temp_out};
+    push @cmd, $self->{temp_in};
     push @cmd, $self->{xslt_filename};
     foreach my $name ( keys %{ $test->{params} } ) {
         my $value = $test->{params}->{$name};
         push( @cmd, $name . '=' . $value );
     }
 
-    # make sure there's always a 'tmp-out'
+    # make sure there's always a $self->{temp_out}
     # even if Saxon doesn't create one 
     # because the XSLT ouputs nothing
-    $self->write_file('tmp-out','');
+    $self->write_file($self->{temp_out},'');
 
     unless ( system(@cmd) == 0 ) {
         warn "Could not execute Saxon";
         return;
     }
 
-    my $s = $self->read_file('tmp-out');
-    unlink('tmp-out');
+    my $s = $self->read_file($self->{temp_out});
+    unlink($self->{temp_out});
 
     return $s;
 }
@@ -574,7 +585,7 @@ sub execute_xalan_c {
     my @cmd;    #= qw(gecho);
     push @cmd, 'Xalan';
     push @cmd, '-o';
-    push @cmd, 'tmp-out';
+    push @cmd, $self->{temp_out};
 
     foreach my $name ( keys %{ $test->{params} } ) {
         my $value = $test->{params}->{$name};
@@ -582,7 +593,7 @@ sub execute_xalan_c {
         push @cmd, $name;
         push @cmd, q{'} . $value . q{'};
     }
-    push @cmd, 'tmp-in';
+    push @cmd, $self->{temp_in};
     push @cmd, $self->{xslt_filename};
 
     unless ( system(@cmd) == 0 ) {
@@ -590,8 +601,8 @@ sub execute_xalan_c {
         return;
     }
 
-    my $s = $self->read_file('tmp-out');
-    unlink('tmp-out');
+    my $s = $self->read_file($self->{temp_out});
+    unlink($self->{temp_out});
 
     return $s;
 }
@@ -611,9 +622,11 @@ sub execute_xalan_j {
         . 'javax.xml.transform.TransformerFactory' . '='
         . 'org.apache.xalan.processor.TransformerFactoryImpl';
     push @cmd, 'org.apache.xalan.xslt.Process';
-    push @cmd, qw(-IN tmp-in);
+    push @cmd, '-IN';
+    push @cmd, $self->{temp_in};
+    push @cmd, '-OUT';
+    push @cmd, $self->{temp_out};
     push @cmd, '-XSL', $self->{xslt_filename};
-    push @cmd, qw(-OUT tmp-out);
 
     foreach my $name ( keys %{ $test->{params} } ) {
         my $value = $test->{params}->{$name};
@@ -624,8 +637,8 @@ sub execute_xalan_j {
         warn "Could not execute Xalan-J";
         return;
     }
-    my $s = $self->read_file('tmp-out');
-    unlink('tmp-out');
+    my $s = $self->read_file($self->{temp_out});
+    unlink($self->{temp_out});
 
     return $s;
 }
