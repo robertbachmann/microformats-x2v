@@ -3,7 +3,7 @@
  xmlns:xsl ="http://www.w3.org/1999/XSL/Transform"
  xmlns:mf  ="http://suda.co.uk/projects/microformats/mf-templates.xsl?template="
  xmlns:geo ="http://www.w3.org/2003/01/geo/wgs84_pos#"
- version="1.0"
+ version="2.0"
 >
 
 <xsl:import href="../mf-templates.xsl" />
@@ -58,7 +58,10 @@ http://www.w3.org/Consortium/Legal/copyright-software-19980720
 </xsl:template>
 
 
-<xsl:template name="properties">	
+<xsl:template name="properties">
+	<xsl:variable name="latLon">
+		<xsl:call-template name="mf:extractGeo"/>
+	</xsl:variable>	
 	<title>
 	<xsl:choose>
 		<!-- if this is an abbr element, use the value -->
@@ -66,14 +69,14 @@ http://www.w3.org/Consortium/Legal/copyright-software-19980720
 			<xsl:value-of select="."/>
 		</xsl:when>
 		<!-- if this is inside an hCard, use the hCard FN -->
-		<xsl:when test="ancestor::*[name() = 'del' = false() and contains(concat(' ', normalize-space(@class), ' '),' vcard ')]//*[name() = 'del' = false() and contains(concat(' ', normalize-space(@class), ' '),' fn ')]">
-			<xsl:for-each select="ancestor::*[name() = 'del' = false() and contains(concat(' ', normalize-space(@class), ' '),' vcard ')]//*[name() = 'del' = false() and contains(concat(' ', normalize-space(@class), ' '),' fn ')][1]">
+		<xsl:when test="ancestor::*[not(name() = 'del') = true() and contains(concat(' ', normalize-space(@class), ' '),' vcard ')]//*[not(name() = 'del') = true() and contains(concat(' ', normalize-space(@class), ' '),' fn ')]">
+			<xsl:for-each select="ancestor::*[not(name() = 'del') = true() and contains(concat(' ', normalize-space(@class), ' '),' vcard ')]//*[not(name() = 'del') = true() and contains(concat(' ', normalize-space(@class), ' '),' fn ')][1]">
 				<xsl:call-template name="mf:extractText" />
 			</xsl:for-each>
 		</xsl:when>
 		<!-- if this is inside an hCalendar, use the hCalendar Summary -->
-		<xsl:when test="ancestor::*[name() = 'del' = false() and contains(concat(' ', normalize-space(@class), ' '),' vevent ')]//*[name() = 'del' = false() and contains(concat(' ', normalize-space(@class), ' '),' summary ')]">
-			<xsl:for-each select="ancestor::*[name() = 'del' = false() and contains(concat(' ', normalize-space(@class), ' '),' vevent ')]//*[name() = 'del' = false() and contains(concat(' ', normalize-space(@class), ' '),' summary ')][1]">
+		<xsl:when test="ancestor::*[not(name() = 'del') = true() and contains(concat(' ', normalize-space(@class), ' '),' vevent ')]//*[not(name() = 'del') = true() and contains(concat(' ', normalize-space(@class), ' '),' summary ')]">
+			<xsl:for-each select="ancestor::*[not(name() = 'del') = true() and contains(concat(' ', normalize-space(@class), ' '),' vevent ')]//*[not(name() = 'del') = true() and contains(concat(' ', normalize-space(@class), ' '),' summary ')][1]">
 				<xsl:call-template name="mf:extractText" />
 			</xsl:for-each>
 		</xsl:when>
@@ -81,20 +84,13 @@ http://www.w3.org/Consortium/Legal/copyright-software-19980720
 		<!-- default: use the co-ordinates -->
 		<xsl:otherwise>
 			<!-- not perfect because of issues with a delimiter -->
-			<xsl:call-template name="mf:extractGeo"/>
+			<xsl:value-of select="$latLon/longitude"/><xsl:text>,</xsl:text><xsl:value-of select="$latLon/latitude"/>
 		</xsl:otherwise>
 	</xsl:choose>
 	</title>
 	
-	<xsl:call-template name="mf:extractGeo"/>
-</xsl:template>
-
-<xsl:template name="geoCallBack">
-	<xsl:param name="latitude"/>
-	<xsl:param name="longitude"/>
-	<xsl:param name="altitude"/>
-	<geo:long><xsl:value-of select="$longitude"/></geo:long>
-	<geo:lat><xsl:value-of select="$latitude"/></geo:lat>
+	<geo:long><xsl:value-of select="$latLon/longitude"/></geo:long>
+	<geo:lat><xsl:value-of select="$latLon/latitude"/></geo:lat>
 </xsl:template>
 
 <xsl:template match="comment()"></xsl:template>

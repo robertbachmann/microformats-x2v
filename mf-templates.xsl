@@ -1,5 +1,5 @@
 <xsl:transform
-    xmlns:xsl  ="http://www.w3.org/1999/XSL/Transform" version="1.0"
+    xmlns:xsl  ="http://www.w3.org/1999/XSL/Transform" version="2.0"
     xmlns:mf   ="http://suda.co.uk/projects/microformats/mf-templates.xsl?template="
  	xmlns:datetime ="http://suda.co.uk/projects/microformats/datetime.xsl?template="
  	xmlns:uri ="http://www.w3.org/2000/07/uri43/uri.xsl?template="
@@ -12,7 +12,7 @@
 		This work is licensed under The W3C Open Source License
 		http://www.w3.org/Consortium/Legal/copyright-software-19980720
 		
-		VERSION: 0.1
+		VERSION: 0.2
 	-->
 
 	<xsl:import href="datetime.xsl" />
@@ -24,87 +24,70 @@
 
 	<!-- Extract N Property for Microformats -->
 	<xsl:template name="mf:extractN">
-		<xsl:variable name="family-name">
+		<xsl:element name="family-names">
 			<xsl:for-each select=".//*[contains(concat(' ', normalize-space(@class), ' '),' family-name ')]">
-				<xsl:if test="position() != 1">
-					<xsl:text>,</xsl:text>					
-				</xsl:if>
-				<xsl:call-template name="mf:extractText"/>
+				<xsl:element name="family-name">
+					<xsl:call-template name="mf:extractText"/>
+				</xsl:element>	
 			</xsl:for-each>
-		</xsl:variable>
-		<xsl:variable name="given-name">
+		</xsl:element>
+		<xsl:element name="given-names">
 			<xsl:for-each select=".//*[contains(concat(' ', normalize-space(@class), ' '),' given-name ')]">
-				<xsl:if test="position() != 1">
-					<xsl:text>,</xsl:text>					
-				</xsl:if>
-				<xsl:call-template name="mf:extractText"/>
+				<xsl:element name="given-name">
+					<xsl:call-template name="mf:extractText"/>
+				</xsl:element>
 			</xsl:for-each>
-		</xsl:variable>
+		</xsl:element>
 		
-		<xsl:variable name="additional-name">
+		<xsl:element name="additional-names">
 			<xsl:for-each select=".//*[contains(concat(' ', normalize-space(@class), ' '),' additional-name ')]">
-				<xsl:if test="position() != 1">
-					<xsl:text>,</xsl:text>
-				</xsl:if>
-				<xsl:call-template name="mf:extractText"/>
+				<xsl:element name="additional-name">
+					<xsl:call-template name="mf:extractText"/>
+				</xsl:element>
 			</xsl:for-each>
-		</xsl:variable>
+		</xsl:element>
 
-		<xsl:variable name="honorific-prefix">
+		<xsl:element name="honorific-prefixs">
 			<xsl:for-each select=".//*[contains(concat(' ', normalize-space(@class), ' '),' honorific-prefix ')]">
-				<xsl:if test="position() != 1">
-					<xsl:text>,</xsl:text>
-				</xsl:if>
-				<xsl:call-template name="mf:extractText"/>
+				<xsl:element name="honorific-prefix">
+					<xsl:call-template name="mf:extractText"/>
+				</xsl:element>
 			</xsl:for-each>
-		</xsl:variable>
+		</xsl:element>
 
-		<xsl:variable name="honorific-suffix">
+		<xsl:element name="honorific-suffixs">
 			<xsl:for-each select=".//*[contains(concat(' ', normalize-space(@class), ' '),' honorific-suffix ')]">
-				<xsl:if test="position() != 1">
-					<xsl:text>,</xsl:text>
-				</xsl:if>
-				<xsl:call-template name="mf:extractText"/>
+				<xsl:element name="honorific-suffix">
+					<xsl:call-template name="mf:extractText"/>
+				</xsl:element>
 			</xsl:for-each>
-		</xsl:variable>
+		</xsl:element>
 
-		<!-- call display Function -->
-		<xsl:call-template name="nCallBack">
-			<xsl:with-param name="family-name"><xsl:value-of select="$family-name"/></xsl:with-param>
-			<xsl:with-param name="given-name"><xsl:value-of select="$given-name"/></xsl:with-param>
-			<xsl:with-param name="additional-name"><xsl:value-of select="$additional-name"/></xsl:with-param>
-			<xsl:with-param name="honorific-prefix"><xsl:value-of select="$honorific-prefix"/></xsl:with-param>
-			<xsl:with-param name="honorific-suffix"><xsl:value-of select="$honorific-suffix"/></xsl:with-param>
-		</xsl:call-template>
 	</xsl:template>
 	
 	<xsl:template name="mf:extractOrg">
 		<xsl:choose>
 			<xsl:when test=".//*[contains(concat(' ', @class, ' '), concat(' ', 'organization-name', ' '))]" >
-				<xsl:variable name="organization-name">
+				<xsl:element name="organization-name">
 					<xsl:for-each select=".//*[contains(concat(' ', normalize-space(@class), ' '),' organization-name ')]">
 						<xsl:if test="position() = 1">
 							<xsl:call-template name="mf:extractText"/>
 						</xsl:if>
 					</xsl:for-each>
-				</xsl:variable>
+				</xsl:element>
 
-				<xsl:variable name="organization-unit">
+				<xsl:element name="organization-units">
 					<xsl:for-each select=".//*[contains(concat(' ', normalize-space(@class), ' '),' organization-unit ')]">
 						<xsl:if test="position() != 1">
 							<xsl:text>;</xsl:text>
 						</xsl:if>
-						<xsl:call-template name="mf:extractText"/>
+						<xsl:element name="organization-unit"><xsl:call-template name="mf:extractText"/></xsl:element>
 					</xsl:for-each>
-				</xsl:variable>
+				</xsl:element>
 				
-				<xsl:call-template name="orgCallBack">
-					<xsl:with-param name="organization-name"><xsl:value-of select="$organization-name"/></xsl:with-param>
-					<xsl:with-param name="organization-unit"><xsl:value-of select="$organization-unit"/></xsl:with-param>
-				</xsl:call-template>
 			</xsl:when>
 			<xsl:otherwise>
-				<xsl:call-template name="mf:extractText"/>
+				<xsl:element name="organization-name"><xsl:call-template name="mf:extractText"/></xsl:element>
 			</xsl:otherwise>
 		</xsl:choose>		
 	</xsl:template>
@@ -112,11 +95,11 @@
 	<!-- Extract ADR Property for Microformats -->
 	<xsl:template name="mf:extractAdr">
 		<xsl:param name="type-list"/>
-		<xsl:variable name="type">
+		<xsl:element name="type">
 			<xsl:call-template name="mf:find-types">
 				<xsl:with-param name="list"><xsl:value-of select="$type-list"/></xsl:with-param>
 			</xsl:call-template>
-		</xsl:variable>
+		</xsl:element>
 		
 		<xsl:variable name="street-address">
 			<xsl:for-each select=".//*[contains(concat(' ', normalize-space(@class), ' '),' street-address ')]">
@@ -144,49 +127,42 @@
 			</xsl:for-each>
 		</xsl:variable>
 
-		<xsl:variable name="region">
+		<xsl:element name="region">
 			<xsl:for-each select=".//*[contains(concat(' ', normalize-space(@class), ' '),' region ')]">
 				<xsl:if test="position() = 1">
 					<xsl:call-template name="mf:extractText"/>
 				</xsl:if>
 			</xsl:for-each>
-		</xsl:variable>
+		</xsl:element>
 
-		<xsl:variable name="locality">
+		<xsl:element name="locality">
 			<xsl:for-each select=".//*[contains(concat(' ', normalize-space(@class), ' '),' locality ')]">
 				<xsl:if test="position() = 1">
 					<xsl:call-template name="mf:extractText"/>
 				</xsl:if>
 			</xsl:for-each>
-		</xsl:variable>
+		</xsl:element>
 		
-		<xsl:variable name="country-name">
+		<xsl:element name="country-name">
 			<xsl:for-each select=".//*[contains(concat(' ', normalize-space(@class), ' '),' country-name ')]">
 				<xsl:if test="position() = 1">
 					<xsl:call-template name="mf:extractText"/>
 				</xsl:if>
 			</xsl:for-each>
-		</xsl:variable>		
+		</xsl:element>		
 
-		<xsl:variable name="postal-code">
+		<xsl:element name="postal-code">
 			<xsl:for-each select=".//*[contains(concat(' ', normalize-space(@class), ' '),' postal-code ')]">
 				<xsl:if test="position() = 1">
 					<xsl:call-template name="mf:extractText"/>
 				</xsl:if>
 			</xsl:for-each>
-		</xsl:variable>		
+		</xsl:element>		
 
 		<!-- call display Function -->
-		<xsl:call-template name="adrCallBack">
-			<xsl:with-param name="type"><xsl:value-of select="$type"/></xsl:with-param>
-			<xsl:with-param name="street-address"><xsl:value-of select="$street-address"/></xsl:with-param>
-			<xsl:with-param name="extended-address"><xsl:value-of select="$extended-address"/></xsl:with-param>
-			<xsl:with-param name="post-office-box"><xsl:value-of select="$post-office-box"/></xsl:with-param>
-			<xsl:with-param name="region"><xsl:value-of select="$region"/></xsl:with-param>
-			<xsl:with-param name="locality"><xsl:value-of select="$locality"/></xsl:with-param>
-			<xsl:with-param name="country-name"><xsl:value-of select="$country-name"/></xsl:with-param>
-			<xsl:with-param name="postal-code"><xsl:value-of select="$postal-code"/></xsl:with-param>
-		</xsl:call-template>
+		<xsl:element name="street-address"><xsl:value-of select="$street-address"/></xsl:element>
+		<xsl:element name="extended-address"><xsl:value-of select="$extended-address"/></xsl:element>
+		<xsl:element name="post-office-box"><xsl:value-of select="$post-office-box"/></xsl:element>
 	</xsl:template>
 	
 	<!-- Extract GEO Property for Microformats -->
@@ -196,23 +172,31 @@
 				<xsl:variable name="longitude" select="normalize-space(substring-after(@title,';'))" />
 				<xsl:variable name="latitude" select="normalize-space(substring-before(@title,';'))" />
 				<xsl:variable name="altitude" select="0" />
-				<!-- call display Function -->
-				<xsl:call-template name="geoCallBack">
-					<xsl:with-param name="latitude"><xsl:value-of select="$latitude"/></xsl:with-param>
-					<xsl:with-param name="longitude"><xsl:value-of select="$longitude"/></xsl:with-param>
-					<xsl:with-param name="altitude"><xsl:value-of select="$altitude"/></xsl:with-param>
-				</xsl:call-template>
+				
+				<xsl:element name="latitude">
+					<xsl:value-of select="$latitude"/>
+				</xsl:element>
+				<xsl:element name="longitude">
+					<xsl:value-of select="$longitude"/>
+				</xsl:element>
+				<xsl:element name="altitude">
+					<xsl:value-of select="$altitude"/>
+				</xsl:element>				
 			</xsl:when>
 			<xsl:when test="local-name(.) = 'img' and @alt">
 				<xsl:variable name="longitude" select="normalize-space(substring-after(@alt,';'))" />
 				<xsl:variable name="latitude" select="normalize-space(substring-before(@alt,';'))" />
 				<xsl:variable name="altitude" select="0" />
 				<!-- call display Function -->
-				<xsl:call-template name="geoCallBack">
-					<xsl:with-param name="latitude"><xsl:value-of select="$latitude"/></xsl:with-param>
-					<xsl:with-param name="longitude"><xsl:value-of select="$longitude"/></xsl:with-param>
-					<xsl:with-param name="altitude"><xsl:value-of select="$altitude"/></xsl:with-param>
-				</xsl:call-template>
+				<xsl:element name="latitude">
+					<xsl:value-of select="$latitude"/>
+				</xsl:element>
+				<xsl:element name="longitude">
+					<xsl:value-of select="$longitude"/>
+				</xsl:element>
+				<xsl:element name="altitude">
+					<xsl:value-of select="$altitude"/>
+				</xsl:element>				
 			</xsl:when>
 			<!-- look for child elements -->
 			<xsl:otherwise>				
@@ -245,11 +229,15 @@
 				<xsl:variable name="altitude" select="0" />
 				
 				<!-- call display Function -->
-				<xsl:call-template name="geoCallBack">
-					<xsl:with-param name="latitude"><xsl:value-of select="$latitude"/></xsl:with-param>
-					<xsl:with-param name="longitude"><xsl:value-of select="$longitude"/></xsl:with-param>
-					<xsl:with-param name="altitude"><xsl:value-of select="$altitude"/></xsl:with-param>
-				</xsl:call-template>
+				<xsl:element name="latitude">
+					<xsl:value-of select="$latitude"/>
+				</xsl:element>
+				<xsl:element name="longitude">
+					<xsl:value-of select="$longitude"/>
+				</xsl:element>
+				<xsl:element name="altitude">
+					<xsl:value-of select="$altitude"/>
+				</xsl:element>				
 				
 			</xsl:otherwise>
 		</xsl:choose>
@@ -258,7 +246,7 @@
 	<!-- extract rel-Tags or text -->
 	<xsl:template name="mf:extractKeywords">
 		<xsl:choose>
-			<xsl:when test="@rel = true() and contains(concat(' ', normalize-space(@rel), ' '),' tag ')">
+			<xsl:when test="@rel and contains(concat(' ', normalize-space(@rel), ' '),' tag ')">
 				<xsl:call-template name="mf:tagFromTagspace">
 					<xsl:with-param name="text-string" select="@href" />
 				</xsl:call-template>
@@ -406,7 +394,13 @@
 		<xsl:param name="protocol"/>
 		<xsl:choose>
 			<xsl:when test=".//*[contains(concat(' ', normalize-space(@class), ' '),' value ')]/@href">
-				<xsl:if test="substring-before(.//*[contains(concat(' ', normalize-space(@class), ' '),' value ')]/@href,':') = $protocol">
+				<xsl:if test="
+					contains(
+					concat(' ', normalize-space($protocol), ' '),
+					concat(' ',
+					substring-before(.//*[contains(concat(' ', normalize-space(@class), ' '),' value ')]/@href,':'),
+					' '))
+					">
 					<xsl:choose>
 						<xsl:when test="string-length(normalize-space(substring-before(substring-after(.//*[contains(concat(' ', normalize-space(@class), ' '),' value ')]/@href,':'),'?'))) &lt; 1">
 							<xsl:value-of select="normalize-space(substring-after(.//*[contains(concat(' ', normalize-space(@class), ' '),' value ')]/@href,':'))" />
@@ -417,7 +411,12 @@
 					</xsl:choose>
 				</xsl:if>				
 			</xsl:when>
-			<xsl:when test="(substring-before(@href,':') = $protocol)">
+			<xsl:when test="
+				contains(
+				concat(' ', normalize-space($protocol), ' '),
+				concat(' ',
+				substring-before(@href,':'),
+				' '))">
 				<xsl:choose>
 					<xsl:when test="string-length(normalize-space(substring-before(substring-after(@href,':'),'?'))) &lt; 1">
 						<xsl:value-of select="normalize-space(substring-after(@href,':'))" />
@@ -448,10 +447,8 @@
 			</xsl:call-template>
 		</xsl:variable>
 		
-		<xsl:call-template name="uidCallBack">
-			<xsl:with-param name="type" ><xsl:value-of select="$type" /></xsl:with-param>
-			<xsl:with-param name="value"><xsl:value-of select="$value"/></xsl:with-param>
-		</xsl:call-template>
+		<xsl:element name="type" ><xsl:value-of select="$type" /></xsl:element>
+		<xsl:element name="value"><xsl:value-of select="$value"/></xsl:element>
 	</xsl:template>
 	
 	<!-- extract text from a Microformat property -->
@@ -501,34 +498,26 @@
 		</xsl:choose>
 	</xsl:template>
 	
-	<xsl:template name="mf:doIncludes">	
-		<!-- this allows for a switch when this pops back -->
-		<xsl:param name="case"/>
-			
+	<xsl:template name="mf:doIncludes">				
 		<!-- check for header="" and extract that data -->
 		<xsl:if test="descendant-or-self::*/@headers">
 			<xsl:call-template name="mf:extract-ids">
-				<xsl:with-param name="case"><xsl:value-of select="$case"/></xsl:with-param>
 				<xsl:with-param name="text-string"><xsl:value-of select="descendant-or-self::*/@headers"/></xsl:with-param>
 			</xsl:call-template>
 		</xsl:if>
 		
 		<!-- check for object/a elements with data references to IDs -->
-		<xsl:if test=".//*[ancestor-or-self::*[local-name() = 'del'] = false()] and .//*[descendant-or-self::*[local-name() = 'object' or local-name() = 'a'] = true() and (contains(normalize-space(@data),'#') or contains(normalize-space(@href),'#'))]">
-			<xsl:for-each select=".//*[descendant-or-self::*[local-name() = 'object'] = true() and contains(normalize-space(@data),'#') and contains(concat(' ',normalize-space(@class),' '),' include ')]">
+		<xsl:if test=".//*[not(ancestor-or-self::*[local-name() = 'del']) = true()] and .//*[not(descendant-or-self::*[local-name() = 'object' or local-name() = 'a']) = false() and (contains(normalize-space(@data),'#') or contains(normalize-space(@href),'#'))]">
+			<xsl:for-each select=".//*[not(descendant-or-self::*[local-name() = 'object']) = false() and contains(normalize-space(@data),'#') and contains(concat(' ',normalize-space(@class),' '),' include ')]">
 				<xsl:variable name="header-id"><xsl:value-of select="substring-after(@data,'#')"/></xsl:variable>
 				<xsl:for-each select="//*[@id=$header-id]">
-					<xsl:call-template name="properties">
-						<xsl:with-param name="case"><xsl:value-of select="$case"/></xsl:with-param>
-					</xsl:call-template>
+					<xsl:call-template name="properties"/>
 				</xsl:for-each>
 			</xsl:for-each>
-			<xsl:for-each select=".//*[descendant-or-self::*[local-name() = 'a'] = true() and contains(normalize-space(@href),'#') and contains(concat(' ',normalize-space(@class),' '),' include ')]">
+			<xsl:for-each select=".//*[not(descendant-or-self::*[local-name() = 'a']) = false() and contains(normalize-space(@href),'#') and contains(concat(' ',normalize-space(@class),' '),' include ')]">
 				<xsl:variable name="header-id"><xsl:value-of select="substring-after(@href,'#')"/></xsl:variable>
 				<xsl:for-each select="//*[@id=$header-id]">
-					<xsl:call-template name="properties">
-						<xsl:with-param name="case"><xsl:value-of select="$case"/></xsl:with-param>
-					</xsl:call-template>
+					<xsl:call-template name="properties"/>
 				</xsl:for-each>
 			</xsl:for-each>
 		</xsl:if>
@@ -536,24 +525,19 @@
 	
 	<!-- recursive function to extract headers="id id id" -->
 	<xsl:template name="mf:extract-ids">
-		<!-- this allows for a switch when this pops back -->
-		<xsl:param name="case"/>
 		<xsl:param name="text-string"/>
 
 		<xsl:choose>
-			<xsl:when test="substring-before($text-string,' ') = true()">
+			<xsl:when test="not(substring-before($text-string,' ')) = false()">
 				<xsl:call-template name="mf:get-header">
-					<xsl:with-param name="case"><xsl:value-of select="$case"/></xsl:with-param>
 					<xsl:with-param name="header-id"><xsl:value-of select="substring-before($text-string,' ')"/></xsl:with-param>
 				</xsl:call-template>
 				<xsl:call-template name="mf:extract-ids">
-					<xsl:with-param name="case"><xsl:value-of select="$case"/></xsl:with-param>
 					<xsl:with-param name="text-string"><xsl:value-of select="substring-after($text-string,' ')"/></xsl:with-param>
 				</xsl:call-template>
 			</xsl:when>
 			<xsl:otherwise>
 				<xsl:call-template name="mf:get-header">
-					<xsl:with-param name="case"><xsl:value-of select="$case"/></xsl:with-param>
 					<xsl:with-param name="header-id"><xsl:value-of select="$text-string"/></xsl:with-param>
 				</xsl:call-template>
 			</xsl:otherwise>
@@ -561,31 +545,42 @@
 	</xsl:template>
 
 	<!-- include the HTML where the id attribute matches -->
-	<xsl:template name="mf:get-header">
-		<!-- this allows for a switch when this pops back -->
-		<xsl:param name="case"/>
-		
+	<xsl:template name="mf:get-header">		
 		<!-- problem here!? need to pass the tag WITH the id, not descendants -->
 		<xsl:param name="header-id"/>
 		<xsl:for-each select="//*[@id=$header-id]">
-			<xsl:call-template name="properties">
-				<xsl:with-param name="case"><xsl:value-of select="$case"/></xsl:with-param>
-			</xsl:call-template>
+			<xsl:call-template name="properties"/>
 		</xsl:for-each>
 	</xsl:template>
 
 	<!-- recursive function to extract Tag from a URL -->
 	<xsl:template name="mf:tagFromTagspace">
 		<xsl:param name="text-string"></xsl:param>
+
+		<!-- need to strip ? and # -->
 		<xsl:choose>
-			<xsl:when test="substring($text-string,string-length($text-string),1) = '/'">
+			<xsl:when test="substring-before($text-string,'?')">
+				<xsl:call-template name="mf:tagFromTagspace">
+					<xsl:with-param name="text-string">
+						<xsl:value-of select="substring-before($text-string,'?')"/>
+					</xsl:with-param>
+				</xsl:call-template>
+			</xsl:when>
+			<xsl:when test="substring-before($text-string,'#')">
+				<xsl:call-template name="mf:tagFromTagspace">
+					<xsl:with-param name="text-string">
+						<xsl:value-of select="substring-before($text-string,'#')"/>
+					</xsl:with-param>
+				</xsl:call-template>
+			</xsl:when>
+			<xsl:when test="substring($text-string,string-length($text-string),1) = '/'">		
 				<xsl:call-template name="mf:tagFromTagspace">
 					<xsl:with-param name="text-string">
 						<xsl:value-of select="substring($text-string,1,string-length($text-string)-1)"/>
 					</xsl:with-param>
 				</xsl:call-template>
 			</xsl:when>
-			<xsl:when test="substring-after($text-string,'/') = true()">
+			<xsl:when test="not(substring-after($text-string,'/')) = false()">				
 				<xsl:call-template name="mf:tagFromTagspace">
 					<xsl:with-param name="text-string"><xsl:value-of select="substring-after($text-string,'/')"/></xsl:with-param>
 				</xsl:call-template>
@@ -648,12 +643,12 @@
 		<xsl:param name="Source" />
 		<xsl:choose>
 			<!-- if there is an xml:base attribute use that -->
-			<xsl:when test="//*[@xml:base] = true()">
+			<xsl:when test="not(//*[@xml:base]) = false()">
 				<xsl:value-of select="//*[@xml:base]/@xml:base" />
 			</xsl:when>
 
 			<!-- if there is an HTML base element use that -->
-			<xsl:when test="//*[name() = 'base'] = true()">
+			<xsl:when test="not(//*[name() = 'base']) = false()">
 				<xsl:value-of select="//*[name() = 'base']/@href" />
 			</xsl:when>
 			
@@ -684,37 +679,37 @@
 		<xsl:param name="iso-date"/>
 	
 		<xsl:choose>
-			<xsl:when test="substring($iso-date,5,2) = 1">
+			<xsl:when test="substring($iso-date,5,2) = '1'">
 				<xsl:text>Jan</xsl:text>
 			</xsl:when>
-			<xsl:when test="substring($iso-date,5,2) = 2">
+			<xsl:when test="substring($iso-date,5,2) = '2'">
 				<xsl:text>Feb</xsl:text>
 			</xsl:when>
-			<xsl:when test="substring($iso-date,5,2) = 3">
+			<xsl:when test="substring($iso-date,5,2) = '3'">
 				<xsl:text>Mar</xsl:text>
 			</xsl:when>
-			<xsl:when test="substring($iso-date,5,2) = 4">
+			<xsl:when test="substring($iso-date,5,2) = '4'">
 				<xsl:text>Apr</xsl:text>
 			</xsl:when>
-			<xsl:when test="substring($iso-date,5,2) = 5">
+			<xsl:when test="substring($iso-date,5,2) = '5'">
 				<xsl:text>May</xsl:text>
 			</xsl:when>
-			<xsl:when test="substring($iso-date,5,2) = 6">
+			<xsl:when test="substring($iso-date,5,2) = '6'">
 				<xsl:text>Jun</xsl:text>
 			</xsl:when>
-			<xsl:when test="substring($iso-date,5,2) = 7">
+			<xsl:when test="substring($iso-date,5,2) = '7'">
 				<xsl:text>Jul</xsl:text>
 			</xsl:when>
-			<xsl:when test="substring($iso-date,5,2) = 8">
+			<xsl:when test="substring($iso-date,5,2) = '8'">
 				<xsl:text>Aug</xsl:text>
 			</xsl:when>
-			<xsl:when test="substring($iso-date,5,2) = 9">
+			<xsl:when test="substring($iso-date,5,2) = '9'">
 				<xsl:text>Sep</xsl:text>
 			</xsl:when>
-			<xsl:when test="substring($iso-date,5,2) = 10">
+			<xsl:when test="substring($iso-date,5,2) = '10'">
 				<xsl:text>Oct</xsl:text>
 			</xsl:when>
-			<xsl:when test="substring($iso-date,5,2) = 11">
+			<xsl:when test="substring($iso-date,5,2) = '11'">
 				<xsl:text>Nov</xsl:text>
 			</xsl:when>
 			<xsl:otherwise>
