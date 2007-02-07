@@ -3,7 +3,7 @@
  xmlns:xsl ="http://www.w3.org/1999/XSL/Transform"
  xmlns:mf  ="http://suda.co.uk/projects/microformats/mf-templates.xsl?template="
  xmlns:uri ="http://www.w3.org/2000/07/uri43/uri.xsl?template="
- version="1.0"
+ version="2.0"
 >
 
 <xsl:import href="../mf-templates.xsl" />
@@ -24,8 +24,8 @@ brian@suda.co.uk
 http://suda.co.uk/
 
 XHTML-2-vCard
-Version 0.9
-2006-11-08
+Version 0.10
+2007-02-06
 
 Copyright 2005 Brian Suda
 This work is relicensed under The W3C Open Source License
@@ -44,7 +44,7 @@ I'm not an XSLT expert, so there are no guarantees to quality of this code!
 
 
 
-<xsl:param name="Prodid" select='"-//suda.co.uk//X2V 0.9 (BETA)//EN"' />
+<xsl:param name="Prodid" select='"-//suda.co.uk//X2V 0.10 (BETA)//EN"' />
 <xsl:param name="Source" >(Best Practices states this should be the URL the vcard was transformed from)</xsl:param>
 <xsl:param name="Encoding" >UTF-8</xsl:param>
 <xsl:param name="Anchor" />
@@ -84,28 +84,33 @@ Without the correct profile you cannot assume the class values are intended for 
 <xsl:template name="properties">
 	<!--  Implied "N" Optimization -->
 	<xsl:variable name="n-elt" select="
-		.//*[ancestor-or-self::*[local-name() = 'del'] = false() and contains(concat(' ', normalize-space(@class), ' '),' n ')]
+		.//*[not(ancestor-or-self::*[local-name() = 'del']) = true() and contains(concat(' ', normalize-space(@class), ' '),' n ')]
 		or 
 		(
-		.//*[ancestor-or-self::*[local-name() = 'del'] = false() and not(contains(concat(' ', normalize-space(@class), ' '),' n '))]
+		.//*[not(ancestor-or-self::*[local-name() = 'del']) = true() and not(contains(concat(' ', normalize-space(@class), ' '),' n '))]
 		and
-		.//*[ancestor-or-self::*[local-name() = 'del'] = false() and ancestor::*[contains(concat(' ', normalize-space(@class), ' '),' fn ')] and (contains(concat(' ', normalize-space(@class), ' '),' given-name ') or contains(concat(' ', normalize-space(@class), ' '),' family-name '))]		
+		.//*[not(ancestor-or-self::*[local-name() = 'del']) = true() and ancestor::*[contains(concat(' ', normalize-space(@class), ' '),' fn ')] and (contains(concat(' ', normalize-space(@class), ' '),' given-name ') or contains(concat(' ', normalize-space(@class), ' '),' family-name '))]		
 		)		
 		" />
-				
+							
 	<xsl:variable name="fn-val">
 		<xsl:for-each select=".//*[contains(concat(' ',normalize-space(@class),' '),' fn ')]">
 			<xsl:if test="position() = 1">
 				<xsl:call-template name="mf:extractText"/>
 			</xsl:if>
 		</xsl:for-each>
-	</xsl:variable>
+	</xsl:variable>	
+	
 	<xsl:variable name="org-val">
-		<xsl:for-each select=".//*[ancestor-or-self::*[local-name() = 'del'] = false() and contains(concat(' ', normalize-space(@class), ' '),' org ')]">
-			<xsl:if test="position() = 1">
-				<xsl:call-template name="mf:extractOrg"/>
-			</xsl:if>
-		</xsl:for-each>
+		<xsl:variable name="orgData">
+			<xsl:for-each select=".//*[not(ancestor-or-self::*[local-name() = 'del']) = true() and contains(concat(' ', normalize-space(@class), ' '),' org ')]">
+				<xsl:if test="position() = 1">
+					<xsl:call-template name="mf:extractOrg"/>
+				</xsl:if>
+			</xsl:for-each>
+		</xsl:variable>
+		
+		<xsl:value-of select="$orgData/organization-name"/>
 	</xsl:variable>
 
 	<xsl:variable name="is-org" select="$fn-val = $org-val and not($fn-val = '')" />
@@ -114,7 +119,49 @@ Without the correct profile you cannot assume the class values are intended for 
 		<xsl:when test="$n-elt">
 			<xsl:for-each select=".//*[contains(concat(' ',normalize-space(@class),' '),' n ')]">
 				<xsl:if test="position() = 1">
-					<xsl:call-template name="mf:extractN"/>
+					<xsl:variable name="nData">
+						<xsl:call-template name="mf:extractN"/>
+					</xsl:variable>
+					
+					<xsl:text>&#x0D;&#x0A;N</xsl:text>
+					<xsl:call-template name="lang" />
+					<xsl:text>;CHARSET=</xsl:text><xsl:value-of select="$Encoding"/>
+					<xsl:text>:</xsl:text>
+					<xsl:for-each select="$nData/family-names/family-name">
+						<xsl:if test="position() != 1">
+							<xsl:text>,</xsl:text>
+						</xsl:if>
+						<xsl:value-of select="."/>
+					</xsl:for-each>
+					<xsl:text>;</xsl:text>
+					<xsl:for-each select="$nData/given-names/given-name">
+						<xsl:if test="position() != 1">
+							<xsl:text>,</xsl:text>
+						</xsl:if>
+						<xsl:value-of select="."/>
+					</xsl:for-each>
+					<xsl:text>;</xsl:text>
+					<xsl:for-each select="$nData/additional-names/additional-name">
+						<xsl:if test="position() != 1">
+							<xsl:text>,</xsl:text>
+						</xsl:if>
+						<xsl:value-of select="."/>
+					</xsl:for-each>
+					<xsl:text>;</xsl:text>
+					<xsl:for-each select="$nData/honorific-prefixs/honorific-prefix">
+						<xsl:if test="position() != 1">
+							<xsl:text>,</xsl:text>
+						</xsl:if>
+						<xsl:value-of select="."/>
+					</xsl:for-each>
+					<xsl:text>;</xsl:text>
+					<xsl:for-each select="$nData/honorific-suffixs/honorific-suffix">
+						<xsl:if test="position() != 1">
+							<xsl:text>,</xsl:text>
+						</xsl:if>
+						<xsl:value-of select="."/>
+					</xsl:for-each>
+					
 				</xsl:if>
 			</xsl:for-each>
 		</xsl:when>
@@ -129,12 +176,24 @@ Without the correct profile you cannot assume the class values are intended for 
 		</xsl:otherwise>
 	</xsl:choose>
 
-	<xsl:for-each select=".//*[ancestor-or-self::*[local-name() = 'del'] = false() and contains(concat(' ', normalize-space(@class), ' '),' org ')]">
+	<xsl:for-each select=".//*[not(ancestor-or-self::*[local-name() = 'del']) = true() and contains(concat(' ', normalize-space(@class), ' '),' org ')]">
 		<xsl:if test="position() = 1">
 			<xsl:text>&#x0D;&#x0A;ORG</xsl:text>
 			<xsl:text>;CHARSET=</xsl:text><xsl:value-of select="$Encoding"/>
 	    	<xsl:text>:</xsl:text>
-			<xsl:call-template name="mf:extractOrg"/>
+			<xsl:variable name="orgData">
+				<xsl:call-template name="mf:extractOrg"/>
+			</xsl:variable>
+			
+			<xsl:call-template name="escapeText">
+				<xsl:with-param name="text-string"><xsl:value-of select="$orgData/organization-name"/></xsl:with-param>
+			</xsl:call-template>
+			<xsl:for-each select="$orgData/organization-units/organization-unit">
+				<xsl:text>;</xsl:text>
+				<xsl:call-template name="escapeText">
+					<xsl:with-param name="text-string"><xsl:value-of select="."/></xsl:with-param>
+				</xsl:call-template>
+			</xsl:for-each>
 		</xsl:if>
 	</xsl:for-each>
 	
@@ -267,31 +326,83 @@ Without the correct profile you cannot assume the class values are intended for 
 			</xsl:call-template>
 	</xsl:for-each>
 	
-	<xsl:for-each select=".//*[ancestor-or-self::*[local-name() = 'del'] = false() and contains(concat(' ', normalize-space(@class), ' '),' email ')]">
+	<xsl:for-each select=".//*[contains(concat(' ', normalize-space(@class), ' '),' email ')]">
 		<xsl:text>&#x0D;&#x0A;EMAIL</xsl:text>
-		<xsl:call-template name="mf:extractUid">
-			<xsl:with-param name="protocol">mailto</xsl:with-param>
-			<xsl:with-param name="type-list">internet x400 pref</xsl:with-param>
-		</xsl:call-template>
+		<xsl:variable name="emailData">
+			<xsl:call-template name="mf:extractUid">
+				<xsl:with-param name="protocol">mailto</xsl:with-param>
+				<xsl:with-param name="type-list">internet x400 pref</xsl:with-param>
+			</xsl:call-template>
+		</xsl:variable>
+		<xsl:if test="$emailData/type != ''">
+			<xsl:text>;TYPE=</xsl:text>
+			<xsl:value-of select="$emailData/type"/>
+		</xsl:if>
+		<xsl:text>:</xsl:text>
+		<xsl:value-of select="$emailData/value"/>
+		
 	</xsl:for-each>
 	
-	<xsl:for-each select=".//*[ancestor-or-self::*[local-name() = 'del'] = false() and contains(concat(' ', normalize-space(@class), ' '),' adr ')]">
+	<xsl:for-each select=".//*[contains(concat(' ', normalize-space(@class), ' '),' adr ')]">
+		<xsl:variable name="adrData">
 			<xsl:call-template name="mf:extractAdr">
 				<xsl:with-param name="type-list">dom intl postal parcel home work pref</xsl:with-param>
 			</xsl:call-template>
+		</xsl:variable>
+			<xsl:text>&#x0D;&#x0A;ADR</xsl:text>
+			<xsl:call-template name="lang" />
+			<xsl:text>;CHARSET=</xsl:text><xsl:value-of select="$Encoding"/>
+
+			<xsl:if test="not(normalize-space($adrData/type)) = false()">
+				<xsl:text>;TYPE=</xsl:text>
+				<xsl:value-of select="normalize-space($adrData/type)"/>
+			</xsl:if>
+			<xsl:text>:</xsl:text>
+
+			<!-- need to convert these for multiple instances -->
+			<xsl:value-of select="$adrData/post-office-box"/>
+			<xsl:text>;</xsl:text>
+		    <xsl:value-of select="$adrData/extended-address"/>
+		    <xsl:text>;</xsl:text>
+			<xsl:value-of select="$adrData/street-address"/>
+			<xsl:text>;</xsl:text>
+		    <xsl:value-of select="$adrData/locality"/>
+		    <xsl:text>;</xsl:text>
+		    <xsl:value-of select="$adrData/region"/>
+		    <xsl:text>;</xsl:text>
+		    <xsl:value-of select="$adrData/postal-code"/>
+		    <xsl:text>;</xsl:text>
+		    <xsl:value-of select="$adrData/country-name"/>
+			
 	</xsl:for-each>
 
-	<xsl:for-each select=".//*[ancestor-or-self::*[local-name() = 'del'] = false() and contains(concat(' ', normalize-space(@class), ' '),' tel ')]">
+	<xsl:for-each select=".//*[contains(concat(' ', normalize-space(@class), ' '),' tel ')]">
 		<xsl:text>&#x0D;&#x0A;TEL</xsl:text>
-		<xsl:call-template name="mf:extractUid">
-			<xsl:with-param name="protocol">tel</xsl:with-param>
-			<xsl:with-param name="type-list">home work pref voice fax msg cell pager bbs modem car isdn video pcs</xsl:with-param>
-		</xsl:call-template>
+		<xsl:variable name="telData">
+			<xsl:call-template name="mf:extractUid">
+				<xsl:with-param name="protocol">tel fax</xsl:with-param>
+				<xsl:with-param name="type-list">home work pref voice fax msg cell pager bbs modem car isdn video pcs</xsl:with-param>
+			</xsl:call-template>
+		</xsl:variable>
+		
+		<xsl:if test="$telData/type != ''">
+			<xsl:text>;TYPE=</xsl:text>
+			<xsl:value-of select="$telData/type"/>
+		</xsl:if>
+		<xsl:text>:</xsl:text>
+		<xsl:value-of select="$telData/value"/>
+		
 	</xsl:for-each>
 
-	<xsl:for-each select=".//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ', normalize-space(@class), ' '),' geo ')][1]">
+	<xsl:for-each select=".//*[contains(concat(' ', normalize-space(@class), ' '),' geo ')][1]">
 		<xsl:text>&#x0D;&#x0A;GEO:</xsl:text>
-		<xsl:call-template name="mf:extractGeo"/>
+		<xsl:variable name="geoData">
+			<xsl:call-template name="mf:extractGeo"/>
+		</xsl:variable>
+
+		<xsl:value-of select="$geoData/latitude"/>
+		<xsl:text>;</xsl:text>
+		<xsl:value-of select="$geoData/longitude"/>
 	</xsl:for-each>
 	
 	<xsl:for-each select=".//*[contains(concat(' ',normalize-space(@class),' '),' note ')]">
@@ -319,7 +430,15 @@ Without the correct profile you cannot assume the class values are intended for 
 		<xsl:when test="not($is-org)">
 			<!-- check to see it is only one word long -->
 			<xsl:choose>
-				<xsl:when test="((true() = normalize-space(.//*[ancestor-or-self::*[local-name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ') and (local-name() = 'img' or local-name() = 'area')]/@alt) and (string-length(normalize-space(.//*[ancestor-or-self::*[local-name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ') and (local-name() = 'img' or local-name() = 'area')]/@alt)) = string-length(translate(normalize-space(.//*[ancestor-or-self::*[local-name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ') and (local-name() = 'img' or local-name() = 'area')]/@alt),' ','')))) or (true() = normalize-space(.//*[ancestor-or-self::*[local-name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ') and local-name() = 'abbr']/@title) and (string-length(normalize-space(.//*[ancestor-or-self::*[local-name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ') and local-name() = 'abbr']/@title)) = string-length(translate(normalize-space(.//*[ancestor-or-self::*[local-name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ') and local-name() = 'abbr']/@title),' ','')))) or (true() = normalize-space(.//*[ancestor-or-self::*[local-name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ') and not(local-name() = 'abbr' or local-name() = 'img')]) and (string-length(normalize-space(.//*[ancestor-or-self::*[local-name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ') and not(local-name() = 'abbr' or local-name() = 'img')])) = string-length(translate(normalize-space(.//*[ancestor-or-self::*[local-name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ') and not(local-name() = 'abbr' or local-name() = 'img')]),' ','')))))">
+				<xsl:when test="(false() = not((.//*[not(ancestor-or-self::*[local-name() = 'del']) = true() and contains(concat(' ',normalize-space(@class),' '),' fn ') and (local-name() = 'img' or local-name() = 'area')]/@alt) and (string-length(normalize-space(.//*[not(ancestor-or-self::*[local-name() = 'del']) = true() and contains(concat(' ',normalize-space(@class),' '),' fn ') and (local-name() = 'img' or local-name() = 'area')]/@alt)) = string-length(translate(normalize-space(.//*[not(ancestor-or-self::*[local-name() = 'del']) = true() and contains(concat(' ',normalize-space(@class),' '),' fn ') and (local-name() = 'img' or local-name() = 'area')]/@alt),' ',''))))) or (false() = not((.//*[not(ancestor-or-self::*[local-name() = 'del']) = true() and contains(concat(' ',normalize-space(@class),' '),' fn ') and (local-name() = 'abbr')]/@title) and (string-length(normalize-space(.//*[not(ancestor-or-self::*[local-name() = 'del']) = true() and contains(concat(' ',normalize-space(@class),' '),' fn ') and (local-name() = 'abbr')]/@title)) = string-length(translate(normalize-space(.//*[not(ancestor-or-self::*[local-name() = 'del']) = true() and contains(concat(' ',normalize-space(@class),' '),' fn ') and (local-name() = 'abbr')]/@title),' ',''))))) or (false() = not((.//*[not(ancestor-or-self::*[local-name() = 'del']) = true() and contains(concat(' ',normalize-space(@class),' '),' fn ') and not(local-name() = 'abbr' or local-name() = 'img')]) and (string-length(normalize-space(.//*[not(ancestor-or-self::*[local-name() = 'del']) = true() and contains(concat(' ',normalize-space(@class),' '),' fn ') and not(local-name() = 'abbr' or local-name() = 'img' or local-name() = 'area')][1])) = string-length(translate(normalize-space(.//*[not(ancestor-or-self::*[local-name() = 'del']) = true() and contains(concat(' ',normalize-space(@class),' '),' fn ') and not(local-name() = 'abbr' or local-name() = 'img')][1]),' ','')))))">
+<!-- 
+	
+	
+	
+	
+						       
+	-->
+
 					<xsl:if test=".//*[contains(concat(' ', normalize-space(@class), ' '),' nickname ')]">
 						<xsl:text>&#x0D;&#x0A;NICKNAME</xsl:text>
 						<xsl:call-template name="lang" />
@@ -331,14 +450,14 @@ Without the correct profile you cannot assume the class values are intended for 
 							</xsl:call-template>
 						</xsl:for-each>
 						<xsl:choose>
-							<xsl:when test="true() = normalize-space(.//*[ancestor-or-self::*[local-name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ') and (local-name() = 'img' or local-name() = 'area')]/@alt)">
-								<xsl:value-of select=".//*[ancestor-or-self::*[local-name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ')]/@alt"/>
+							<xsl:when test="false() = not(normalize-space(.//*[not(ancestor-or-self::*[local-name() = 'del']) = true() and contains(concat(' ',normalize-space(@class),' '),' fn ') and (local-name() = 'img' or local-name() = 'area')]/@alt))">
+								<xsl:value-of select=".//*[not(ancestor-or-self::*[local-name() = 'del']) = true() and contains(concat(' ',normalize-space(@class),' '),' fn ')]/@alt"/>
 							</xsl:when>
-							<xsl:when test="true() = normalize-space(.//*[ancestor-or-self::*[local-name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ') and local-name() = 'abbr']/@title)">
-								<xsl:value-of select="normalize-space(.//*[ancestor-or-self::*[local-name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ')]/@title)"/>
+							<xsl:when test="false() = not(normalize-space(.//*[not(ancestor-or-self::*[local-name() = 'del']) = true() and contains(concat(' ',normalize-space(@class),' '),' fn ') and local-name() = 'abbr']/@title))">
+								<xsl:value-of select="normalize-space(.//*[not(ancestor-or-self::*[local-name() = 'del']) = true() and contains(concat(' ',normalize-space(@class),' '),' fn ')]/@title)"/>
 							</xsl:when>
 							<xsl:otherwise>
-								<xsl:value-of select="normalize-space(.//*[ancestor-or-self::*[local-name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ')])"/>
+								<xsl:value-of select="normalize-space(.//*[not(ancestor-or-self::*[local-name() = 'del']) = true() and contains(concat(' ',normalize-space(@class),' '),' fn ')])"/>
 							</xsl:otherwise>
 						</xsl:choose>
 					</xsl:if>
@@ -360,6 +479,7 @@ Without the correct profile you cannot assume the class values are intended for 
 					</xsl:if>
 				</xsl:otherwise>
 			</xsl:choose>
+
 		</xsl:when>
 		<xsl:otherwise>
 			<xsl:if test=".//*[contains(concat(' ', normalize-space(@class), ' '),' nickname ')]">
@@ -400,121 +520,25 @@ Without the correct profile you cannot assume the class values are intended for 
 	<!-- <xsl:apply-templates select=".//*[ancestor-or-self::*[local-name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' agent ')]" mode="agent"/> 	-->
 
 	<!-- @@TYPE=PGP, TYPE=X509, ENCODING=b -->
-	<xsl:variable name="key-elt" select=".//*[ancestor-or-self::*[local-name() = 'del'] = false() and contains(concat(' ', normalize-space(@class), ' '),' key ')]" />
+	<xsl:variable name="key-elt" select=".//*[not(ancestor-or-self::*[local-name() = 'del']) = true() and contains(concat(' ', normalize-space(@class), ' '),' key ')]" />
 	<xsl:if test="$key-elt">
 			<xsl:call-template name="key-prop"/>
 	</xsl:if>
 
 	<!-- LABEL needs work! -->
-	<xsl:variable name="label-elt" select=".//*[ancestor-or-self::*[local-name() = 'del'] = false() and contains(concat(' ', normalize-space(@class), ' '),' label ')]" />
+	<xsl:variable name="label-elt" select=".//*[not(ancestor-or-self::*[local-name() = 'del']) = true() and contains(concat(' ', normalize-space(@class), ' '),' label ')]" />
 	<xsl:if test="$label-elt">
 			<xsl:call-template name="label-prop"/>
 	</xsl:if>
 		
 </xsl:template>
 
-<xsl:template name="orgCallBack">
-	<xsl:param name="organization-name"/>
-	<xsl:param name="organization-unit"/>
-	<xsl:call-template name="escapeText">
-		<xsl:with-param name="text-string"><xsl:value-of select="$organization-name"/></xsl:with-param>
-	</xsl:call-template>	
-	<xsl:text>;</xsl:text>
-	<xsl:value-of select="$organization-unit"/>
-	<!-- this will cause problems, it will escape the delimiter ';' -->
-	<!--
-	<xsl:call-template name="escapeText">
-		<xsl:with-param name="text-string"><xsl:value-of select="$organization-unit"/></xsl:with-param>
-	</xsl:call-template>
-	-->
-</xsl:template>
-
-<!-- N Property -->
-<xsl:template name="nCallBack">
-	<xsl:param name="family-name"/>
-	<xsl:param name="given-name"/>
-	<xsl:param name="additional-name"/>
-	<xsl:param name="honorific-prefix"/>
-	<xsl:param name="honorific-suffix"/>
-	
-	<xsl:text>&#x0D;&#x0A;N</xsl:text>
-	<xsl:call-template name="lang" />
-	<xsl:text>;CHARSET=</xsl:text><xsl:value-of select="$Encoding"/>
-	<xsl:text>:</xsl:text>
-	<xsl:value-of select="$family-name"/>	
-	<xsl:text>;</xsl:text>
-	<xsl:value-of select="$given-name"/>
-	<xsl:text>;</xsl:text>
-	<xsl:value-of select="$additional-name"/>
-	<xsl:text>;</xsl:text>
-	<xsl:value-of select="$honorific-prefix"/>
-	<xsl:text>;</xsl:text>
-	<xsl:value-of select="$honorific-suffix"/>
-</xsl:template>
-
-<xsl:template name="geoCallBack">
-	<xsl:param name="latitude"/>
-	<xsl:param name="longitude"/>
-	<xsl:param name="altitude"/>
-	<xsl:value-of select="$latitude"/>
-	<xsl:text>;</xsl:text>
-	<xsl:value-of select="$longitude"/>
-</xsl:template>
-
-<xsl:template name="uidCallBack">
-	<xsl:param name="type"/>
-	<xsl:param name="value"/>
-	
-	<xsl:if test="$type != ''">
-		<xsl:text>;TYPE=</xsl:text>
-		<xsl:value-of select="$type"/>
-	</xsl:if>
-	<xsl:text>:</xsl:text>
-	<xsl:value-of select="$value"/>
-</xsl:template>
-
-<xsl:template name="adrCallBack">
-	<xsl:param name="type"/>
-	<xsl:param name="post-office-box"/>
-	<xsl:param name="street-address"/>
-	<xsl:param name="extended-address"/>
-	<xsl:param name="locality"/>
-	<xsl:param name="region"/>
-	<xsl:param name="country-name"/>
-	<xsl:param name="postal-code"/>
-
-	<xsl:text>&#x0D;&#x0A;ADR</xsl:text>
-	<xsl:call-template name="lang" />
-	<xsl:text>;CHARSET=</xsl:text><xsl:value-of select="$Encoding"/>
-	
-	<xsl:if test="normalize-space($type)">
-		<xsl:text>;TYPE=</xsl:text>
-		<xsl:value-of select="$type"/>
-	</xsl:if>
-	<xsl:text>:</xsl:text>
-		
-	<xsl:value-of select="$post-office-box"/>
-	<xsl:text>;</xsl:text>
-    <xsl:value-of select="$extended-address"/>
-    <xsl:text>;</xsl:text>
-	<xsl:value-of select="$street-address"/>
-	<xsl:text>;</xsl:text>
-    <xsl:value-of select="$locality"/>
-    <xsl:text>;</xsl:text>
-    <xsl:value-of select="$region"/>
-    <xsl:text>;</xsl:text>
-    <xsl:value-of select="$postal-code"/>
-    <xsl:text>;</xsl:text>
-    <xsl:value-of select="$country-name"/>
-</xsl:template>
-
-
 <!-- blob Property -->
 <xsl:template name="blobProp">
 	<xsl:param name="label" />
 	<xsl:param name="class" />
 
-	<xsl:for-each select=".//*[ancestor-or-self::*[local-name() = 'del'] = false() and contains(concat(' ', @class, ' '),concat(' ', $class, ' '))]">
+	<xsl:for-each select=".//*[not(ancestor-or-self::*[local-name() = 'del']) = true() and contains(concat(' ', @class, ' '),concat(' ', $class, ' '))]">
 		<xsl:if test="position() = 1">
 		<xsl:text>&#x0D;&#x0A;</xsl:text>
 		<xsl:value-of select="$label" />
@@ -598,7 +622,7 @@ Without the correct profile you cannot assume the class values are intended for 
 
 <!-- KEY Property -->
 <xsl:template name="key-prop">
-	<xsl:for-each select=".//*[ancestor-or-self::*[local-name() = 'del'] = false() and contains(concat(' ', @class, ' '),concat(' ', 'key', ' '))]">
+	<xsl:for-each select=".//*[not(ancestor-or-self::*[local-name() = 'del']) = true() and contains(concat(' ', @class, ' '),concat(' ', 'key', ' '))]">
 	<xsl:if test="position() = 1">
         <xsl:text>&#x0D;&#x0A;KEY:</xsl:text>
 		<xsl:variable name="types">
@@ -633,7 +657,7 @@ Without the correct profile you cannot assume the class values are intended for 
 
 <!-- LABEL Property -->
 <xsl:template name="label-prop">
-	<xsl:for-each select=".//*[ancestor-or-self::*[local-name() = 'del'] = false() and contains(concat(' ', @class, ' '),concat(' ', label, ' '))]">
+	<xsl:for-each select=".//*[not(ancestor-or-self::*[local-name() = 'del']) = true() and contains(concat(' ', @class, ' '),concat(' ', label, ' '))]">
 		<xsl:if test="position() = 1">
 	        <xsl:text>&#x0D;&#x0A;LABEL:</xsl:text>
 		<xsl:variable name="types">
@@ -667,7 +691,7 @@ Without the correct profile you cannot assume the class values are intended for 
 
 <!-- IMPLIED N from FN -->
 <xsl:template name="implied-n">
-	<xsl:for-each select=".//*[ancestor-or-self::*[local-name() = 'del'] = false() and contains(concat(' ', @class, ' '),concat(' ', 'fn', ' '))]">
+	<xsl:for-each select=".//*[not(ancestor-or-self::*[local-name() = 'del']) = true() and contains(concat(' ', @class, ' '),concat(' ', 'fn', ' '))]">
 		<xsl:if test="position() = 1">
 			<xsl:text>&#x0D;&#x0A;N</xsl:text>
 			<xsl:call-template name="lang" />
@@ -866,7 +890,6 @@ Without the correct profile you cannot assume the class values are intended for 
 				</xsl:when>
 				<!-- might need to add case when data is on OBJECT element? -->
 				<xsl:otherwise>
-					
 					<xsl:choose>
 						<xsl:when test='
 							(string-length(substring-after(normalize-space(.), " ")) = 1) or
@@ -931,7 +954,7 @@ Without the correct profile you cannot assume the class values are intended for 
 							</xsl:call-template>
 							
 						</xsl:when>
-						<xsl:when test='not(substring-before(normalize-space(.), " "))'>
+						<xsl:when test='not(substring-before(normalize-space(.), " "))'>							
 							<xsl:variable name="given-name">
 								<xsl:text />
 							</xsl:variable>
@@ -946,7 +969,7 @@ Without the correct profile you cannot assume the class values are intended for 
 								<xsl:with-param name="text-string" select="$given-name" />
 							</xsl:call-template>
 						</xsl:when>
-						<xsl:otherwise>
+						<xsl:when test="string-length(normalize-space(.)) = (1+string-length(translate(normalize-space(.),' ','')))">
 							<xsl:variable name="given-name">
 								<xsl:value-of select='substring-before(normalize-space(.), " ")' />
 							</xsl:variable>
@@ -959,7 +982,10 @@ Without the correct profile you cannot assume the class values are intended for 
 							<xsl:text>;</xsl:text>
 							<xsl:call-template name="escapeText">
 								<xsl:with-param name="text-string" select="$given-name" />
-							</xsl:call-template>							
+							</xsl:call-template>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:text>;</xsl:text>
 						</xsl:otherwise>
 					</xsl:choose>
 				</xsl:otherwise>
@@ -1262,7 +1288,7 @@ Without the correct profile you cannot assume the class values are intended for 
 	<xsl:param name="text-string"></xsl:param>
 	<xsl:param name="colapse-spacing">1</xsl:param>
 	<xsl:choose>
-		<xsl:when test="substring($text-string,2) = true()">
+		<xsl:when test="not(substring($text-string,2)) = false()">
 			<xsl:choose>
 				<xsl:when test="$colapse-spacing = '1'">
 					<xsl:choose>
@@ -1324,7 +1350,7 @@ Without the correct profile you cannot assume the class values are intended for 
 <xsl:template name="escapeText">
 	<xsl:param name="text-string"></xsl:param>
 	<xsl:choose>
-		<xsl:when test="substring($text-string,2) = true()">
+		<xsl:when test="not(substring($text-string,2)) = false()">
 			<xsl:choose>
 				<xsl:when test="substring($text-string,1,1) = '\'">
 					<xsl:text>\\</xsl:text>

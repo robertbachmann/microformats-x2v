@@ -3,8 +3,7 @@
  xmlns:xsl ="http://www.w3.org/1999/XSL/Transform"
  xmlns:mf  ="http://suda.co.uk/projects/microformats/mf-templates.xsl?template="
  xmlns:uri ="http://www.w3.org/2000/07/uri43/uri.xsl?template="
-
- version="1.0"
+ version="2.0"
 >
 
 <xsl:import href="../mf-templates.xsl" />
@@ -440,7 +439,13 @@ I'm not an XSLT expert, so there are no guarantees to quality of this code!
 
 	<xsl:for-each select=".//*[ancestor-or-self::*[name() = 'del'] = false() and contains(concat(' ', normalize-space(@class), ' '),' geo ')]">
 		<xsl:text>&#x0D;&#x0D;&#x0A;GEO:</xsl:text>
-		<xsl:call-template name="mf:extractGeo"/>
+		<xsl:variable name="geoData">
+			<xsl:call-template name="mf:extractGeo"/>
+		</xsl:variable>
+
+		<xsl:value-of select="$geoData/latitude"/>
+		<xsl:text>;</xsl:text>
+		<xsl:value-of select="$geoData/longitude"/>
 	</xsl:for-each>
 	
 	<xsl:call-template name="personProp">
@@ -603,15 +608,6 @@ I'm not an XSLT expert, so there are no guarantees to quality of this code!
 	
 </xsl:template>
 -->
-
-<xsl:template name="geoCallBack">
-	<xsl:param name="latitude"/>
-	<xsl:param name="longitude"/>
-	<xsl:param name="altitude"/>
-	<xsl:value-of select="$latitude"/>
-	<xsl:text>;</xsl:text>
-	<xsl:value-of select="$longitude"/>
-</xsl:template>
 
 <!-- Person Property (Attendee / Organizer) -->
 <xsl:template name="personProp">
@@ -1027,11 +1023,6 @@ ATTACH</xsl:text>
 <xsl:template match="text()"></xsl:template>
 
 <!-- Empty templates required by Saxon -->
-<!-- @@TODO: refactor mf-templates.xsl to use node-set() -->
-<xsl:template name="nCallBack" />
-<xsl:template name="orgCallBack" />
-<xsl:template name="adrCallBack" />
-<xsl:template name="uidCallBack" />
 <xsl:template name="vtodoProperties" />
 <xsl:template name="vfreebusyProperties" />
 
