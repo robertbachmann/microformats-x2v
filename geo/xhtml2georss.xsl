@@ -3,7 +3,10 @@
  xmlns:xsl ="http://www.w3.org/1999/XSL/Transform"
  xmlns:mf  ="http://suda.co.uk/projects/microformats/mf-templates.xsl?template="
  xmlns:geo ="http://www.w3.org/2003/01/geo/wgs84_pos#"
- version="2.0"
+ xmlns:common="http://exslt.org/common"
+ extension-element-prefixes="common"
+ exclude-result-prefixes="mf"
+ version="1.0"
 >
 
 <xsl:import href="../mf-templates.xsl" />
@@ -59,9 +62,10 @@ http://www.w3.org/Consortium/Legal/copyright-software-19980720
 
 
 <xsl:template name="properties">
-	<xsl:variable name="latLon">
+	<xsl:variable name="latLon-RTF">
 		<xsl:call-template name="mf:extractGeo"/>
 	</xsl:variable>	
+	<xsl:variable name="latLon" select="common:node-set($latLon-RTF)"/>
 	<title>
 	<xsl:choose>
 		<!-- if this is an abbr element, use the value -->

@@ -4,6 +4,7 @@
  xmlns:mf  ="http://suda.co.uk/projects/microformats/mf-templates.xsl?template="
  xmlns:uri ="http://www.w3.org/2000/07/uri43/uri.xsl?template="
  xmlns:common="http://exslt.org/common" 
+ extension-element-prefixes="common"
  version="1.0"
 >
 
