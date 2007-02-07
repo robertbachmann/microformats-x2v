@@ -14,9 +14,11 @@ use strict;
 
 use FindBin;
 use Data::Dumper;
-use Cwd;
+use File::Basename;
+use Cwd qw(cwd);
 use utf8;
 use POSIX qw(isatty);
+use Carp;
 
 sub new {    # Constructor
     my $class = shift;
@@ -33,8 +35,14 @@ sub new {    # Constructor
     };
     bless $self, $class;
 
-    foreach ( keys %{$args} ) {
-        $self->{$_} = $args->{$_};
+    # get required arguments
+    foreach ( qw(xslt_filename) ) {
+        if (exists $args->{$_}) {
+            $self->{$_} = $args->{$_};
+        }
+        else {
+            Carp::croak("Missing required argument $_\n");
+        }
     }
 
     eval { require XML::LibXML; require XML::LibXSLT };
@@ -67,8 +75,10 @@ sub new {    # Constructor
         exit 1;
     }
 
+
     $self->{test_dir} = $ENV{MICROFORMATS_TESTS};
 
+    $self->{inital_cwd} = cwd();
     chdir( $self->{test_dir} ) || die "Couldn't chdir to tests directory";
 
     my @test_list = $self->get_file_names_and_params();
@@ -102,7 +112,8 @@ sub parse_cmdline_args {    # Parse the commandline arguments from ARGV
         $p->getoptions(
             \%opt,          '4xslt',   'libxslt|x', 'saxon',
             'xalan-c',      'xalan-j', 'q|quiet',   'all|A',
-            'list-tests|l', 'exclude|e=s@', 'color:1' ,'help'
+            'list-tests|l', 'color|c:1', 'dump=s',  'exclude|e=s@',
+            'help'
         );
     }
     else {
@@ -123,6 +134,7 @@ sub parse_cmdline_args {    # Parse the commandline arguments from ARGV
         exit 0;
     }
 
+    $self->{dump_file} = $opt{dump};
     $self->{use_color} = $opt{color};
     $self->{quiet} = 1 if ( $opt{q} );
 
@@ -291,7 +303,8 @@ Run the test suite with the supported XSLT engines.
   -l, --list-tests         List test numbers and exit
   -e, --exclude            Exclude test(s)
   -q, --quiet              Supress uppress nonessential output
-      --color [1|0]        Display colors if value is ommited or 1.
+  -c, --color [1|0]        Display colors if value is ommited or 1.
+      --dump FILENAME      Write machine-readable test results to FILENAME
   -A, --all                Run the tests with all engines
   -x, --libxslt            Run the tests with libxslt (via `XML::LibXSLT')
       --4xslt              Run the tests with 4XSLT
@@ -379,9 +392,22 @@ sub remove_doctype {
     $$s_ref = substr( $$s_ref, 0, $start ) . substr( $$s_ref, $end + 1 );
 }
 
+sub dump_results {
+    my ($self, $results_ref)  = @_;
+    my $d = Data::Dumper->new([$results_ref]);
+    my $varname = uc basename($self->{xslt_filename});
+    $varname =~ s/[^A-Z0-9]//g;
+
+    $d->Indent(1);
+    $d->Varname($varname);
+
+    chdir($self->{inital_cwd});
+    $self->write_file($self->{dump_file}, $d->Dump);
+}
+
 sub run {    # Run all tests
     my $self         = shift;
-    my $test_results = {};
+    my @results;
 
     chdir( $FindBin::Bin . '/../..' );
     $self->load_libxslt();
@@ -390,6 +416,9 @@ sub run {    # Run all tests
 
     foreach my $test ( @{ $self->{test_list} } ) {
         next unless $test->{enabled};
+
+        my %test_result = ( 'test-name' => $test->{test_name} );
+
         # get the expected result
         my $expected = do {
             my $s = $self->read_file( $test->{result_filename} );
@@ -412,8 +441,7 @@ sub run {    # Run all tests
 
             my $got = $self->execute_engine( $engine, $test );
             if ( !defined($got) ) { # engine error
-                $test_results->{ $test->{test_name} }->{ $engine . "-result" }
-                    = -1;
+                $test_result{ $engine . "-result" } = 'FAIL (ENGINE)';
                 next;
             }
             $got = $self->normalize_data($got);
@@ -421,26 +449,24 @@ sub run {    # Run all tests
             if ( $self->compare_result( $got, $expected ) ) {
                 $self->color_print("PASS", 'lime');
                 print " ", $test->{test_name}, " [$engine]\n";
-                $passed = 1;
+                $test_result{ $engine . "-result" } = 'PASS';
             }
             else {
                 $self->color_print("FAIL", 'red');
                 print " ", $test->{test_name}, " [$engine]\n";
-                unless ( $self->{quiet} ) {
+                if ( !$self->{quiet} || $self->{dump_file} ) {
                     my $diff = $self->make_diff( $expected, $got );
-                    $test_results->{ $test->{test_name} }
-                        ->{ $engine . "-diff" } = $diff;
-                    $self->print_diff($diff);
+                    $test_result{ $engine . "-diff" } = $diff;
+                    $self->print_diff($diff) unless $self->{quiet};
                 }
-                $passed = 0;
+                $test_result{ $engine . "-result" } = 'FAIL';
             }
-
-            $test_results->{ $test->{test_name} }->{ $engine . "-result" }
-                = $passed;
         }
+        push @results, \%test_result;
         unlink('tmp-in');
         unlink('tmp-out');
     }
+    $self->dump_results(\@results) if ($self->{dump_file});
 }
 
 sub make_diff {    # Generate an unified diff
