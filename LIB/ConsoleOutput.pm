@@ -44,6 +44,60 @@ sub new {    # Constructor
     return $self;
 }
 
+sub print_summary {    # print a summary table
+    my ( $self, $test_data ) = @_;
+    my $width_left = 68;
+
+    # get the used engines
+    my @used_engines;
+    for ( keys %{ $test_data->[0] } ) {
+        next unless /-result$/;
+        my $engine = $_;
+
+        $engine =~ s/-result$//;
+        push @used_engines, $engine;
+    }
+    @used_engines = sort(@used_engines);
+
+    # print header
+    my %engine_lut = (
+        '4XSLT'   => '4X',
+        'LibXSLT' => 'LX',
+        'Xalan-C' => 'XC',
+        'Xalan-J' => 'XJ',
+        'Saxon'   => 'SA'
+    );
+    for ( my $i = 0; $i < 2; $i++ ) {
+        print ' ' x 68;
+        for my $engine (@used_engines) {
+            my $char = substr( $engine_lut{$engine}, $i, 1 );
+            print "$char ";
+        }
+        print "\n";
+    }
+    print "\n";
+
+    # print body
+    for my $test ( @{$test_data} ) {
+        my $name = $test->{'test-name'};
+
+        print $name;
+        print ' ' x ( $width_left - length($name) );
+
+        for my $engine (@used_engines) {
+            my $result = $test->{ $engine . '-result' };
+            if ( $result eq 'PASS' ) {
+                $self->color_print( 'P', 'lime' );
+            }
+            else {
+                $self->color_print( 'F', 'red' );
+            }
+            print ' ';
+        }
+        print "\n";
+    }
+}
+
 sub color_print {    # print with colors if appropriate
     my ( $self, $text, $text_color ) = @_;
     my %color = (

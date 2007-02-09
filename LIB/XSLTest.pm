@@ -120,7 +120,7 @@ sub parse_cmdline_args {    # Parse the commandline arguments from ARGV
             \%opt,          '4xslt',     'libxslt|x', 'saxon',
             'xalan-c',      'xalan-j',   'q|quiet',   'all|A',
             'list-tests|l', 'color|c:1', 'dump=s',    'exclude|e=s@',
-            'help'
+            'table|t',      'help'
         );
     }
     else {
@@ -141,9 +141,10 @@ sub parse_cmdline_args {    # Parse the commandline arguments from ARGV
         exit 0;
     }
 
-    $self->{dump_file} = $opt{dump};
-    $self->{use_color} = $opt{color};
-    $self->{quiet}     = 1 if ( $opt{q} );
+    $self->{dump_file}             = $opt{dump};
+    $self->{display_summary_table} = $opt{table};
+    $self->{use_color}             = $opt{color};
+    $self->{quiet}                 = 1 if ( $opt{q} );
 
     $self->{engines}->{'4XSLT'}   = 1 if ( $opt{'4xslt'} );
     $self->{engines}->{'LibXSLT'} = 1 if ( $opt{libxslt} );
@@ -249,6 +250,7 @@ Run the test suite with the supported XSLT engines.
   -q, --quiet              Supress uppress nonessential output
   -c, --color [1|0]        Display colors if value is ommited or 1.
       --dump FILENAME      Write machine-readable test results to FILENAME
+  -t  --table              Display a summary table after the tests
   -A, --all                Run the tests with all engines
   -x, --libxslt            Run the tests with libxslt (via `XML::LibXSLT')
       --4xslt              Run the tests with 4XSLT
@@ -412,6 +414,8 @@ sub run {    # Run all tests
         unlink( $self->{temp_in} );
         unlink( $self->{temp_out} );
     }
+    $self->{console_out}->print_summary( \@results )
+        if $self->{display_summary_table};
     $self->dump_results( \@results ) if ( $self->{dump_file} );
 }
 
