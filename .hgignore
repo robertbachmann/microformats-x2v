@@ -2,3 +2,8 @@
 (^|/)\.hg($|/)
 (^|/)\.hgtags($|/)
 \.DS_Store
+~$
+
+syntax: glob
+*.bat
+*.orig
