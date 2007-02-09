@@ -102,6 +102,8 @@ sub make_tempfiles {
 sub DESTROY {
     my $self = shift;
 
+    return unless exists $self->{temp_dir};
+
     # remove tempfiles
     unlink( $self->{temp_in} )  if ( -e $self->{temp_in} );
     unlink( $self->{temp_out} ) if ( -e $self->{temp_out} );
