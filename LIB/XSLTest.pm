@@ -27,7 +27,7 @@ sub new {    # Constructor
     my $args = shift || {};
 
     my $self = {
-        engines  => {
+        engines => {
             '4XSLT'   => 0,
             'LibXSLT' => 0,
             'Saxon'   => 0,
@@ -38,8 +38,8 @@ sub new {    # Constructor
     bless $self, $class;
 
     # get required arguments
-    foreach ( qw(xslt_filename) ) {
-        if (exists $args->{$_}) {
+    foreach (qw(xslt_filename)) {
+        if ( exists $args->{$_} ) {
             $self->{$_} = $args->{$_};
         }
         else {
@@ -71,12 +71,12 @@ sub new {    # Constructor
         exit 1;
     }
 
-    unless ($ENV{MICROFORMATS_TESTS}) {
-        print STDERR "Please set the MICROFORMATS_TESTS environment variable\n",
+    unless ( $ENV{MICROFORMATS_TESTS} ) {
+        print STDERR
+            "Please set the MICROFORMATS_TESTS environment variable\n",
             "to the path of the directory which contains the tests from http://hg.microformats.org/tests\n";
         exit 1;
     }
-
 
     $self->{test_dir} = $ENV{MICROFORMATS_TESTS};
 
@@ -88,42 +88,39 @@ sub new {    # Constructor
 
     $self->parse_cmdline_args();
 
-    if ( $self->{use_color} eq 'auto') {
-        if (isatty(\*STDOUT)) {
+    if ( $self->{use_color} eq 'auto' ) {
+        if ( isatty( \*STDOUT ) ) {
             $self->{use_color} = 1;
         }
         else {
             $self->{use_color} = 0;
         }
     }
-    if ($self->{use_color} && $^O eq "MSWin32") {
+    if ( $self->{use_color} && $^O eq "MSWin32" ) {
         eval { require Win32::Console::ANSI };
         $self->{use_color} = 1 unless ($@);
     }
 
-    $self->{temp_in}  = File::Spec->catfile(
-                            File::Spec->tmpdir,
-                            mktemp('mftest-INPUT-TMP-XXXX')
-                        );
-    $self->{temp_out}  = File::Spec->catfile(
-                            File::Spec->tmpdir,
-                            mktemp('mftest-OUTPUT-TMP-XXXX')
-                        );
+    $self->{temp_in} = File::Spec->catfile( File::Spec->tmpdir,
+        mktemp('mftest-INPUT-TMP-XXXX') );
+    $self->{temp_out} = File::Spec->catfile( File::Spec->tmpdir,
+        mktemp('mftest-OUTPUT-TMP-XXXX') );
 
     return $self;
 }
 
 sub parse_cmdline_args {    # Parse the commandline arguments from ARGV
-    my $self               = shift;
+    my $self = shift;
     my $p = Getopt::Long::Parser->new( config => ['bundling'] );
     my $numbers_were_given = 0;
-    my %opt; $opt{color} = 'auto';
+    my %opt;
+    $opt{color} = 'auto';
 
     if (@ARGV) {
         $p->getoptions(
-            \%opt,          '4xslt',   'libxslt|x', 'saxon',
-            'xalan-c',      'xalan-j', 'q|quiet',   'all|A',
-            'list-tests|l', 'color|c:1', 'dump=s',  'exclude|e=s@',
+            \%opt,          '4xslt',     'libxslt|x', 'saxon',
+            'xalan-c',      'xalan-j',   'q|quiet',   'all|A',
+            'list-tests|l', 'color|c:1', 'dump=s',    'exclude|e=s@',
             'help'
         );
     }
@@ -138,7 +135,7 @@ sub parse_cmdline_args {    # Parse the commandline arguments from ARGV
 
     if ( $opt{'list-tests'} ) {
         print "Test list\n\n";
-        for my $test (@{ $self->{test_list} }) {
+        for my $test ( @{ $self->{test_list} } ) {
             printf "%2d  %s\n", $test->{number}, $test->{test_name};
         }
         print "\n";
@@ -147,7 +144,7 @@ sub parse_cmdline_args {    # Parse the commandline arguments from ARGV
 
     $self->{dump_file} = $opt{dump};
     $self->{use_color} = $opt{color};
-    $self->{quiet} = 1 if ( $opt{q} );
+    $self->{quiet}     = 1 if ( $opt{q} );
 
     $self->{engines}->{'4XSLT'}   = 1 if ( $opt{'4xslt'} );
     $self->{engines}->{'LibXSLT'} = 1 if ( $opt{libxslt} );
@@ -175,9 +172,9 @@ sub parse_cmdline_args {    # Parse the commandline arguments from ARGV
         }
         elsif (/^(\d+)-(\d+)$/) {
             $numbers_were_given = 1;
-            my ($no1, $no2) = ($1, $2);
+            my ( $no1, $no2 ) = ( $1, $2 );
 
-            if ( $no1 <= 0 or $no2 <= $no1 or $no2 > $max_nr) {
+            if ( $no1 <= 0 or $no2 <= $no1 or $no2 > $max_nr ) {
                 print STDERR "$0: Invalid test range: $no1-$no2\n"
                     . "Valid numbers are in the range from 1 to $max_nr \n";
                 exit 1;
@@ -197,17 +194,17 @@ sub parse_cmdline_args {    # Parse the commandline arguments from ARGV
         $_->{enabled} = 1 for @{ $self->{test_list} };
     }
 
-    unless ( grep {$_ == 1} values %{$self->{engines}} ){
+    unless ( grep { $_ == 1 } values %{ $self->{engines} } ) {
         print STDERR "$0: No engine selected\n"
             . "Try `$0 --help' for more information.\n";
         exit 1;
     }
 
-    return unless ($opt{exclude});
-    
+    return unless ( $opt{exclude} );
+
     my @numbers_to_exclude;
-    
-    for my $compound_rule (@{ $opt{exclude} }) {
+
+    for my $compound_rule ( @{ $opt{exclude} } ) {
         $compound_rule =~ s/,/ /g;
         my @rules = split /\s+/, $compound_rule;
         for (@rules) {
@@ -221,9 +218,9 @@ sub parse_cmdline_args {    # Parse the commandline arguments from ARGV
                 push @numbers_to_exclude, $no1;
             }
             elsif (/^(\d+)-(\d+)$/) {
-                my ($no1, $no2) = ($1, $2);
+                my ( $no1, $no2 ) = ( $1, $2 );
 
-                if ( $no1 <= 0 or $no2 <= $no1 or $no2 > $max_nr) {
+                if ( $no1 <= 0 or $no2 <= $no1 or $no2 > $max_nr ) {
                     print STDERR "$0: Invalid test range: $no1-$no2\n"
                         . "Valid numbers are in the range from 1 to $max_nr \n";
                     exit 1;
@@ -243,9 +240,9 @@ sub parse_cmdline_args {    # Parse the commandline arguments from ARGV
     }
 }
 
-sub color_print { # print with colors if appropriate
-    my ($self, $text, $text_color)  = @_;
-    my %color  = (
+sub color_print {    # print with colors if appropriate
+    my ( $self, $text, $text_color ) = @_;
+    my %color = (
         black   => "\e[0;30;47m",
         maroon  => "\e[0;31;40m",
         green   => "\e[0;32;40m",
@@ -264,9 +261,9 @@ sub color_print { # print with colors if appropriate
         white   => "\e[1;37;40m",
     );
 
-    if ($self->{use_color}) {
-        if (!exists $color{$text_color}) {
-            warn ('Unknown color ',$text_color)
+    if ( $self->{use_color} ) {
+        if ( !exists $color{$text_color} ) {
+            warn( 'Unknown color ', $text_color );
         }
         print $color{$text_color}, $text, "\e[0m";
     }
@@ -275,27 +272,27 @@ sub color_print { # print with colors if appropriate
     }
 }
 
-sub print_diff { # print unified diff output
-    my $self = shift;
-    my @lines = split /\r?\n/, $_[0];
+sub print_diff {    # print unified diff output
+    my $self         = shift;
+    my @lines        = split /\r?\n/, $_[0];
     my $screen_width = 80 - 4;
 
-    if ($self->{use_color}) {
+    if ( $self->{use_color} ) {
         for (@lines) {
             my $color;
 
-            if    (/^\+\+\+/ || /^---/) { $color = "\e[0;30;43m" }
-            elsif (/^\+/)               { $color = "\e[0;30;42m" }
-            elsif (/^-/)                { $color = "\e[0;30;41m" }
+            if ( /^\+\+\+/ || /^---/ ) { $color = "\e[0;30;43m" }
+            elsif (/^\+/) { $color = "\e[0;30;42m" }
+            elsif (/^-/)  { $color = "\e[0;30;41m" }
 
             if ($color) {
                 my $line = $_;
-                my $len = length($line);
-                if ($len < $screen_width) {
-                    $line .= ' ' x ($screen_width - $len);
+                my $len  = length($line);
+                if ( $len < $screen_width ) {
+                    $line .= ' ' x ( $screen_width - $len );
                 }
                 print "    $color$line\e[m\n";
-            } 
+            }
             else {
                 print "    $_\n";
             }
@@ -404,20 +401,20 @@ sub remove_doctype {
 }
 
 sub dump_results {
-    my ($self, $results_ref)  = @_;
-    my $d = Data::Dumper->new([$results_ref]);
-    my $varname = uc basename($self->{xslt_filename});
+    my ( $self, $results_ref ) = @_;
+    my $d = Data::Dumper->new( [$results_ref] );
+    my $varname = uc basename( $self->{xslt_filename} );
     $varname =~ s/[^A-Z0-9]//g;
 
     $d->Indent(1);
     $d->Varname($varname);
 
-    chdir($self->{inital_cwd});
-    $self->write_file($self->{dump_file}, $d->Dump);
+    chdir( $self->{inital_cwd} );
+    $self->write_file( $self->{dump_file}, $d->Dump );
 }
 
 sub run {    # Run all tests
-    my $self         = shift;
+    my $self = shift;
     my @results;
 
     chdir( $FindBin::Bin . '/../..' );
@@ -451,19 +448,19 @@ sub run {    # Run all tests
             my $passed;
 
             my $got = $self->execute_engine( $engine, $test );
-            if ( !defined($got) ) { # engine error
+            if ( !defined($got) ) {    # engine error
                 $test_result{ $engine . "-result" } = 'FAIL (ENGINE)';
                 next;
             }
             $got = $self->normalize_data($got);
 
             if ( $self->compare_result( $got, $expected ) ) {
-                $self->color_print("PASS", 'lime');
+                $self->color_print( "PASS", 'lime' );
                 print " ", $test->{test_name}, " [$engine]\n";
                 $test_result{ $engine . "-result" } = 'PASS';
             }
             else {
-                $self->color_print("FAIL", 'red');
+                $self->color_print( "FAIL", 'red' );
                 print " ", $test->{test_name}, " [$engine]\n";
                 if ( !$self->{quiet} || $self->{dump_file} ) {
                     my $diff = $self->make_diff( $expected, $got );
@@ -474,10 +471,10 @@ sub run {    # Run all tests
             }
         }
         push @results, \%test_result;
-        unlink($self->{temp_in});
-        unlink($self->{temp_out});
+        unlink( $self->{temp_in} );
+        unlink( $self->{temp_out} );
     }
-    $self->dump_results(\@results) if ($self->{dump_file});
+    $self->dump_results( \@results ) if ( $self->{dump_file} );
 }
 
 sub make_diff {    # Generate an unified diff
@@ -525,8 +522,8 @@ sub execute_4xslt {
         warn "Could not execute 4XSLT";
         return;
     }
-    my $s = $self->read_file($self->{temp_out});
-    unlink($self->{temp_out});
+    my $s = $self->read_file( $self->{temp_out} );
+    unlink( $self->{temp_out} );
 
     return $s;
 }
@@ -540,8 +537,8 @@ sub execute_libxslt {
         push @params, ( $name, $value );
     }
 
-    my $results = $self->{libxslt}
-        ->transform_file( $self->{temp_in}, XML::LibXSLT::xpath_to_string(@params) );
+    my $results = $self->{libxslt}->transform_file( $self->{temp_in},
+        XML::LibXSLT::xpath_to_string(@params) );
 
     my $result_string = $self->{libxslt}->output_string($results);
 
@@ -564,17 +561,17 @@ sub execute_saxon {
     }
 
     # make sure there's always a $self->{temp_out}
-    # even if Saxon doesn't create one 
+    # even if Saxon doesn't create one
     # because the XSLT ouputs nothing
-    $self->write_file($self->{temp_out},'');
+    $self->write_file( $self->{temp_out}, '' );
 
     unless ( system(@cmd) == 0 ) {
         warn "Could not execute Saxon";
         return;
     }
 
-    my $s = $self->read_file($self->{temp_out});
-    unlink($self->{temp_out});
+    my $s = $self->read_file( $self->{temp_out} );
+    unlink( $self->{temp_out} );
 
     return $s;
 }
@@ -601,8 +598,8 @@ sub execute_xalan_c {
         return;
     }
 
-    my $s = $self->read_file($self->{temp_out});
-    unlink($self->{temp_out});
+    my $s = $self->read_file( $self->{temp_out} );
+    unlink( $self->{temp_out} );
 
     return $s;
 }
@@ -637,8 +634,8 @@ sub execute_xalan_j {
         warn "Could not execute Xalan-J";
         return;
     }
-    my $s = $self->read_file($self->{temp_out});
-    unlink($self->{temp_out});
+    my $s = $self->read_file( $self->{temp_out} );
+    unlink( $self->{temp_out} );
 
     return $s;
 }
@@ -721,7 +718,7 @@ sub get_file_names_and_params {
     my %params = ( Source => "http://example.com/" );
 
     @file_names = glob('hcard/*.html');
-    
+
     my $i = 1;
     for (@file_names) {
         my ( $output, $input, $test ) = ( $_, $_, $_ );
@@ -736,7 +733,7 @@ sub get_file_names_and_params {
         };
 
         push @list, $entry;
-        ++ $i;
+        ++$i;
     }
 
     return @list;
@@ -772,7 +769,7 @@ sub get_file_names_and_params {
         };
 
         push @list, $entry;
-        ++ $i;
+        ++$i;
     }
 
     return @list;
