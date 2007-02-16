@@ -776,7 +776,7 @@ ATTACH</xsl:text>
 	<xsl:param name="text-string"></xsl:param>
 	<xsl:variable name="nl">&#x0D;&#x0A;</xsl:variable>
 	<xsl:choose>
-		<xsl:when test="substring($text-string,2) = true()">
+		<xsl:when test="not(substring($text-string,2)) = false()">
 			<xsl:choose>
 				<xsl:when test="substring($text-string,1,1) = '\'">
 					<xsl:text>\\</xsl:text>
