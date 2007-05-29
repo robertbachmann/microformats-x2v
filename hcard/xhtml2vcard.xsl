@@ -26,8 +26,8 @@ brian@suda.co.uk
 http://suda.co.uk/
 
 XHTML-2-vCard
-Version 0.10
-2007-02-06
+Version 0.11
+2007-05-29
 
 Copyright 2005 Brian Suda
 This work is relicensed under The W3C Open Source License
@@ -46,7 +46,7 @@ I'm not an XSLT expert, so there are no guarantees to quality of this code!
 
 
 
-<xsl:param name="Prodid" select='"-//suda.co.uk//X2V 0.10 (BETA)//EN"' />
+<xsl:param name="Prodid" select='"-//suda.co.uk//X2V 0.11 (BETA)//EN"' />
 <xsl:param name="Source" >(Best Practices states this should be the URL the vcard was transformed from)</xsl:param>
 <xsl:param name="Encoding" >UTF-8</xsl:param>
 <xsl:param name="Anchor" />
@@ -532,12 +532,23 @@ Without the correct profile you cannot assume the class values are intended for 
 			<xsl:call-template name="key-prop"/>
 	</xsl:if>
 
-	<!-- LABEL needs work! -->
-	<xsl:variable name="label-elt" select=".//*[not(ancestor-or-self::*[local-name() = 'del']) = true() and contains(concat(' ', normalize-space(@class), ' '),' label ')]" />
-	<xsl:if test="$label-elt">
-			<xsl:call-template name="label-prop"/>
-	</xsl:if>
-		
+	<!-- LABEL needs work!? -->
+	<xsl:for-each select=".//*[contains(concat(' ',normalize-space(@class),' '),' label ')]">
+		<xsl:if test="position() = 1">
+			<xsl:text>&#x0D;&#x0A;LABEL:</xsl:text>
+			<xsl:variable name="types">
+				<xsl:call-template name="find-types">
+					<xsl:with-param name="list">dom intl postal parcel home work pref</xsl:with-param>
+				</xsl:call-template>
+			</xsl:variable>
+			<xsl:if test="normalize-space($types)">
+				<xsl:text>;TYPE=</xsl:text>
+				<xsl:value-of select="$types"/>
+			</xsl:if>
+			<xsl:call-template name="mf:extractText"/>
+		</xsl:if>
+	</xsl:for-each>
+			
 </xsl:template>
 
 <!-- blob Property -->
@@ -676,6 +687,7 @@ Without the correct profile you cannot assume the class values are intended for 
 			<xsl:text>;TYPE=</xsl:text>
 			<xsl:value-of select="$types"/>
 		</xsl:if>
+		<xsl:value-of select="*/@class"/>
 		<xsl:choose>
 			<xsl:when test=".//*[contains(concat(' ', normalize-space(@class), ' '),' value ')]">
 				<xsl:for-each select=".//*[contains(concat(' ', normalize-space(@class), ' '),' value ')]">
@@ -686,8 +698,10 @@ Without the correct profile you cannot assume the class values are intended for 
 				</xsl:for-each>
 			</xsl:when>
 			<xsl:otherwise>
+				<xsl:value-of select="name()"/>
+				<xsl:value-of select="."/>
 				<xsl:variable name="textFormatted">
-				<xsl:apply-templates select="." mode="unFormatText" />
+					<xsl:apply-templates select="." mode="unFormatText" />
 				</xsl:variable>
 				<xsl:value-of select="normalize-space($textFormatted)"/>
 			</xsl:otherwise>
