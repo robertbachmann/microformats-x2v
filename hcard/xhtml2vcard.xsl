@@ -402,14 +402,16 @@ Without the correct profile you cannot assume the class values are intended for 
 	</xsl:for-each>
 
 	<xsl:for-each select=".//*[contains(concat(' ', normalize-space(@class), ' '),' geo ')][1]">
-		<xsl:text>&#x0D;&#x0A;GEO:</xsl:text>
-		<xsl:variable name="geoData">
-			<xsl:call-template name="mf:extractGeo"/>
-		</xsl:variable>
+		<xsl:if test="position() = 1">
+			<xsl:text>&#x0D;&#x0A;GEO:</xsl:text>
+			<xsl:variable name="geoData">
+				<xsl:call-template name="mf:extractGeo"/>
+			</xsl:variable>
 
-		<xsl:value-of select="common:node-set($geoData)/latitude"/>
-		<xsl:text>;</xsl:text>
-		<xsl:value-of select="common:node-set($geoData)/longitude"/>
+			<xsl:value-of select="common:node-set($geoData)/latitude"/>
+			<xsl:text>;</xsl:text>
+			<xsl:value-of select="common:node-set($geoData)/longitude"/>
+		</xsl:if>
 	</xsl:for-each>
 	
 	<xsl:for-each select=".//*[contains(concat(' ',normalize-space(@class),' '),' note ')]">
