@@ -1336,7 +1336,7 @@
 <xsl:template mode="h2a:sanitize-html" 
               match="xhtml:a|xhtml:abbr|xhtml:acronym|xhtml:address|xhtml:area|
 xhtml:b|xhtml:big|xhtml:blockquote|xhtml:br|xhtml:button|
-xhtml:caption|xhtml:center|xhtml:cite|xhtml:codecol|xhtml:colgroup|
+xhtml:caption|xhtml:center|xhtml:cite|xhtml:code|xhtml:col|xhtml:colgroup|
 xhtml:dd|xhtml:del|xhtml:dfn|xhtml:dir|xhtml:div|xhtml:dl|xhtml:dt|
 xhtml:em|
 xhtml:fieldset|xhtml:font|xhtml:form|
