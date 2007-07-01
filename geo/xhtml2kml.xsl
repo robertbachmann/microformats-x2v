@@ -11,6 +11,7 @@
 
 <xsl:import href="../mf-templates.xsl" />
 
+<!--
 <xsl:output
   encoding="UTF-8"
   indent="yes"
@@ -18,14 +19,13 @@
 />
 
 
-<!--
 brian suda
 brian@suda.co.uk
 http://suda.co.uk/
 
 XHTML-2-KML
-Version 0.3
-2007-01-12
+Version 0.4
+2007-06-29
 
 Copyright 2006 Brian Suda
 This work is relicensed under The W3C Open Source License
@@ -47,9 +47,10 @@ http://www.w3.org/Consortium/Legal/copyright-software-19980720
 </kml>
 </xsl:template>
 
-<!-- Each vCard is listed in succession -->
+<!-- Each GEO is listed in succession -->
 <xsl:template match="*[contains(concat(' ',normalize-space(@class),' '),' geo ')]">
-	<xsl:if test="not($Anchor) or @id = $Anchor">
+	<!-- and (not($Anchor) = true() or ancestor-or-self::*[@id = $Anchor]) -->
+	<xsl:if test="not($Anchor) or ancestor-or-self::*[@id = $Anchor]">
 		<Placemark>
 			<Style>
 				<LineStyle>

@@ -465,7 +465,14 @@
 						<!-- check for value in child elements -->
 						<xsl:when test=".//*[contains(concat(' ', normalize-space(@class), ' '),' value ')]">
 							<xsl:for-each select=".//*[contains(concat(' ', normalize-space(@class), ' '),' value ')]">
-								<xsl:value-of select="normalize-space(.)"/>
+								<xsl:choose>
+									<xsl:when test="string-length(.) > 0 and string-length(normalize-space(.)) = 0">
+										<xsl:text> </xsl:text>
+									</xsl:when>
+									<xsl:otherwise>
+										<xsl:value-of select="normalize-space(.)"/>
+									</xsl:otherwise>
+								</xsl:choose>
 							</xsl:for-each>
 						</xsl:when>
 						<xsl:otherwise>
@@ -489,7 +496,15 @@
 			<!-- check for child attributes that might have value elements -->
 			<xsl:when test=".//*[contains(concat(' ', normalize-space(@class), ' '),' value ')]">
 				<xsl:for-each select=".//*[contains(concat(' ', normalize-space(@class), ' '),' value ')]">
-					<xsl:value-of select="normalize-space(.)"/>						
+					<xsl:choose>
+						<!-- when there are multiple spaces, save one! -->
+						<xsl:when test="string-length(.) > 0 and string-length(normalize-space(.)) = 0">
+							<xsl:text> </xsl:text>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:value-of select="normalize-space(.)"/>
+						</xsl:otherwise>
+					</xsl:choose>					
 				</xsl:for-each>
 			</xsl:when>
 			<!-- take the value of the child node -->

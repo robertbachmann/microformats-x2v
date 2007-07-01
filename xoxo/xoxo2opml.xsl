@@ -1,15 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xsl:stylesheet 
  xmlns:xsl ="http://www.w3.org/1999/XSL/Transform"
- xmlns:uri ="http://www.w3.org/2000/07/uri43/uri.xsl?template="
- xmlns:mf  ="http://suda.co.uk/projects/X2V/mf-templates.xsl?template="
+ xmlns:mf  ="http://suda.co.uk/projects/microformats/mf-templates.xsl?template="
  xmlns     ="http://www.opml.org/spec"
+ exclude-result-prefixes="mf"
  version="1.0"
 >
 
 <!-- i have saved the file locally to conserve bandwidth, always check for updateds -->
-<xsl:import href="../../X2V/uri.xsl" />
-<xsl:import href="../../X2V/mf-templates.xsl" />
+<xsl:import href="../mf-templates.xsl" />
 
 <xsl:output
   encoding="UTF-8"
@@ -24,8 +23,8 @@ brian@suda.co.uk
 http://suda.co.uk/
 
 XOXO-2-OPML
-Version 0.2
-2006-11-08
+Version 0.2.1
+2007-07-01
 
 Copyright 2006 Brian Suda
 This work is relicensed under The W3C Open Source License
@@ -72,15 +71,10 @@ http://www.w3.org/Consortium/Legal/copyright-software-19980720
 		<xsl:if test="local-name() = 'a'">
 		<xsl:element name="outline" namespace="http://www.opml.org/spec">
 			<xsl:attribute name="xmlURL">
-				<xsl:call-template name="uri:expand">
-					<xsl:with-param name="base">
-						<xsl:call-template name="mf:baseURL">
-							<xsl:with-param name="Source"><xsl:value-of select="$Source" /></xsl:with-param>
-						</xsl:call-template>
-					</xsl:with-param>
-					<xsl:with-param name="there"><xsl:value-of select="normalize-space(@href)"/></xsl:with-param>
+				<xsl:call-template name="mf:extractUrl">
+					<xsl:with-param name="Source"><xsl:value-of select="$Source"/></xsl:with-param>
 				</xsl:call-template>
-			</xsl:attribute>		
+			</xsl:attribute>
 		
 			<xsl:attribute name="text">
 				<xsl:value-of select="normalize-space(text())"/>
