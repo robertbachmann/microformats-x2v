@@ -43,7 +43,7 @@ http://www.w3.org/Consortium/Legal/copyright-software-19980720
 	</head>
 	<body>
 	<xsl:for-each select=".//*[ancestor-or-self::*[name() = 'del'] = false() and descendant-or-self::*[name() = 'ul' or name() = 'ol'] = true() and contains(concat(' ',normalize-space(@class),' '),' xoxo ')]">
-		<xsl:if test="not($Anchor) or @id = $Anchor">
+		<xsl:if test="not($Anchor) or ancestor-or-self::*[@id = $Anchor]">
 			<xsl:element name="outline" namespace="http://www.opml.org/spec">
 		
 			<xsl:if test="@title">

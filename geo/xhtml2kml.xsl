@@ -11,13 +11,13 @@
 
 <xsl:import href="../mf-templates.xsl" />
 
-<!--
 <xsl:output
   encoding="UTF-8"
   indent="yes"
   method="xml"
 />
 
+<!--
 
 brian suda
 brian@suda.co.uk
