@@ -386,7 +386,7 @@ Without the correct profile you cannot assume the class values are intended for 
 		<xsl:text>&#x0D;&#x0A;TEL</xsl:text>
 		<xsl:variable name="telData-RTF">
 			<xsl:call-template name="mf:extractUid">
-				<xsl:with-param name="protocol">tel: fax:</xsl:with-param>
+				<xsl:with-param name="protocol">tel fax</xsl:with-param>
 				<xsl:with-param name="type-list">home work pref voice fax msg cell pager bbs modem car isdn video pcs</xsl:with-param>
 			</xsl:call-template>
 		</xsl:variable>
