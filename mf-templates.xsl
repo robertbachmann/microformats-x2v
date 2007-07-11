@@ -469,6 +469,18 @@
 									<xsl:when test="string-length(.) > 0 and string-length(normalize-space(.)) = 0">
 										<xsl:text> </xsl:text>
 									</xsl:when>
+									<!-- if the property is on an ABBR element check for @title -->
+									<xsl:when test='local-name(.) = "abbr" and @title'>
+										<xsl:value-of select="normalize-space(@title)"/>
+									</xsl:when>
+									<!-- if the property is on an PRE element don't do anything with the white-space -->
+									<xsl:when test='local-name(.) = "pre"'>
+										<xsl:value-of select="."/>
+									</xsl:when>
+									<!-- if the property is on an IMG or AREA check the @alt -->
+									<xsl:when test='@alt and (local-name(.) = "img" or local-name(.) = "area")'>
+										<xsl:value-of select="normalize-space(@alt)"/>
+									</xsl:when>
 									<xsl:otherwise>
 										<xsl:value-of select="normalize-space(.)"/>
 									</xsl:otherwise>
@@ -500,6 +512,18 @@
 						<!-- when there are multiple spaces, save one! -->
 						<xsl:when test="string-length(.) > 0 and string-length(normalize-space(.)) = 0">
 							<xsl:text> </xsl:text>
+						</xsl:when>
+						<!-- if the property is on an ABBR element check for @title -->
+						<xsl:when test='local-name(.) = "abbr" and @title'>
+							<xsl:value-of select="normalize-space(@title)"/>
+						</xsl:when>
+						<!-- if the property is on an PRE element don't do anything with the white-space -->
+						<xsl:when test='local-name(.) = "pre"'>
+							<xsl:value-of select="."/>
+						</xsl:when>
+						<!-- if the property is on an IMG or AREA check the @alt -->
+						<xsl:when test='@alt and (local-name(.) = "img" or local-name(.) = "area")'>
+							<xsl:value-of select="normalize-space(@alt)"/>
 						</xsl:when>
 						<xsl:otherwise>
 							<xsl:value-of select="normalize-space(.)"/>

@@ -720,6 +720,111 @@ Without the correct profile you cannot assume the class values are intended for 
 			<xsl:call-template name="lang" />
 			<xsl:text>;CHARSET=</xsl:text><xsl:value-of select="$Encoding"/>
 			<xsl:text>:</xsl:text>
+			
+			<xsl:variable name="fn-val">
+				<xsl:call-template name="mf:extractText"/>
+			</xsl:variable>
+			
+			<xsl:choose>
+				<xsl:when test='
+					(string-length(substring-after(normalize-space($fn-val), " ")) = 1) or
+					(
+					(string-length(substring-after(normalize-space($fn-val), " ")) = 2) and 
+					(substring(substring-after(normalize-space($fn-val), " "), 2,1) = ".")
+					) or
+					(
+						substring(
+								normalize-space($fn-val),
+								string-length(
+									(substring-before(
+										normalize-space($fn-val), " "
+									))
+								),
+								1
+						) = ","
+					)
+					'>
+					<xsl:variable name="given-name">
+						<xsl:value-of select='substring-after(normalize-space($fn-val), " ")' />
+					</xsl:variable>
+					<xsl:choose>
+						<xsl:when test='substring(
+									normalize-space($fn-val),
+									string-length(
+										(substring-before(
+											normalize-space($fn-val), " "
+										))
+									),
+									1
+								) = ","'>
+								<xsl:variable name="family-name">
+									<xsl:value-of select='substring(
+												normalize-space($fn-val),
+												1,
+												string-length(
+													(substring-before(
+														normalize-space($fn-val), " "
+													))
+												)-1
+											)' />
+								</xsl:variable>
+								<xsl:call-template name="escapeText">
+									<xsl:with-param name="text-string" select="$family-name" />
+								</xsl:call-template>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:variable name="family-name">
+								<xsl:value-of select='substring-before(normalize-space($fn-val), " ")' />
+							</xsl:variable>
+							<xsl:call-template name="escapeText">
+								<xsl:with-param name="text-string" select="$family-name" />
+							</xsl:call-template>
+						</xsl:otherwise>
+					</xsl:choose>
+
+					<xsl:text>;</xsl:text>
+					<xsl:call-template name="escapeText">
+						<xsl:with-param name="text-string" select="$given-name" />
+					</xsl:call-template>
+					
+				</xsl:when>
+				<xsl:when test='not(substring-before(normalize-space($fn-val), " "))'>							
+					<xsl:variable name="given-name">
+						<xsl:text />
+					</xsl:variable>
+					<xsl:variable name="family-name">
+						<xsl:value-of select='substring-before(normalize-space($fn-val), " ")' />
+					</xsl:variable>
+					<xsl:call-template name="escapeText">
+						<xsl:with-param name="text-string" select="$family-name" />
+					</xsl:call-template>
+					<xsl:text>;</xsl:text>
+					<xsl:call-template name="escapeText">
+						<xsl:with-param name="text-string" select="$given-name" />
+					</xsl:call-template>
+				</xsl:when>
+				<xsl:when test="string-length(normalize-space($fn-val)) = (1+string-length(translate(normalize-space($fn-val),' ','')))">
+					<xsl:variable name="given-name">
+						<xsl:value-of select='substring-before(normalize-space($fn-val), " ")' />
+					</xsl:variable>
+					<xsl:variable name="family-name">
+						<xsl:value-of select='substring-after(normalize-space($fn-val), " ")' />
+					</xsl:variable>
+					<xsl:call-template name="escapeText">
+						<xsl:with-param name="text-string" select="$family-name" />
+					</xsl:call-template>
+					<xsl:text>;</xsl:text>
+					<xsl:call-template name="escapeText">
+						<xsl:with-param name="text-string" select="$given-name" />
+					</xsl:call-template>
+				</xsl:when>
+				<xsl:otherwise>
+					<xsl:text>;</xsl:text>
+				</xsl:otherwise>
+			</xsl:choose>
+			
+			
+			<!--
 			<xsl:choose>
 				<xsl:when test="local-name(.) = 'abbr' and @title">
 					<xsl:choose>
@@ -911,7 +1016,6 @@ Without the correct profile you cannot assume the class values are intended for 
 						</xsl:otherwise>
 					</xsl:choose>
 				</xsl:when>
-				<!-- might need to add case when data is on OBJECT element? -->
 				<xsl:otherwise>
 					<xsl:choose>
 						<xsl:when test='
@@ -932,7 +1036,6 @@ Without the correct profile you cannot assume the class values are intended for 
 								) = ","
 							)
 							'>
-							
 							<xsl:variable name="given-name">
 								<xsl:value-of select='substring-after(normalize-space(.), " ")' />
 							</xsl:variable>
@@ -1013,6 +1116,7 @@ Without the correct profile you cannot assume the class values are intended for 
 					</xsl:choose>
 				</xsl:otherwise>
 			</xsl:choose>
+		-->
 			<xsl:text>;;;</xsl:text>
 		</xsl:if>
 	</xsl:for-each>
