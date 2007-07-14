@@ -392,14 +392,15 @@
 	</xsl:template>
 
 	<xsl:template name="mf:extractFromProtocol">
-		<xsl:param name="protocol"/>
+		<xsl:param name="protocolList"/>
+
 		<xsl:choose>
 			<xsl:when test=".//*[contains(concat(' ', normalize-space(@class), ' '),' value ')]/@href">
 				<xsl:if test="
 					contains(
-					concat(' ', normalize-space($protocol), ' '),
+					concat(' ', substring-before(.//*[contains(concat(' ', normalize-space(@class), ' '),' value ')]/@href,':'), ' '),
 					concat(' ',
-					substring-before(.//*[contains(concat(' ', normalize-space(@class), ' '),' value ')]/@href,':'),
+					normalize-space($protocolList),
 					' '))
 					">
 					<xsl:choose>
@@ -414,9 +415,9 @@
 			</xsl:when>
 			<xsl:when test="
 				contains(
-				concat(' ', normalize-space($protocol), ' '),
+				concat(' ', normalize-space($protocolList),' '),
 				concat(' ',
-				substring-before(@href,':'),
+				substring-before(@href,':'), 
 				' '))">
 				<xsl:choose>
 					<xsl:when test="string-length(normalize-space(substring-before(substring-after(@href,':'),'?'))) &lt; 1">
@@ -427,6 +428,39 @@
 					</xsl:otherwise>
 				</xsl:choose>
 			</xsl:when>
+			<xsl:when test=".//*[contains(concat(' ', normalize-space(@class), ' '),' value ')]/@data">
+				<xsl:if test="
+					contains(
+					concat(' ', substring-before(.//*[contains(concat(' ', normalize-space(@class), ' '),' value ')]/@data,':'), ' '),
+					concat(' ',
+					normalize-space($protocolList),
+					' '))
+					">
+					<xsl:choose>
+						<xsl:when test="string-length(normalize-space(substring-before(substring-after(.//*[contains(concat(' ', normalize-space(@class), ' '),' value ')]/@data,':'),'?'))) &lt; 1">
+							<xsl:value-of select="normalize-space(substring-after(.//*[contains(concat(' ', normalize-space(@class), ' '),' value ')]/@data,':'))" />
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:value-of select="normalize-space(substring-before(substring-after(.//*[contains(concat(' ', normalize-space(@class), ' '),' value ')]/@data,':'),'?'))" />
+						</xsl:otherwise>
+					</xsl:choose>
+				</xsl:if>				
+			</xsl:when>
+			<xsl:when test="
+				contains(
+				concat(' ', normalize-space($protocolList),' '),
+				concat(' ',
+				substring-before(@data,':'), 
+				' '))">
+				<xsl:choose>
+					<xsl:when test="string-length(normalize-space(substring-before(substring-after(@data,':'),'?'))) &lt; 1">
+						<xsl:value-of select="normalize-space(substring-after(@data,':'))" />
+					</xsl:when>
+					<xsl:otherwise>
+						<xsl:value-of select="normalize-space(substring-before(substring-after(@data,':'),'?'))" />
+					</xsl:otherwise>
+				</xsl:choose>
+			</xsl:when>			
 			<xsl:otherwise>
 				<xsl:call-template name="mf:extractText"/>
 			</xsl:otherwise>
@@ -444,7 +478,7 @@
 
 		<xsl:variable name="value">
 			<xsl:call-template name="mf:extractFromProtocol">
-				<xsl:with-param name="protocol"><xsl:value-of select="$protocol"/></xsl:with-param>
+				<xsl:with-param name="protocolList"><xsl:value-of select="$protocol"/></xsl:with-param>
 			</xsl:call-template>
 		</xsl:variable>
 		
