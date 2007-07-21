@@ -536,19 +536,17 @@ Without the correct profile you cannot assume the class values are intended for 
 
 	<!-- LABEL needs work!? -->
 	<xsl:for-each select=".//*[contains(concat(' ',normalize-space(@class),' '),' label ')]">
-		<xsl:if test="position() = 1">
-			<xsl:text>&#x0D;&#x0A;LABEL:</xsl:text>
-			<xsl:variable name="types">
-				<xsl:call-template name="find-types">
-					<xsl:with-param name="list">dom intl postal parcel home work pref</xsl:with-param>
-				</xsl:call-template>
-			</xsl:variable>
-			<xsl:if test="normalize-space($types)">
-				<xsl:text>;TYPE=</xsl:text>
-				<xsl:value-of select="$types"/>
-			</xsl:if>
-			<xsl:call-template name="mf:extractText"/>
+		<xsl:text>&#x0D;&#x0A;LABEL:</xsl:text>
+		<xsl:variable name="types">
+			<xsl:call-template name="find-types">
+				<xsl:with-param name="list">dom intl postal parcel home work pref</xsl:with-param>
+			</xsl:call-template>
+		</xsl:variable>
+		<xsl:if test="normalize-space($types)">
+			<xsl:text>;TYPE=</xsl:text>
+			<xsl:value-of select="$types"/>
 		</xsl:if>
+		<xsl:call-template name="mf:extractText"/>
 	</xsl:for-each>
 			
 </xsl:template>
