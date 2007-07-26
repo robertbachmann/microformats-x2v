@@ -62,7 +62,7 @@
                                    SEE ALSO
 
    For the latest version of this stylesheet: 
-     <http://rbach.priv.at/hAtom2Atom/>
+     <http://rbach.priv.at/Microformats/hAtom2Atom/>
     
    Mercurial repository:
      <http://hg.microformats.org/x2v/>
@@ -108,7 +108,7 @@
  xmlns:str="http://exslt.org/strings"
  xmlns:uri="http://www.w3.org/2000/07/uri43/uri.xsl?template="
  xmlns:datetime ="http://suda.co.uk/projects/microformats/datetime.xsl?template="
- xmlns:h2a="http://rbach.priv.at/hAtom2Atom/"
+ xmlns:h2a="http://rbach.priv.at/2007/hatom2atom"
  extension-element-prefixes="extension str"
  exclude-result-prefixes="xhtml uri h2a datetime">
 
@@ -125,30 +125,36 @@
 <xsl:output method="xml" indent="no" encoding="UTF-8" />
 
 <xsl:template match="/">
-	<xsl:call-template name="h2a:convert" />
+	<xsl:call-template name="h2a:parse">
+		<xsl:with-param name="source-uri" select="$source-uri" />
+		<xsl:with-param name="content-type" select="$content-type" />
+		<xsl:with-param name="implicit-feed" select="$implicit-feed" />
+		<xsl:with-param name="debug-comments" select="$debug-comments" />
+		<xsl:with-param name="sanitize-html" select="$sanitize-html" />
+	</xsl:call-template>
 </xsl:template>
 
-<xsl:template name="h2a:convert">
-	<xsl:param name="source-uri" select="$source-uri" />
-	<xsl:param name="content-type" select="$content-type" />
-	<xsl:param name="implicit-feed" select="$implicit-feed" />
-	<xsl:param name="debug-comments" select="$debug-comments" />
-	<xsl:param name="sanitize-html" select="$sanitize-html" />
+<xsl:template name="h2a:parse">
+	<xsl:param name="source-uri"     />
+	<xsl:param name="content-type"   />
+	<xsl:param name="implicit-feed"  />
+	<xsl:param name="debug-comments" />
+	<xsl:param name="sanitize-html"  />
 
 	<!-- 
-	Enable users to use 'h2a:conversion' as part of bigger stylesheet, for example:
+	Enable users to use 'h2a:parse' as part of bigger stylesheet, for example:
 	
 	<xsl:import href="hAtom2Atom.xsl" />
 	[...]
 	<xsl:for-each select="document('document-a.htm')">
-	  <xsl:call-template name="h2a:convert">
+	  <xsl:call-template name="h2a:parse">
 	    <xsl:with-param name="source-uri">http://example.com/foo#abc</xsl:with-param>
 	    <xsl:with-param name="sanitize-html" select="0" />
 	  </xsl:call-template>
 	</xsl:for-each>
 	[...]
 	<xsl:for-each select="document('document-b.htm')">
-	  <xsl:call-template name="h2a:convert">
+	  <xsl:call-template name="h2a:parse">
 	    <xsl:with-param name="source-uri">http://example.org/bar/foo#abcd</xsl:with-param>
 	    <xsl:with-param name="sanitize-html" select="1" />
 	  </xsl:call-template>
