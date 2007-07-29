@@ -507,6 +507,10 @@
 									<xsl:when test='local-name(.) = "abbr" and @title'>
 										<xsl:value-of select="normalize-space(@title)"/>
 									</xsl:when>
+									<!-- if the property is on an INPUT element check for @type=text -->
+									<xsl:when test='local-name(.) = "input" and @type = "text" and @value'>
+										<xsl:value-of select="normalize-space(@value)"/>
+									</xsl:when>
 									<!-- if the property is on an PRE element don't do anything with the white-space -->
 									<xsl:when test='local-name(.) = "pre"'>
 										<xsl:value-of select="."/>
@@ -531,6 +535,10 @@
 			<xsl:when test='local-name(.) = "abbr" and @title'>
 				<xsl:value-of select="normalize-space(@title)"/>
 			</xsl:when>
+			<!-- if the property is on an INPUT element check for @type=text -->
+			<xsl:when test='local-name(.) = "input" and @type = "text" and @value'>
+				<xsl:value-of select="normalize-space(@value)"/>
+			</xsl:when>
 			<!-- if the property is on an PRE element don't do anything with the white-space -->
 			<xsl:when test='local-name(.) = "pre"'>
 				<xsl:value-of select="."/>
@@ -550,6 +558,10 @@
 						<!-- if the property is on an ABBR element check for @title -->
 						<xsl:when test='local-name(.) = "abbr" and @title'>
 							<xsl:value-of select="normalize-space(@title)"/>
+						</xsl:when>
+						<!-- if the property is on an INPUT element check for @type=text -->
+						<xsl:when test='local-name(.) = "input" and @type = "text" and @value'>
+							<xsl:value-of select="normalize-space(@value)"/>
 						</xsl:when>
 						<!-- if the property is on an PRE element don't do anything with the white-space -->
 						<xsl:when test='local-name(.) = "pre"'>
