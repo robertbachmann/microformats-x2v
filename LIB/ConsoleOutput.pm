@@ -133,7 +133,7 @@ sub color_print {    # print with colors if appropriate
 sub print_diff {    # print unified diff output
     my $self         = shift;
     my @lines        = split /\r?\n/, $_[0];
-    my $screen_width = 80 - 4;
+    my $screen_width = 80 - 5;
 
     if ( $self->{use_color} ) {
         for (@lines) {
