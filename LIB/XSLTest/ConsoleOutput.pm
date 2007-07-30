@@ -5,7 +5,8 @@
 # This work is licensed under The W3C Open Source License
 # <http://www.w3.org/Consortium/Legal/copyright-software-19980720>
 
-package ConsoleOutput;
+package XSLTest::ConsoleOutput;
+
 use strict;
 use warnings;
 use Carp qw();

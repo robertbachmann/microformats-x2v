@@ -1,9 +1,17 @@
 #!/usr/bin/env perl
 use strict;
-use FindBin; use File::Spec;
-use lib "$FindBin::Bin/../LIB/"; require XSLTest;
+use FindBin;
 
-my $xslt = File::Spec->rel2abs('../hatom/hAtom2Atom.xsl', $FindBin::Bin);
-my $t = XSLTest::hAtom->new( {xslt_filename => $xslt} );
-$t->run();
+use lib "$FindBin::Bin/../LIB/";
+
+require XSLTest::Driver::Microformats::hAtom;
+require XSLTest::OutputHandler::XML;
+
+my $driver = XSLTest::Driver::Microformats::hAtom->new(
+    {   xslt1_filename => $FindBin::Bin . '/hAtom2Atom.xsl',
+        output_handler => XSLTest::OutputHandler::XML->new()
+    }
+);
+
+$driver->run();
 exit 0;
