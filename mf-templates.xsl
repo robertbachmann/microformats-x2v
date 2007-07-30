@@ -765,31 +765,31 @@
 		<xsl:param name="iso-date"/>
 	
 		<xsl:choose>
-			<xsl:when test="substring($iso-date,5,2) = '1'">
+			<xsl:when test="substring($iso-date,5,2) = '01'">
 				<xsl:text>Jan</xsl:text>
 			</xsl:when>
-			<xsl:when test="substring($iso-date,5,2) = '2'">
+			<xsl:when test="substring($iso-date,5,2) = '02'">
 				<xsl:text>Feb</xsl:text>
 			</xsl:when>
-			<xsl:when test="substring($iso-date,5,2) = '3'">
+			<xsl:when test="substring($iso-date,5,2) = '03'">
 				<xsl:text>Mar</xsl:text>
 			</xsl:when>
-			<xsl:when test="substring($iso-date,5,2) = '4'">
+			<xsl:when test="substring($iso-date,5,2) = '04'">
 				<xsl:text>Apr</xsl:text>
 			</xsl:when>
-			<xsl:when test="substring($iso-date,5,2) = '5'">
+			<xsl:when test="substring($iso-date,5,2) = '05'">
 				<xsl:text>May</xsl:text>
 			</xsl:when>
-			<xsl:when test="substring($iso-date,5,2) = '6'">
+			<xsl:when test="substring($iso-date,5,2) = '06'">
 				<xsl:text>Jun</xsl:text>
 			</xsl:when>
-			<xsl:when test="substring($iso-date,5,2) = '7'">
+			<xsl:when test="substring($iso-date,5,2) = '07'">
 				<xsl:text>Jul</xsl:text>
 			</xsl:when>
-			<xsl:when test="substring($iso-date,5,2) = '8'">
+			<xsl:when test="substring($iso-date,5,2) = '08'">
 				<xsl:text>Aug</xsl:text>
 			</xsl:when>
-			<xsl:when test="substring($iso-date,5,2) = '9'">
+			<xsl:when test="substring($iso-date,5,2) = '09'">
 				<xsl:text>Sep</xsl:text>
 			</xsl:when>
 			<xsl:when test="substring($iso-date,5,2) = '10'">
@@ -803,7 +803,7 @@
 			</xsl:otherwise>
 		</xsl:choose>
 		<xsl:text> </xsl:text>
-		<xsl:value-of select="substring($iso-date,5,2)"/>	
+		<xsl:value-of select="substring($iso-date,7,2)"/>	
 		<xsl:text> </xsl:text>
 		<xsl:value-of select="substring($iso-date,1,4)"/>
 		
