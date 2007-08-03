@@ -1,9 +1,17 @@
 #!/usr/bin/env perl
 use strict;
-use FindBin; use File::Spec;
-use lib "$FindBin::Bin/../LIB/"; require XSLTest;
+use FindBin;
 
-my $xslt = File::Spec->rel2abs('./xhtml2vcal.xsl', $FindBin::Bin);
-my $t = XSLTest::hCalendar->new( {xslt_filename => $xslt} );
-$t->run();
+use lib "$FindBin::Bin/../LIB/";
+
+require XSLTest::Driver::Microformats::hCalendar;
+require XSLTest::OutputHandler::RFC2425;
+
+my $driver = XSLTest::Driver::Microformats::hCalendar->new(
+    {   xslt1_filename => $FindBin::Bin . '/xhtml2vcal.xsl',
+        output_handler => XSLTest::OutputHandler::RFC2425->new()
+    }
+);
+
+$driver->run();
 exit 0;

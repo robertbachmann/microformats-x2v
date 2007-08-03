@@ -1,9 +1,17 @@
 #!/usr/bin/env perl
 use strict;
-use FindBin; use File::Spec;
-use lib "$FindBin::Bin/../LIB/"; require XSLTest;
+use FindBin;
 
-my $xslt = File::Spec->rel2abs('./xhtml2vcard.xsl', $FindBin::Bin);
-my $t = XSLTest::hCard->new( {xslt_filename => $xslt} );
-$t->run();
+use lib "$FindBin::Bin/../LIB/";
+
+require XSLTest::Driver::Microformats::hCard;
+require XSLTest::OutputHandler::RFC2425;
+
+my $driver = XSLTest::Driver::Microformats::hCard->new(
+    {   xslt1_filename => $FindBin::Bin . '/xhtml2vcard.xsl',
+        output_handler => XSLTest::OutputHandler::RFC2425->new()
+    }
+);
+
+$driver->run();
 exit 0;
