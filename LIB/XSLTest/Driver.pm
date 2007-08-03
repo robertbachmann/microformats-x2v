@@ -30,7 +30,9 @@ sub new {                 # Constructor
             'Saxon'   => 0,
             'Xalan-C' => 0,
             'Xalan-J' => 0,
-        }
+        },
+        'xalan_j_instance' => undef,
+        'saxon_instance'   => undef,
     };
     bless $self, $class;
 
@@ -96,10 +98,10 @@ sub parse_cmdline_args {  # Parse the commandline arguments from ARGV
 
     if (@ARGV) {
         $p->getoptions(
-            \%opt,          '4xslt',     'libxslt|x', 'saxon',
-            'xalan-c',      'xalan-j',   'q|quiet',   'all|A',
+            \%opt,          '4xslt',     'libxslt|x', 'saxon|s',
+            'xalan-c',      'xalan-j|j', 'q|quiet',   'all|A',
             'list-tests|l', 'color|c:1', 'dump=s',    'exclude|e=s@',
-            'table|t',      'help'
+            'no-trax',      'table|t',   'help'
         );
     }
     else {
@@ -133,6 +135,8 @@ sub parse_cmdline_args {  # Parse the commandline arguments from ARGV
     $self->{engines}->{'Saxon'}   = 1 if ( $opt{saxon} );
     $self->{engines}->{'Xalan-C'} = 1 if ( $opt{'xalan-c'} );
     $self->{engines}->{'Xalan-J'} = 1 if ( $opt{'xalan-j'} );
+
+    $self->{try_java_trax} = !$opt{'no-trax'};
 
     if ( $opt{all} ) {
         foreach ( keys %{ $self->{engines} } ) {
@@ -236,9 +240,10 @@ Run the test suite with the supported XSLT engines.
   -A, --all                Run the tests with all engines
   -x, --libxslt            Run the tests with libxslt (via `XML::LibXSLT')
       --4xslt              Run the tests with 4XSLT
-      --saxon              Run the tests with Saxon
+  -s, --saxon              Run the tests with Saxon
       --xalan-c            Run the tests with Xalan-C
-      --xalan-j            Run the tests with Xalan-J
+  -j, --xalan-j            Run the tests with Xalan-J
+      --no-trax            Do not use Java's TrAX for Saxon and Xalan-J
       --help               Display this help and exit
       
 Examples:
@@ -260,7 +265,7 @@ sub write_file {          # Write scalar into a (new) file
     close $f;
 }
 
-sub load_libxslt {        # Load an XSLT file into LibXSLT
+sub load_xslt {        # Load XSLT file and engines
     my $self = shift;
 
     my ( $parser, $libxslt, $xslt_doc );
@@ -273,10 +278,100 @@ sub load_libxslt {        # Load an XSLT file into LibXSLT
         $self->get_product_id($doc)
     );
 
+    # LibXSLT
     if ( $self->{engines}->{LibXSLT} ) {
         $libxslt = XML::LibXSLT->new();
         $self->{libxslt} = $libxslt->parse_stylesheet($doc)
-            or die "Error in XSLT file";
+            or Carp::croak "Error in XSLT file (libXSLT)";
+    }
+
+    # Try to use Java's TrAX for Saxon and Xalan-J
+    my $use_java_trax = 0;
+    if (
+        ($ENV{PERL_INLINE_JAVA_DIRECTORY} && $self->{try_java_trax})
+        &&
+        ($self->{engines}->{Saxon} || $self->{engines}->{'Xalan-J'})
+       ) {
+        eval { require XSLTest::JavaTrAX; };
+        if (! $@) {
+            $use_java_trax = 1;
+        } else {die $@;}
+    }
+
+    # Xalan-J
+    if ( $self->{engines}->{'Xalan-J'} && $use_java_trax) {
+
+        $self->{console_out}->color_print( 
+            '---- Trying to load Xalan-J via Inline::Java ... ',
+            'teal'
+        );
+
+        my $dir = cwd();
+
+        chdir ($ENV{PERL_INLINE_JAVA_DIRECTORY})
+            or Carp::croak "Can't chdir to ", 
+               $ENV{PERL_INLINE_JAVA_DIRECTORY}, "\n";
+
+        my $obj = eval {
+            XSLTest::JavaTrAX->new(
+                {
+                 factory_name =>
+                 'org.apache.xalan.processor.TransformerFactoryImpl'
+                }
+            );
+        };
+
+        if ($@) {
+            $self->{console_out}->color_print('error','red');
+            print "\n";
+        }
+        else {
+            $self->{console_out}->color_print('ok','lime');
+            print "\n";
+
+            $obj->load_xslt($self->{xslt1_filename})
+                or Carp::croak "Error in XSLT file (Xalan-J)\n";
+            $self->{xalan_j_instance} = $obj;
+        }
+        chdir($dir) or Carp::croak "Can't chdir to $dir\n";
+    }
+
+    # Saxon
+    if ( $self->{engines}->{Saxon} && $use_java_trax) {
+
+        $self->{console_out}->color_print( 
+            '---- Trying to load Saxon via Inline::Java ... ',
+            'teal'
+        );
+
+        my $dir = cwd();
+
+        chdir ($ENV{PERL_INLINE_JAVA_DIRECTORY})
+            or Carp::croak "Can't chdir to ", 
+               $ENV{PERL_INLINE_JAVA_DIRECTORY}, "\n";
+
+        my $obj = eval {
+            XSLTest::JavaTrAX->new(
+                {
+                 factory_name => 'net.sf.saxon.TransformerFactoryImpl'
+                }
+            );
+        };
+
+        if ($@) {
+            $self->{console_out}->color_print('error','red');
+            print "\n";
+            $self->{saxon_instance} = undef;
+        }
+        else {
+            $self->{console_out}->color_print('ok','lime');
+            print "\n";
+
+            $obj->load_xslt($self->{xslt1_filename})
+                or Carp::croak "Error in XSLT file (Saxon)\n";
+            $self->{saxon_instance} = $obj;
+        }
+        chdir($dir) or Carp::croak "Can't chdir to $dir\n";
     }
 }
 
@@ -304,10 +399,14 @@ sub run {                 # Run all tests
     my $self = shift;
     my @results;
 
-    my $console_out = XSLTest::ConsoleOutput->new( { use_color => $self->{use_color} } );
+    my $console_out = XSLTest::ConsoleOutput->new({
+        use_color => $self->{use_color} 
+    });
+    $self->{console_out} = $console_out;
+
     my $output_handler = $self->{output_handler};
 
-    $self->load_libxslt();
+    $self->load_xslt();
 
     foreach my $test ( @{ $self->{test_list} } ) {
         next unless $test->{enabled};
@@ -424,33 +523,44 @@ sub execute_libxslt {     # Execute LibXSLT
 
 sub execute_saxon {       # Execute Saxon
     my ( $self, $test ) = @_;
+    my $result;
+    
+    if (! $self->{saxon_instance}) { # use CLI version
+        my @cmd;
+        push @cmd, qw(java net.sf.saxon.Transform);
+        push @cmd, '-novw';
+        push @cmd, '-o';
+        push @cmd, $self->{temp_out};
+        push @cmd, $test->{input_filename};
+        push @cmd, $self->{xslt1_filename};
+        foreach my $name ( keys %{ $test->{params} } ) {
+            my $value = $test->{params}->{$name};
+            push( @cmd, $name . '=' . $value );
+        }
 
-    my @cmd;
-    push @cmd, qw(java net.sf.saxon.Transform);
-    push @cmd, '-novw';
-    push @cmd, '-o';
-    push @cmd, $self->{temp_out};
-    push @cmd, $test->{input_filename};
-    push @cmd, $self->{xslt1_filename};
-    foreach my $name ( keys %{ $test->{params} } ) {
-        my $value = $test->{params}->{$name};
-        push( @cmd, $name . '=' . $value );
+        # make sure there's always a $self->{temp_out}
+        # even if Saxon doesn't create one
+        # because the XSLT ouputs nothing
+        $self->write_file( $self->{temp_out}, '' );
+
+        unless ( system(@cmd) == 0 ) {
+            warn "Could not execute Saxon";
+            return;
+        }
+
+        $result = $self->{output_handler}->read_file( $self->{temp_out} );
+        unlink( $self->{temp_out} );
     }
-
-    # make sure there's always a $self->{temp_out}
-    # even if Saxon doesn't create one
-    # because the XSLT ouputs nothing
-    $self->write_file( $self->{temp_out}, '' );
-
-    unless ( system(@cmd) == 0 ) {
-        warn "Could not execute Saxon";
-        return;
+    else { # use TrAX via Inline::Java
+        foreach my $name ( keys %{ $test->{params} } ) {
+            my $value = $test->{params}->{$name};
+            $self->{saxon_instance}->set_param($name, $value);
+        }
+        $result = $self->{saxon_instance}->transform(
+            $test->{input_filename}
+        );
     }
-
-    my $s = $self->{output_handler}->read_file( $self->{temp_out} );
-    unlink( $self->{temp_out} );
-
-    return $s;
+    return $result;
 }
 
 sub execute_xalan_c {     # Execute Xalan-C
@@ -483,38 +593,50 @@ sub execute_xalan_c {     # Execute Xalan-C
 
 sub execute_xalan_j {     # Execute Xalan-J
     my ( $self, $test ) = @_;
+    my $result;
 
-    my @cmd;
-    push @cmd, 'java';
+    if (! $self->{xalan_j_instance}) { # use CLI version
+        my @cmd;
+        push @cmd, 'java';
 
-    # Make sure Xalan-J always uses Xalan-J and not an other JAXP compilant
-    # XSLT enginge for transforming. See:
-    # <http://www.biglist.com/lists/xsl-list/archives/200302/msg00954.html>
-    # and <http://xml.apache.org/xalan-j/usagepatterns.html#plug>
-    push @cmd,
-        '-D'
-        . 'javax.xml.transform.TransformerFactory' . '='
-        . 'org.apache.xalan.processor.TransformerFactoryImpl';
-    push @cmd, 'org.apache.xalan.xslt.Process';
-    push @cmd, '-IN';
-    push @cmd, $test->{input_filename};
-    push @cmd, '-OUT';
-    push @cmd, $self->{temp_out};
-    push @cmd, '-XSL', $self->{xslt1_filename};
+        # Make sure Xalan-J always uses Xalan-J and not an other JAXP 
+        # compilant XSLT enginge for transforming. See:
+        # <http://xml.apache.org/xalan-j/usagepatterns.html#plug>
+        push @cmd,
+            '-D'
+            . 'javax.xml.transform.TransformerFactory' . '='
+            . 'org.apache.xalan.processor.TransformerFactoryImpl';
+        push @cmd, 'org.apache.xalan.xslt.Process';
+        push @cmd, '-IN';
+        push @cmd, $test->{input_filename};
+        push @cmd, '-OUT';
+        push @cmd, $self->{temp_out};
+        push @cmd, '-XSL', $self->{xslt1_filename};
 
-    foreach my $name ( keys %{ $test->{params} } ) {
-        my $value = $test->{params}->{$name};
-        push @cmd, ( '-PARAM', $name, $value );
+        foreach my $name ( keys %{ $test->{params} } ) {
+            my $value = $test->{params}->{$name};
+            push @cmd, ( '-PARAM', $name, $value );
+        }
+
+        unless ( system(@cmd) == 0 ) {
+            warn "Could not execute Xalan-J";
+            return;
+        }
+    
+        $result = $self->{output_handler}->read_file( $self->{temp_out} );
+        unlink( $self->{temp_out} );
     }
-
-    unless ( system(@cmd) == 0 ) {
-        warn "Could not execute Xalan-J";
-        return;
+    else { # use TrAX via Inline::Java
+        foreach my $name ( keys %{ $test->{params} } ) {
+            my $value = $test->{params}->{$name};
+            $self->{xalan_j_instance}->set_param($name, $value);
+        }
+        $result = $self->{xalan_j_instance}->transform(
+            $test->{input_filename}
+        );
+        $result =~ s/\r*\n/\n/g;
     }
-    my $s = $self->{output_handler}->read_file( $self->{temp_out} );
-    unlink( $self->{temp_out} );
-
-    return $s;
+    return $result;
 }
 
 sub get_product_id {       # Get the product_id of the XSLT file
