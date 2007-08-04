@@ -23,8 +23,8 @@ brian@suda.co.uk
 http://suda.co.uk/
 
 XHTML-2-iCal
-Version 0.9.2
-2007-09-03
+Version 0.9.2.1
+2007-09-04
 
 Copyright 2005 Brian Suda
 This work is relicensed under The W3C Open Source License
@@ -36,7 +36,7 @@ Until the hCal spec has been finalised this is a work in progress.
 I'm not an XSLT expert, so there are no guarantees to quality of this code!
 
 -->
-<xsl:param name="Prodid">-//suda.co.uk//X2V 0.9.2 (BETA)//EN</xsl:param>
+<xsl:param name="Prodid">-//suda.co.uk//X2V 0.9.2.1 (BETA)//EN</xsl:param>
 <xsl:param name="Source">(Best Practice: should be URL that this was ripped from)</xsl:param>
 <xsl:param name="Anchor" />
 
@@ -349,8 +349,6 @@ I'm not an XSLT expert, so there are no guarantees to quality of this code!
 	<xsl:for-each select=".//*[ancestor-or-self::*[local-name() = 'del'] = false() and contains(concat(' ', normalize-space(@class), ' '),' dtstamp ')]">
 		<xsl:if test="position() = 1">
 			<xsl:text>&#x0D;&#x0A;DTSTAMP</xsl:text>
-			<!-- TZID needs work! -->
-			<xsl:apply-templates select="ancestor::*[@class='vevent']//*[not (name() = 'del') and contains(concat(' ',@class,' '),' tzid ')]" mode="tzid"/> 
 		    <xsl:text>:</xsl:text>
 			<xsl:call-template name="escapeText">
 				<xsl:with-param name="text-string"><xsl:call-template name="mf:extractDate"/></xsl:with-param>
@@ -361,8 +359,6 @@ I'm not an XSLT expert, so there are no guarantees to quality of this code!
 	<xsl:for-each select=".//*[ancestor-or-self::*[local-name() = 'del'] = false() and contains(concat(' ', normalize-space(@class), ' '),' last-modified ')]">
 		<xsl:if test="position() = 1">
 			<xsl:text>&#x0D;&#x0A;LAST-MODIFIED</xsl:text>
-			<!-- TZID needs work! -->
-			<xsl:apply-templates select="ancestor::*[@class='vevent']//*[not (name() = 'del') and contains(concat(' ',@class,' '),' tzid ')]" mode="tzid"/> 
 		    <xsl:text>:</xsl:text>
 			<xsl:call-template name="escapeText">
 				<xsl:with-param name="text-string"><xsl:call-template name="mf:extractDate"/></xsl:with-param>
@@ -373,8 +369,6 @@ I'm not an XSLT expert, so there are no guarantees to quality of this code!
 	<xsl:for-each select=".//*[ancestor-or-self::*[local-name() = 'del'] = false() and contains(concat(' ', normalize-space(@class), ' '),' created ')]">
 		<xsl:if test="position() = 1">
 			<xsl:text>&#x0D;&#x0A;CREATED</xsl:text>
-			<!-- TZID needs work! -->
-			<xsl:apply-templates select="ancestor::*[@class='vevent']//*[not (name() = 'del') and contains(concat(' ',@class,' '),' tzid ')]" mode="tzid"/> 
 		    <xsl:text>:</xsl:text>
 			<xsl:call-template name="escapeText">
 				<xsl:with-param name="text-string"><xsl:call-template name="mf:extractDate"/></xsl:with-param>
@@ -385,8 +379,6 @@ I'm not an XSLT expert, so there are no guarantees to quality of this code!
 	<xsl:for-each select=".//*[ancestor-or-self::*[local-name() = 'del'] = false() and contains(concat(' ', normalize-space(@class), ' '),' recurrence-id ')]">
 		<xsl:if test="position() = 1">
 			<xsl:text>&#x0D;&#x0A;RECURRENCE-ID</xsl:text>
-			<!-- TZID needs work! -->
-			<xsl:apply-templates select="ancestor::*[@class='vevent']//*[not (name() = 'del') and contains(concat(' ',@class,' '),' tzid ')]" mode="tzid"/> 
 		    <xsl:text>:</xsl:text>
 			<xsl:call-template name="escapeText">
 				<xsl:with-param name="text-string"><xsl:call-template name="mf:extractDate"/></xsl:with-param>
@@ -903,22 +895,21 @@ ATTACH</xsl:text>
 			</xsl:when>
 			<xsl:otherwise>
 				
-				
 				<xsl:choose>
 					<!--
 					<xsl:when test="normalize-space(.) = '' and not(contains(.,' '))"><xsl:text>^</xsl:text></xsl:when>-->
-					<xsl:when test="contains(translate(.,$nl,' '),' ') and normalize-space(translate(.,$nl,' ')) = ''">
+					<xsl:when test="contains(translate(.,$nl,''),' ') and normalize-space(translate(.,$nl,'')) = ''">
 						<xsl:text> </xsl:text>
 					</xsl:when>
-					<xsl:when test="substring(translate(.,$nl,' '),1,1) = $tb or substring(translate(.,$nl,' '),1,1) = ' '">
-						<xsl:if test="substring(.,string-length(translate(.,$nl,' ')),1) = $tb or substring(.,string-length(translate(.,$nl,' ')),1) = ' '">
+					<xsl:when test="substring(translate(.,$nl,''),1,1) = $tb or substring(translate(.,$nl,''),1,1) = ' '">						
+						<xsl:if test="substring(translate(.,$nl,''),1,1) = $tb or substring(translate(.,$nl,''),1,1) = ' '">
 								<xsl:text> </xsl:text>
 						</xsl:if>					
 						<xsl:choose>
-							<xsl:when test="substring(translate(.,$nl,' '),string-length(translate(.,$nl,' ')),1) = $tb or substring(translate(.,$nl,' '),string-length(translate(.,$nl,' ')),1) = ' '">
+							<xsl:when test="substring(translate(.,$nl,''),string-length(translate(.,$nl,'')),1) = $tb or substring(translate(.,$nl,''),string-length(translate(.,$nl,'')),1) = ' '">
 								<xsl:call-template name="escapeText">
 									<xsl:with-param name="text-string">
-										<xsl:value-of select="normalize-space(translate(.,$nl,' '))"/>
+										<xsl:value-of select="normalize-space(translate(.,$nl,''))"/>
 									</xsl:with-param>
 								</xsl:call-template>
 								<xsl:text> </xsl:text>
@@ -926,17 +917,17 @@ ATTACH</xsl:text>
 							<xsl:otherwise>
 								<xsl:call-template name="escapeText">
 									<xsl:with-param name="text-string">
-										<xsl:value-of select="normalize-space(translate(.,$nl,' '))"/>
+										<xsl:value-of select="normalize-space(translate(.,$nl,''))"/>
 									</xsl:with-param>
 								</xsl:call-template>
 								
 							</xsl:otherwise>						
 						</xsl:choose>
 					</xsl:when>
-					<xsl:when test="substring(.,string-length(translate(.,$nl,' ')),1) = $tb or substring(.,string-length(translate(.,$nl,' ')),1) = ' '">
+					<xsl:when test="substring(.,string-length(translate(.,$nl,'')),1) = $tb or substring(.,string-length(translate(.,$nl,'')),1) = ' '">
 						<xsl:call-template name="escapeText">
 							<xsl:with-param name="text-string">
-								<xsl:value-of select="normalize-space(translate(.,$nl,' '))"/>
+								<xsl:value-of select="normalize-space(translate(.,$nl,''))"/>
 							</xsl:with-param>
 						</xsl:call-template>
 						
@@ -950,7 +941,7 @@ ATTACH</xsl:text>
 						-->
 								<xsl:call-template name="escapeText">
 									<xsl:with-param name="text-string">
-										<xsl:value-of select="translate(translate(.,$tb,' '),$nl,' ')"/>
+										<xsl:value-of select="translate(translate(.,$tb,' '),$nl,'')"/>
 									</xsl:with-param>
 								</xsl:call-template>
 						<!--
