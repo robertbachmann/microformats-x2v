@@ -87,7 +87,11 @@ sub print_summary {    # print a summary table
 
         for my $engine (@used_engines) {
             my $result = $test->{ $engine . '-result' };
-            if ( $result eq 'PASS' ) {
+
+            if (!defined($result)) {
+                $self->color_print( '?', 'red' );
+            }
+            elsif ( $result eq 'PASS' ) {
                 $self->color_print( 'P', 'lime' );
             }
             else {

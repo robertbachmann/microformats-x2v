@@ -98,10 +98,10 @@ sub parse_cmdline_args {  # Parse the commandline arguments from ARGV
 
     if (@ARGV) {
         $p->getoptions(
-            \%opt,          '4xslt',     'libxslt|x', 'saxon|s',
-            'xalan-c',      'xalan-j|j', 'q|quiet',   'all|A',
-            'list-tests|l', 'color|c:1', 'dump=s',    'exclude|e=s@',
-            'no-trax',      'table|t',   'help'
+            \%opt,          '4xslt|4',     'libxslt|x', 'saxon|s',
+            'xalan-c|c',    'xalan-j|j', 'q|quiet',   'all|A',
+            'list-tests|l', 'color|C:1', 'dump=s',    'exclude|e=s@',
+            'no-trax',      'table|t',   'die|d',     'help'
         );
     }
     else {
@@ -129,6 +129,7 @@ sub parse_cmdline_args {  # Parse the commandline arguments from ARGV
     $self->{display_summary_table} = $opt{table};
     $self->{use_color}             = $opt{color};
     $self->{quiet}                 = 1 if ( $opt{q} );
+    $self->{die_on_error}          = 1 if ( $opt{die} );
 
     $self->{engines}->{'4XSLT'}   = 1 if ( $opt{'4xslt'} );
     $self->{engines}->{'LibXSLT'} = 1 if ( $opt{libxslt} );
@@ -234,14 +235,15 @@ Run the test suite with the supported XSLT engines.
   -l, --list-tests         List test numbers and exit
   -e, --exclude            Exclude test(s)
   -q, --quiet              Supress uppress nonessential output
-  -c, --color [1|0]        Display colors if value is ommited or 1.
+  -C, --color [1|0]        Display colors if value is ommited or 1.
+  -d, --die                Die on first failed test
       --dump FILENAME      Write machine-readable test results to FILENAME
   -t  --table              Display a summary table after the tests
   -A, --all                Run the tests with all engines
   -x, --libxslt            Run the tests with libxslt (via `XML::LibXSLT')
-      --4xslt              Run the tests with 4XSLT
+  -4, --4xslt              Run the tests with 4XSLT
   -s, --saxon              Run the tests with Saxon
-      --xalan-c            Run the tests with Xalan-C
+  -c, --xalan-c            Run the tests with Xalan-C
   -j, --xalan-j            Run the tests with Xalan-J
       --no-trax            Do not use Java's TrAX for Saxon and Xalan-J
       --help               Display this help and exit
@@ -414,6 +416,7 @@ sub prepare_input {     # Prepare input file
 sub run {                 # Run all tests
     my $self = shift;
     my @results;
+    my $test_failed = 0;
 
     my $console_out = XSLTest::ConsoleOutput->new({
         use_color => $self->{use_color} 
@@ -446,10 +449,9 @@ sub run {                 # Run all tests
                 $console_out->color_print( 'FAIL (ENGINE)', 'red' );
                 print " ", $test->{test_name}, " [$engine]\n";
 
-                next;
+                $test_failed = 1;
             }
-
-            if ( $output_handler->compare_result( $expected, $got ) ) {
+            elsif ( $output_handler->compare_result( $expected, $got ) ) {
 
                 $console_out->color_print( 'PASS', 'lime' );
                 print " ", $test->{test_name}, " [$engine]\n";
@@ -470,11 +472,19 @@ sub run {                 # Run all tests
                     $console_out->print_diff($diff)
                         unless ( $self->{quiet} );
                 }
-                
+                $test_failed = 1;
                 $test_result{ $engine . "-result" } = 'FAIL';
+            }
+
+            if ($test_failed && $self->{die_on_error}) {
+                last;
             }
         }
         push @results, \%test_result;
+
+        if ($test_failed && $self->{die_on_error}) {
+            last;
+        }
     }
 
     $console_out->print_summary( \@results )
@@ -482,6 +492,14 @@ sub run {                 # Run all tests
 
     $self->dump_results( \@results )
         if ( $self->{dump_file} );
+
+    if ($test_failed && $self->{die_on_error}) {
+        print "\n";
+        $console_out->color_print( 
+            'Test failed, aborting as requested', 'red' 
+        );
+        print "\n";
+    }
 }
 
 sub execute_engine {      # Execute an XSLT engine
