@@ -287,15 +287,31 @@ sub load_xslt {        # Load XSLT file and engines
 
     # Try to use Java's TrAX for Saxon and Xalan-J
     my $use_java_trax = 0;
-    if (
-        ($ENV{PERL_INLINE_JAVA_DIRECTORY} && $self->{try_java_trax})
-        &&
+    if ( $self->{try_java_trax} &&
         ($self->{engines}->{Saxon} || $self->{engines}->{'Xalan-J'})
        ) {
-        eval { require XSLTest::JavaTrAX; };
-        if (! $@) {
-            $use_java_trax = 1;
-        } else {die $@;}
+        if ($ENV{PERL_INLINE_JAVA_DIRECTORY}) {
+            my $dir = cwd();
+
+            chdir ($ENV{PERL_INLINE_JAVA_DIRECTORY})
+                or Carp::croak "Can't chdir to ", 
+                $ENV{PERL_INLINE_JAVA_DIRECTORY}, "\n";
+
+            eval { require XSLTest::JavaTrAX; };
+            
+            chdir($dir) or Carp::croak "Can't chdir to $dir\n";
+
+            if (! $@) {
+                $use_java_trax = 1;
+            }
+            elsif ($ENV{XSLTEST_DEBUG}) {
+                print "\$@ = $@\n"; exit 1;
+            }
+        }
+        else {
+            print "--- PERL_INLINE_JAVA_DIRECTORY not ",
+                  "set - not using TrAX for Saxon and Xalan-J\n";
+        }
     }
 
     # Xalan-J
@@ -305,12 +321,6 @@ sub load_xslt {        # Load XSLT file and engines
             '---- Trying to load Xalan-J via Inline::Java ... ',
             'teal'
         );
-
-        my $dir = cwd();
-
-        chdir ($ENV{PERL_INLINE_JAVA_DIRECTORY})
-            or Carp::croak "Can't chdir to ", 
-               $ENV{PERL_INLINE_JAVA_DIRECTORY}, "\n";
 
         my $obj = eval {
             XSLTest::JavaTrAX->new(
@@ -333,7 +343,6 @@ sub load_xslt {        # Load XSLT file and engines
                 or Carp::croak "Error in XSLT file (Xalan-J)\n";
             $self->{xalan_j_instance} = $obj;
         }
-        chdir($dir) or Carp::croak "Can't chdir to $dir\n";
     }
 
     # Saxon
@@ -343,12 +352,6 @@ sub load_xslt {        # Load XSLT file and engines
             '---- Trying to load Saxon via Inline::Java ... ',
             'teal'
         );
-
-        my $dir = cwd();
-
-        chdir ($ENV{PERL_INLINE_JAVA_DIRECTORY})
-            or Carp::croak "Can't chdir to ", 
-               $ENV{PERL_INLINE_JAVA_DIRECTORY}, "\n";
 
         my $obj = eval {
             XSLTest::JavaTrAX->new(
@@ -371,7 +374,6 @@ sub load_xslt {        # Load XSLT file and engines
                 or Carp::croak "Error in XSLT file (Saxon)\n";
             $self->{saxon_instance} = $obj;
         }
-        chdir($dir) or Carp::croak "Can't chdir to $dir\n";
     }
 }
 
