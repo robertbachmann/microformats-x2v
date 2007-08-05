@@ -16,6 +16,7 @@ use Cwd qw(cwd);
 use Data::Dumper;
 use File::Basename qw(basename);
 use File::Temp qw(tempdir);
+use IO::Socket;
 
 require XSLTest::ConsoleOutput;
 
@@ -37,7 +38,7 @@ sub new {                 # Constructor
     bless $self, $class;
 
     # get required arguments
-    foreach (qw(xslt1_filename output_handler)) {
+    foreach (qw(xslt1_filename output_handler lib_dir)) {
         if ( exists $args->{$_} ) {
             $self->{$_} = $args->{$_};
         }
@@ -74,6 +75,20 @@ sub new {                 # Constructor
 sub DESTROY {             # Destructor
     my $self = shift;
 
+    if ($self->{'4xslt_socket'}) {
+
+        if ( $self->{'4xslt_daemon'} ) {
+            # quit daemon
+            $self->{'4xslt_socket'}->send("QUIT\n");
+        }
+        else {
+            # only close session
+            $self->{'4xslt_socket'}->send("CLOSE\n");
+        }
+
+        close( $self->{'4xslt_socket'} );
+    }
+
     return unless exists $self->{temp_dir};
 
     # remove tempfiles
@@ -101,7 +116,8 @@ sub parse_cmdline_args {  # Parse the commandline arguments from ARGV
             \%opt,          '4xslt|4',     'libxslt|x', 'saxon|s',
             'xalan-c|c',    'xalan-j|j', 'q|quiet',   'all|A',
             'list-tests|l', 'color|C:1', 'dump=s',    'exclude|e=s@',
-            'no-trax',      'table|t',   'die|d',     'help'
+            'no-trax',      'table|t',   'die|d',     'help',
+            'no-4xslt-server'
         );
     }
     else {
@@ -137,6 +153,7 @@ sub parse_cmdline_args {  # Parse the commandline arguments from ARGV
     $self->{engines}->{'Xalan-C'} = 1 if ( $opt{'xalan-c'} );
     $self->{engines}->{'Xalan-J'} = 1 if ( $opt{'xalan-j'} );
 
+    $self->{try_4xslt_server} =!$opt{'no-4xslt-server'};
     $self->{try_java_trax} = !$opt{'no-trax'};
 
     if ( $opt{all} ) {
@@ -246,6 +263,7 @@ Run the test suite with the supported XSLT engines.
   -c, --xalan-c            Run the tests with Xalan-C
   -j, --xalan-j            Run the tests with Xalan-J
       --no-trax            Do not use Java's TrAX for Saxon and Xalan-J
+      --no-4xslt-server    Do not start 4XsltServer.py for 4XSLT
       --help               Display this help and exit
       
 Examples:
@@ -320,6 +338,10 @@ sub load_xslt {        # Load XSLT file and engines
     if ( $self->{engines}->{'Xalan-J'} && $use_trax) {
         $self->_load_xalan_j();
     }
+
+    if ( $self->{engines}->{'4XSLT'} && $self->{try_4xslt_server}) {
+        $self->_load_4xslt();
+    }
 }
 
 sub _load_libxslt {
@@ -393,6 +415,71 @@ sub _load_saxon {
     }
 }
 
+sub _load_4xslt {
+    my $self = shift;
+    
+    if ($^O !~ m/win32/i) {
+        $self->{console_out}->color_print( 
+            '---- Trying to spawn 4XsltServer.py ... ',
+            'teal'
+        );
+        
+        my $script_path = $self->{lib_dir} . '4XsltServer.py';
+        my $r = system($script_path, '--daemonize');
+        $self->{'4xslt_daemon'} = 1;
+        
+        if ($r == 0) {
+            $self->{console_out}->color_print('ok','lime');
+            print "\n";
+        }
+        else {
+            $self->{console_out}->color_print('error','red');
+            print "\n";
+        }
+    }
+
+    $self->{console_out}->color_print( 
+        '---- Trying to connect to 4XsltServer.py ... ',
+        'teal'
+    );
+
+    my $socket = new IO::Socket::INET (
+        PeerAddr => 'localhost', PeerPort => '40800',
+        Proto => 'tcp'
+    );
+
+    if ($socket) {
+        $self->{console_out}->color_print('ok','lime');
+        print "\n";
+    }
+    else {
+        $self->{console_out}->color_print('error','red');
+        print "\n";
+        return;
+    }
+
+    $socket->autoflush();
+    binmode($socket, ':utf8');
+    $self->{'4xslt_socket'} = $socket;
+
+    my $r = $self->_msg_4xslt('LOAD_XSLT '. $self->{xslt1_filename});
+
+    if ($r !~ /^ok/i) {
+        Carp::croak("Problem with 4XSLT: $r\n");
+    }
+}
+
+sub _msg_4xslt {
+    my ($self, $msg) = @_;
+    my $socket = $self->{'4xslt_socket'};
+    my $data;
+
+    $socket->send($msg . "\n");
+    $socket->recv($data, 1024 * 20);
+
+    return $data;
+}
+
 sub dump_results {        # Dump results into file
     my ( $self, $results_ref ) = @_;
     my $d = Data::Dumper->new( [$results_ref] );
@@ -417,6 +504,8 @@ sub run {                 # Run all tests
     my $self = shift;
     my @results;
     my $test_failed = 0;
+
+    binmode(*STDOUT, ':utf8');
 
     my $console_out = XSLTest::ConsoleOutput->new({
         use_color => $self->{use_color} 
@@ -515,27 +604,47 @@ sub execute_engine {      # Execute an XSLT engine
 
 sub execute_4xslt {       # Execute 4XSLT
     my ( $self, $test ) = @_;
+    my $result;
 
-    my @cmd;
-    push @cmd, '4xslt';
-    foreach my $name ( keys %{ $test->{params} } ) {
-        my $value = $test->{params}->{$name};
-        push( @cmd, '-D' );
-        push( @cmd, $name . '=' . $value );
+    if (! $self->{'4xslt_socket'}) { # use CLI version
+        my @cmd;
+        push @cmd, '4xslt';
+
+        foreach my $name ( keys %{ $test->{params} } ) {
+            my $value = $test->{params}->{$name};
+            push( @cmd, '-D' );
+            push( @cmd, $name . '=' . $value );
+        }
+
+        push @cmd, '-o';
+        push @cmd, $self->{temp_out};
+        push @cmd, $test->{input_filename};
+        push @cmd, $self->{xslt1_filename};
+
+        unless ( system(@cmd) == 0 ) {
+            warn "Could not execute 4XSLT";
+            return;
+        }
+        $result = $self->{output_handler}->read_file( $self->{temp_out} );
+        unlink( $self->{temp_out} );
+    } else {
+        my $response;
+
+        foreach my $name ( keys %{ $test->{params} } ) {
+            my $value = $test->{params}->{$name};
+
+            $response = $self->_msg_4xslt("SET_PARAM $name=$value");
+        }
+
+        $response = $self->_msg_4xslt('TRANSFORM '. $test->{input_filename});
+        unless ( $response =~ m/^OK/i ) {
+            warn "Could not execute 4XSLT";
+            return;
+        }
+
+        $result = substr( $response, length("OK "));
     }
-    push @cmd, '-o';
-    push @cmd, $self->{temp_out};
-    push @cmd, $test->{input_filename};
-    push @cmd, $self->{xslt1_filename};
-
-    unless ( system(@cmd) == 0 ) {
-        warn "Could not execute 4XSLT";
-        return;
-    }
-    my $s = $self->{output_handler}->read_file( $self->{temp_out} );
-    unlink( $self->{temp_out} );
-
-    return $s;
+    return $result;
 }
 
 sub execute_libxslt {     # Execute LibXSLT

@@ -9,7 +9,8 @@ require XSLTest::OutputHandler::RFC2425;
 
 my $driver = XSLTest::Driver::Microformats::hCalendar->new(
     {   xslt1_filename => $FindBin::Bin . '/xhtml2vcal.xsl',
-        output_handler => XSLTest::OutputHandler::RFC2425->new()
+        output_handler => XSLTest::OutputHandler::RFC2425->new(),
+        lib_dir        => "$FindBin::Bin/../LIB/"
     }
 );
 

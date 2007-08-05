@@ -9,7 +9,8 @@ require XSLTest::OutputHandler::XML;
 
 my $driver = XSLTest::Driver::Microformats::hAtom->new(
     {   xslt1_filename => $FindBin::Bin . '/hAtom2Atom.xsl',
-        output_handler => XSLTest::OutputHandler::XML->new()
+        output_handler => XSLTest::OutputHandler::XML->new(),
+        lib_dir        => "$FindBin::Bin/../LIB/"
     }
 );
 
