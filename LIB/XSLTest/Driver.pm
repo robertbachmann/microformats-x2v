@@ -268,25 +268,18 @@ sub write_file {          # Write scalar into a (new) file
 sub load_xslt {        # Load XSLT file and engines
     my $self = shift;
 
-    my ( $parser, $libxslt, $xslt_doc );
-    $parser = XML::LibXML->new();
-
+    # get product id
+    my $parser = XML::LibXML->new();
     my $doc = $parser->parse_file( $self->{xslt1_filename} )
-        or die "Can't parse XSLT";
+        or Carp::croak "Error in XSLT file (libXML)";
 
     $self->{output_handler}->set_product_id(
         $self->get_product_id($doc)
     );
 
-    # LibXSLT
-    if ( $self->{engines}->{LibXSLT} ) {
-        $libxslt = XML::LibXSLT->new();
-        $self->{libxslt} = $libxslt->parse_stylesheet($doc)
-            or Carp::croak "Error in XSLT file (libXSLT)";
-    }
 
     # Try to use Java's TrAX for Saxon and Xalan-J
-    my $use_java_trax = 0;
+    my $use_trax = 0;
     if ( $self->{try_java_trax} &&
         ($self->{engines}->{Saxon} || $self->{engines}->{'Xalan-J'})
        ) {
@@ -298,11 +291,11 @@ sub load_xslt {        # Load XSLT file and engines
                 $ENV{PERL_INLINE_JAVA_DIRECTORY}, "\n";
 
             eval { require XSLTest::JavaTrAX; };
-            
+
             chdir($dir) or Carp::croak "Can't chdir to $dir\n";
 
             if (! $@) {
-                $use_java_trax = 1;
+                $use_trax = 1;
             }
             elsif ($ENV{XSLTEST_DEBUG}) {
                 print "\$@ = $@\n"; exit 1;
@@ -314,66 +307,87 @@ sub load_xslt {        # Load XSLT file and engines
         }
     }
 
-    # Xalan-J
-    if ( $self->{engines}->{'Xalan-J'} && $use_java_trax) {
-
-        $self->{console_out}->color_print( 
-            '---- Trying to load Xalan-J via Inline::Java ... ',
-            'teal'
-        );
-
-        my $obj = eval {
-            XSLTest::JavaTrAX->new(
-                {
-                 factory_name =>
-                 'org.apache.xalan.processor.TransformerFactoryImpl'
-                }
-            );
-        };
-
-        if ($@) {
-            $self->{console_out}->color_print('error','red');
-            print "\n";
-        }
-        else {
-            $self->{console_out}->color_print('ok','lime');
-            print "\n";
-
-            $obj->load_xslt($self->{xslt1_filename})
-                or Carp::croak "Error in XSLT file (Xalan-J)\n";
-            $self->{xalan_j_instance} = $obj;
-        }
+    if ( $self->{engines}->{'LibXSLT'} ) {
+        $self->_load_libxslt($doc);
     }
 
-    # Saxon
-    if ( $self->{engines}->{Saxon} && $use_java_trax) {
+    if ( $self->{engines}->{'Saxon'} && $use_trax) {
+        $self->_load_saxon();
+    }
 
-        $self->{console_out}->color_print( 
-            '---- Trying to load Saxon via Inline::Java ... ',
-            'teal'
+    if ( $self->{engines}->{'Xalan-J'} && $use_trax) {
+        $self->_load_xalan_j();
+    }
+}
+
+sub _load_libxslt {
+    my $self = shift;
+    my $doc  = shift;
+    my $libxslt = XML::LibXSLT->new();
+
+    $self->{libxslt} = $libxslt->parse_stylesheet($doc)
+        or Carp::croak "Error in XSLT file (libXSLT)";
+}
+
+sub _load_xalan_j {
+    my $self = shift;
+    
+    $self->{console_out}->color_print( 
+        '---- Trying to load Xalan-J via Inline::Java ... ',
+        'teal'
+    );
+
+    my $obj = eval {
+        XSLTest::JavaTrAX->new(
+            {
+             factory_name =>
+             'org.apache.xalan.processor.TransformerFactoryImpl'
+            }
         );
+    };
 
-        my $obj = eval {
-            XSLTest::JavaTrAX->new(
-                {
-                 factory_name => 'net.sf.saxon.TransformerFactoryImpl'
-                }
-            );
-        };
+    if ($@) {
+        $self->{console_out}->color_print('error','red');
+        print "\n";
+    }
+    else {
+        $self->{console_out}->color_print('ok','lime');
+        print "\n";
 
-        if ($@) {
-            $self->{console_out}->color_print('error','red');
-            print "\n";
-            $self->{saxon_instance} = undef;
-        }
-        else {
-            $self->{console_out}->color_print('ok','lime');
-            print "\n";
+        $obj->load_xslt($self->{xslt1_filename})
+            or Carp::croak "Error in XSLT file (Xalan-J)\n";
+        $self->{xalan_j_instance} = $obj;
+    }
+}
 
-            $obj->load_xslt($self->{xslt1_filename})
-                or Carp::croak "Error in XSLT file (Saxon)\n";
-            $self->{saxon_instance} = $obj;
-        }
+sub _load_saxon {
+    my $self = shift;
+
+    $self->{console_out}->color_print( 
+        '---- Trying to load Saxon via Inline::Java ... ',
+        'teal'
+    );
+
+    my $obj = eval {
+        XSLTest::JavaTrAX->new(
+            {
+             factory_name => 'net.sf.saxon.TransformerFactoryImpl'
+            }
+        );
+    };
+
+    if ($@) {
+        $self->{console_out}->color_print('error','red');
+        print "\n";
+        $self->{saxon_instance} = undef;
+    }
+    else {
+        $self->{console_out}->color_print('ok','lime');
+        print "\n";
+
+        $obj->load_xslt($self->{xslt1_filename})
+            or Carp::croak "Error in XSLT file (Saxon)\n";
+        $self->{saxon_instance} = $obj;
     }
 }
 
