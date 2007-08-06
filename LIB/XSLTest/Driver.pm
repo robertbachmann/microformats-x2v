@@ -417,26 +417,34 @@ sub _load_saxon {
 
 sub _load_4xslt {
     my $self = shift;
-    
+
+    $self->{console_out}->color_print( 
+        '---- Trying to spawn 4XsltServer.py ... ',
+        'teal'
+    );
+
+    my $script_path = $self->{lib_dir} . '4XsltServer.py';
+    my $r;
+
     if ($^O !~ m/win32/i) {
-        $self->{console_out}->color_print( 
-            '---- Trying to spawn 4XsltServer.py ... ',
-            'teal'
-        );
-        
-        my $script_path = $self->{lib_dir} . '4XsltServer.py';
-        my $r = system($script_path, '--daemonize');
-        $self->{'4xslt_daemon'} = 1;
-        
-        if ($r == 0) {
-            $self->{console_out}->color_print('ok','lime');
-            print "\n";
-        }
-        else {
-            $self->{console_out}->color_print('error','red');
-            print "\n";
-        }
+        $r = system($script_path, '--daemonize');
     }
+    else {
+        $r = system('cmd.exe', '/c', 'start', '"4XsltServer"', 
+                    '/i', '/min', 'python.exe', $script_path);
+        sleep(1); #@@FIXME use "PID" file instead
+    }
+
+    if ($r == 0) {
+        $self->{'4xslt_daemon'} = 1;
+        $self->{console_out}->color_print('ok','lime');
+        print "\n";
+    }
+    else {
+        $self->{console_out}->color_print('error','red');
+        print "\n";
+    }
+
 
     $self->{console_out}->color_print( 
         '---- Trying to connect to 4XsltServer.py ... ',
@@ -462,7 +470,7 @@ sub _load_4xslt {
     binmode($socket, ':utf8');
     $self->{'4xslt_socket'} = $socket;
 
-    my $r = $self->_msg_4xslt('LOAD_XSLT '. $self->{xslt1_filename});
+    $r = $self->_msg_4xslt('LOAD_XSLT '. $self->{xslt1_filename});
 
     if ($r !~ /^ok/i) {
         Carp::croak("Problem with 4XSLT: $r\n");
