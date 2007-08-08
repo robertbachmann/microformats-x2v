@@ -766,47 +766,43 @@ ATTACH</xsl:text>
 <!-- recursive function to escape text -->
 <xsl:template name="escapeText">
 	<xsl:param name="text-string"></xsl:param>
-	<xsl:variable name="nl">&#x0D;&#x0A;</xsl:variable>
+
+	<xsl:call-template name="replaceText"> <!-- , -->
+		<xsl:with-param name="search">,</xsl:with-param>
+		<xsl:with-param name="replace">\,</xsl:with-param>
+		<xsl:with-param name="subject">
+			<xsl:call-template name="replaceText"> <!-- ; -->
+				<xsl:with-param name="search">;</xsl:with-param>
+				<xsl:with-param name="replace">\;</xsl:with-param>
+				<xsl:with-param name="subject">
+					<xsl:call-template name="replaceText"> <!-- \ -->
+						<xsl:with-param name="search">\</xsl:with-param>
+						<xsl:with-param name="replace">\\</xsl:with-param>
+						<xsl:with-param name="subject" select="$text-string" />
+					</xsl:call-template>
+				</xsl:with-param>
+			</xsl:call-template>
+		</xsl:with-param>
+	</xsl:call-template>
+</xsl:template>
+
+<xsl:template name="replaceText">
+	<xsl:param name="subject" />
+	<xsl:param name="search" />
+	<xsl:param name="replace" />
+
 	<xsl:choose>
-		<xsl:when test="not(substring($text-string,2)) = false()">
-			<xsl:choose>
-				<xsl:when test="substring($text-string,1,1) = '\'">
-					<xsl:text>\\</xsl:text>
-					<xsl:call-template name="escapeText">
-						<xsl:with-param name="text-string"><xsl:value-of select="substring($text-string,2)"/></xsl:with-param>
-					</xsl:call-template>
-				</xsl:when>
-				<xsl:when test="substring($text-string,1,1) = ','">
-					<xsl:text>\,</xsl:text>
-					<xsl:call-template name="escapeText">
-						<xsl:with-param name="text-string"><xsl:value-of select="substring($text-string,2)"/></xsl:with-param>
-					</xsl:call-template>
-				</xsl:when>
-				<xsl:when test="substring($text-string,1,1) = ';'">
-					<xsl:text>\;</xsl:text>
-					<xsl:call-template name="escapeText">
-						<xsl:with-param name="text-string"><xsl:value-of select="substring($text-string,2)"/></xsl:with-param>
-					</xsl:call-template>
-				</xsl:when>
-				<!-- New Line -->
-				<!--
-				<xsl:when test="substring($text-string,1,1) = $nl">
-					<xsl:text>\n</xsl:text>
-					<xsl:call-template name="escapeText">
-						<xsl:with-param name="text-string"><xsl:value-of select="substring($text-string,2)"/></xsl:with-param>
-					</xsl:call-template>
-				</xsl:when>
-				-->
-				<xsl:otherwise>
-					<xsl:value-of select="substring($text-string,1,1)"/>
-					<xsl:call-template name="escapeText">
-						<xsl:with-param name="text-string"><xsl:value-of select="substring($text-string,2)"/></xsl:with-param>
-					</xsl:call-template>
-				</xsl:otherwise>				
-			</xsl:choose>
+		<xsl:when test="contains($subject, $search)">
+			<xsl:value-of select="substring-before($subject, $search)" />
+			<xsl:value-of select="$replace" />
+			<xsl:call-template name="replaceText">
+				<xsl:with-param name="subject" select="substring-after($subject, $search)"/>
+				<xsl:with-param name="search" select="$search"/>
+				<xsl:with-param name="replace" select="$replace"/>
+			</xsl:call-template>
 		</xsl:when>
 		<xsl:otherwise>
-			<xsl:value-of select="$text-string"/>			
+			<xsl:value-of select="$subject" />
 		</xsl:otherwise>
 	</xsl:choose>
 </xsl:template>
