@@ -37,23 +37,27 @@ sub normalize_data {  # Normalize data
 }
 
 sub make_diff {       # Generate an unified diff
-    my ( $self, $a, $b ) = @_;
+    my ( $self, $exp, $got ) = @_;
     my ( $parser, $doc1, $doc2 );
 
     $parser = XML::LibXML->new();
     $parser->keep_blanks(0);
 
-    utf8::encode($a);
-    $doc1 = $parser->parse_string($a);
+    utf8::encode($exp);
+    $doc1 = $parser->parse_string($exp);
     $doc1->setEncoding('utf-8');
-    $a = $doc1->toString(1);
+    $exp = $doc1->toString(1);
 
-    utf8::encode($b);
-    $doc2 = $parser->parse_string($b);
+    $got  = $self->normalize_data($got);
+    $doc2 = $parser->parse_string($got);
     $doc2->setEncoding('utf-8');
-    $b = $doc2->toString(1);
+    $got = $doc2->toString(1);
 
-    return $self->SUPER::make_diff( $a, $b );
+    if ( substr( $exp, -1, 1 ) ne "\n" ) { $exp .= "\n" }
+    if ( substr( $got, -1, 1 ) ne "\n" ) { $got .= "\n" }
+
+    return Text::Diff::diff( \$exp, \$got,
+        { FILENAME_A => 'expected', FILENAME_B => 'got' } );
 }
 
 1;
