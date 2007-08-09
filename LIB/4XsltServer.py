@@ -65,7 +65,7 @@ class FourXsltTransformationServer:
                 return False
             
             try:
-                cfile.write(response + "\n")
+                cfile.write(response + "\n\0\0\0\0")
             except:
                 return True
         

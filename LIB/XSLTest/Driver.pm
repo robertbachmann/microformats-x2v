@@ -472,12 +472,18 @@ sub _load_4xslt {
 sub _msg_4xslt {
     my ($self, $msg) = @_;
     my $socket = $self->{'4xslt_socket'};
-    my $data;
+    my $data = '';
+    my $buffer;
 
     $socket->send($msg . "\n");
-    $socket->recv($data, 1024 * 20);
 
-    return $data;
+    while (1) {
+        $socket->recv($buffer, 2048);
+        $data .= $buffer;
+        last if ( index($buffer, "\n\0\0\0\0") != -1 );
+    }
+
+    return substr($data,0, length($data) - 5);
 }
 
 sub dump_results {        # Dump results into file
