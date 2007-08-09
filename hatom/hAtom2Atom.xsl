@@ -46,6 +46,13 @@
      <http://feedparser.org/docs/html-sanitization.html>
      from atom:summary and atom:content.
      The default is "1".
+     
+   $tag-schemes:
+     If $tag-schemes is set to "1", hAtom2Atom.xsl will add
+     the "scheme" attribute to <atom:category> when extracting 
+     rel-tags. The value of scheme will be the tag space of 
+     the extracted rel-tag.
+     The default is "1".
 
                                      NOTES
 
@@ -121,6 +128,7 @@
 <xsl:param name="implicit-feed">1</xsl:param>
 <xsl:param name="debug-comments">1</xsl:param>
 <xsl:param name="sanitize-html">1</xsl:param>
+<xsl:param name="tag-schemes">1</xsl:param>
 
 <xsl:output method="xml" indent="no" encoding="UTF-8" />
 
@@ -131,6 +139,7 @@
 		<xsl:with-param name="implicit-feed" select="$implicit-feed" />
 		<xsl:with-param name="debug-comments" select="$debug-comments" />
 		<xsl:with-param name="sanitize-html" select="$sanitize-html" />
+		<xsl:with-param name="tag-schemes" select="$tag-schemes" />
 	</xsl:call-template>
 </xsl:template>
 
@@ -212,6 +221,7 @@
 		<h2a:implicit-feed><xsl:value-of select="$implicit-feed" /></h2a:implicit-feed>
 		<h2a:debug-comments><xsl:value-of select="$debug-comments" /></h2a:debug-comments>
 		<h2a:sanitize-html><xsl:value-of select="$sanitize-html" /></h2a:sanitize-html>
+		<h2a:tag-schemes><xsl:value-of select="$tag-schemes" /></h2a:tag-schemes>
 		<!-- This isn't a real parameter, but it is derived from one -->
 		<h2a:source-uri-sans-fragment>
 			<xsl:choose>
@@ -457,7 +467,15 @@
 
 		<!-- Extract feed's tags -->
 		<xsl:for-each select="extension:node-set($feedLevelElements)/descendant::xhtml:a[contains(concat(' ',normalize-space(translate(@rel,'TAG','tag')),' '),' tag ')]">
-			<xsl:call-template name="h2a:create-category" />
+			<xsl:call-template name="h2a:create-category">
+				<xsl:with-param name="params" select="$params"/>
+				<xsl:with-param name="base">
+					<xsl:apply-templates mode="h2a:get-base" select=".">
+						<xsl:with-param name="params" select="$params"/>
+						<xsl:with-param name="fallback" select="$feed-base"/>
+					</xsl:apply-templates>
+				</xsl:with-param>
+			</xsl:call-template>
 		</xsl:for-each>
 
 		<!-- Find the feed's author(s) -->
@@ -809,6 +827,12 @@
 			<xsl:for-each select="extension:node-set($entryLevelElements)/descendant::xhtml:a[contains(concat(' ',normalize-space(translate(@rel,'TAG','tag')),' '),' tag ')]">
 				<xsl:call-template name="h2a:create-category">
 					<xsl:with-param name="params" select="$params"/>
+					<xsl:with-param name="base">
+						<xsl:apply-templates mode="h2a:get-base" select=".">
+							<xsl:with-param name="params" select="$params"/>
+							<xsl:with-param name="fallback" select="$entry-base"/>
+						</xsl:apply-templates>
+					</xsl:with-param>
 				</xsl:call-template>
 			</xsl:for-each>
 		</entry>
@@ -1037,12 +1061,25 @@
 -->
 <!--[extension]-->
 <xsl:template name="h2a:create-category">
+	<xsl:param name="params" />
+	<xsl:param name="base" />
+
 	<category>
-		<xsl:attribute name="term">
+		<xsl:variable name="data">
 			<xsl:call-template name="h2a:extract-tag">
+				<xsl:with-param name="params" select="$params"/>
 				<xsl:with-param name="uri" select="@href"/>
+				<xsl:with-param name="base" select="$base"/>
 			</xsl:call-template>
+		</xsl:variable>
+		<xsl:attribute name="term">
+			<xsl:value-of select="extension:node-set($data)/h2a:tag-term" />
 		</xsl:attribute>
+		<xsl:if test="$params/h2a:tag-schemes != 0">
+			<xsl:attribute name="scheme">
+				<xsl:value-of select="extension:node-set($data)/h2a:tag-scheme" />
+			</xsl:attribute>
+		</xsl:if>
 		<xsl:attribute name="label"><xsl:value-of select="."/></xsl:attribute>
 	</category>
 </xsl:template>
@@ -1051,7 +1088,9 @@
  Extract a tag from an URI
 -->
 <xsl:template name="h2a:extract-tag">
+	<xsl:param name="params" />
 	<xsl:param name="uri" />
+	<xsl:param name="base" />
 
 	<xsl:variable name="uri-sans-fragment">
 		<xsl:choose>
@@ -1081,13 +1120,34 @@
 		</xsl:call-template>
 	</xsl:variable>
 
-	<xsl:call-template name="h2a:decode-uri">
-		<xsl:with-param name="uri">
-			<xsl:call-template name="h2a:basename">
-				<xsl:with-param name="uri" select="$uri-sans-trailing-slashes" />
+	<xsl:variable name="basename">
+		<xsl:call-template name="h2a:basename">
+			<xsl:with-param name="uri" select="$uri-sans-trailing-slashes" />
+		</xsl:call-template>
+	</xsl:variable>
+
+	<xsl:variable name="term">
+		<xsl:call-template name="h2a:decode-uri">
+			<xsl:with-param name="uri" select="$basename"/>
+		</xsl:call-template>
+	</xsl:variable>
+	<h2a:tag-term><xsl:value-of select="$term" /></h2a:tag-term>
+
+	<xsl:if test="$params/h2a:tag-schemes != 0">
+		<xsl:variable name="uri-expanded">
+			<xsl:call-template name="uri:expand">
+				<xsl:with-param name="base" select="$base"/>
+				<xsl:with-param name="there" select="$uri-sans-trailing-slashes"/>
 			</xsl:call-template>
-		</xsl:with-param>
-	</xsl:call-template>
+		</xsl:variable>
+
+		<xsl:variable name="scheme">
+			<xsl:value-of select="
+			substring( $uri-expanded, 1, string-length($uri-expanded) - string-length($basename) )
+			" />
+		</xsl:variable>
+		<h2a:tag-scheme><xsl:value-of select="$scheme" /></h2a:tag-scheme>
+	</xsl:if>
 </xsl:template>
 
 <!--
