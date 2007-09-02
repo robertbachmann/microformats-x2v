@@ -22,13 +22,13 @@ sub normalize_data {    # Normalize data
     my $data = shift;
 
     my $source     = "http://example.com/";
-    my $product_id = $self->{product_id};
+    my $product_id = quotemeta($self->{product_id});
 
     my $data_ref = do { my @a = split /\r?\n/, $data; \@a };
     my @data = $self->_sort_object($data_ref);
 
     foreach (@data) {
-        $_ =~ s{\$PRODID\$}{$product_id}g;
+        $_ =~ s{$product_id}{\$PRODID\$}g;
         $_ =~ s{\$SOURCE\$/([^\$]+)\$}{$source$1}g;
         $_ =~ s{\$SOURCE\$}{$source}g;
     }
