@@ -147,6 +147,11 @@ sub parse_cmdline_args {  # Parse the commandline arguments from ARGV
     $self->{quiet}                 = 1 if ( $opt{q} );
     $self->{die_on_error}          = 1 if ( $opt{die} );
 
+    if ($self->{dump_file} && $self->{die_on_error}) {
+        print STDERR "$0: Can not use --dump with --die\n";
+        exit 1;
+    }
+
     $self->{engines}->{'4XSLT'}   = 1 if ( $opt{'4xslt'} );
     $self->{engines}->{'LibXSLT'} = 1 if ( $opt{libxslt} );
     $self->{engines}->{'Saxon'}   = 1 if ( $opt{saxon} );
@@ -488,15 +493,58 @@ sub _msg_4xslt {
 
 sub dump_results {        # Dump results into file
     my ( $self, $results_ref ) = @_;
-    my $d = Data::Dumper->new( [$results_ref] );
-    my $varname = uc basename( $self->{xslt1_filename} );
-    $varname =~ s/[^A-Z0-9]//g;
+    my $s;
+    my $esc = sub() {
+        my $str = shift;
 
-    $d->Indent(1);
-    $d->Varname($varname);
+        $str =~ s/&/&amp;/g;
+        $str =~ s/"/&quot;/g;
+        $str =~ s/>/&lt;/g;
+        $str =~ s/</&gt;/g;
+
+        return $str;
+    };
+
+    my $program = $esc->(basename $self->{xslt1_filename});
+
+    my @engines = grep { $self->{engines}->{$_} }
+        sort keys %{ $self->{engines} };
+
+    $s .= qq{<test-results program="$program">\n};
+    $s .= qq{ <engines>\n};
+
+    for my $e (@engines) {
+        $s .= qq{  <engine>$e</engine>\n};
+    }
+
+    $s .= qq{ </engines>\n};
+
+    for my $t ( @{$results_ref} ) {
+        my $name = $esc->( $t->{'test-name'} );
+        $s .= qq{ <test name="$name">\n};
+
+        for my $e (@engines) {
+            my $result = $t->{"$e-result"};
+
+            if ( $result eq "FAIL" ) {
+                $s .= qq{  <engine name="$e" result="FAIL">\n};
+                $s .= qq{   <diff xml:space="preserve">\n};
+                $s .= $esc->( $t->{"$e-diff"} );
+                $s .= qq{</diff>\n};
+                $s .= qq{  </engine>\n};
+            }
+            else {
+                $result = $esc->($result);
+                $s .= qq{  <engine name="$e" result="$result"/>\n};
+            }
+        }
+
+        $s .= qq{ </test>\n};
+    }
+    $s .= qq{</test-results>\n};
 
     chdir( $self->{inital_cwd} );
-    $self->write_file( $self->{dump_file}, $d->Dump );
+    $self->write_file( $self->{dump_file}, $s );
 }
 
 sub prepare_input {     # Prepare input file
