@@ -287,7 +287,7 @@ I'm not an XSLT expert, so there are no guarantees to quality of this code!
 		</xsl:if>
 	</xsl:for-each>
 
-	<xsl:for-each select=".//*[ancestor-or-self::*[local-name() = 'del'] = false() and contains(concat(' ', normalize-space(@class), ' '),' contact ')]">
+	<xsl:for-each select=".//*[ancestor-or-self::*[local-name() = 'del'] = false() and contains(concat(' ', normalize-space(@class), ' '),' duration ')]">
 		<xsl:if test="position() = 1">
 			<xsl:text>&#x0D;&#x0A;DURATION:</xsl:text>
 			<xsl:call-template name="mf:toUpper">

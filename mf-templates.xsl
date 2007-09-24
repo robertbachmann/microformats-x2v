@@ -584,7 +584,7 @@
 		</xsl:choose>
 	</xsl:template>
 	
-	<xsl:template name="mf:doIncludes">				
+	<xsl:template name="mf:doIncludes">
 		<!-- check for header="" and extract that data -->
 		<xsl:if test="descendant-or-self::*/@headers">
 			<xsl:call-template name="mf:extract-ids">
