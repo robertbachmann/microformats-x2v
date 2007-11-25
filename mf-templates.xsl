@@ -564,8 +564,8 @@
 						</xsl:when>
 						<xsl:when test=".//*[contains(concat(' ', normalize-space(@class), ' '),' type ')]">
 							<xsl:variable name="notType">
-								<xsl:for-each select="node()">
-									<xsl:if test="not(descendant-or-self::*[contains(concat(' ', normalize-space(@class), ' '),' type ')])">
+								<xsl:for-each select="descendant::node()">
+									<xsl:if test="not(ancestor-or-self::*[contains(concat(' ', normalize-space(@class), ' '),' type ')]) and (descendant::node() = false())">
 										<xsl:value-of select="."/>
 									</xsl:if>
 								</xsl:for-each>
@@ -626,8 +626,8 @@
 			</xsl:when>
 			<xsl:when test=".//*[contains(concat(' ', normalize-space(@class), ' '),' type ')]">
 				<xsl:variable name="notType">
-					<xsl:for-each select="node()">
-						<xsl:if test="not(descendant-or-self::*[contains(concat(' ', normalize-space(@class), ' '),' type ')])">
+					<xsl:for-each select="descendant::node()">
+						<xsl:if test="not(ancestor-or-self::*[contains(concat(' ', normalize-space(@class), ' '),' type ')]) and (descendant::node() = false())">
 							<xsl:value-of select="."/>
 						</xsl:if>
 					</xsl:for-each>
