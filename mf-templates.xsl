@@ -288,6 +288,42 @@
 			</xsl:otherwise>
 		</xsl:choose>		
 	</xsl:template>
+	
+	
+	<!-- @@make this a proper MASKING function -->
+	<xsl:template name="mf:extractDateMask">
+		<xsl:variable name="unformatedDate">
+			<xsl:call-template name="mf:extractDate"/>
+		</xsl:variable>
+		
+		<!-- year -->
+		<xsl:value-of select="substring($unformatedDate,1,4)"/>
+		<xsl:text>-</xsl:text>
+		<!-- month -->
+		<xsl:value-of select="substring($unformatedDate,5,2)"/>
+		<xsl:text>-</xsl:text>
+		<!-- day -->
+		<xsl:value-of select="substring($unformatedDate,7,2)"/>
+		
+		<xsl:choose>
+			<xsl:when test="substring($unformatedDate,10,1) = 'T'">
+				<xsl:text>T</xsl:text>			
+				<!-- hours -->
+				<xsl:value-of select="substring($unformatedDate,11,2)"/>
+				<xsl:text>:</xsl:text>
+				<!-- minutes -->
+				<xsl:value-of select="substring($unformatedDate,13,2)"/>
+				<xsl:text>:</xsl:text>
+				<!-- seconds -->
+				<xsl:value-of select="substring($unformatedDate,15,2)"/>
+			</xsl:when>
+			<xsl:otherwise>
+				<xsl:text>T00:00:00</xsl:text>
+			</xsl:otherwise>
+		</xsl:choose>
+		<xsl:text>Z</xsl:text>
+				
+	</xsl:template>
 
 	<!-- extract an ISO date from a Microformat property -->
 	<xsl:template name="mf:extractMultipleDate">
@@ -391,6 +427,7 @@
 		<!-- @@ -->
 	</xsl:template>
 
+	<!-- this might need some work is a protocol also has a value as a child? -->
 	<xsl:template name="mf:extractFromProtocol">
 		<xsl:param name="protocolList"/>
 
@@ -525,6 +562,16 @@
 								</xsl:choose>
 							</xsl:for-each>
 						</xsl:when>
+						<xsl:when test=".//*[contains(concat(' ', normalize-space(@class), ' '),' type ')]">
+							<xsl:variable name="notType">
+								<xsl:for-each select="node()">
+									<xsl:if test="not(descendant-or-self::*[contains(concat(' ', normalize-space(@class), ' '),' type ')])">
+										<xsl:value-of select="."/>
+									</xsl:if>
+								</xsl:for-each>
+							</xsl:variable>
+							<xsl:value-of select="normalize-space($notType)"/>				
+						</xsl:when>
 						<xsl:otherwise>
 							<xsl:value-of select="normalize-space(.)"/>
 						</xsl:otherwise>
@@ -577,6 +624,16 @@
 					</xsl:choose>					
 				</xsl:for-each>
 			</xsl:when>
+			<xsl:when test=".//*[contains(concat(' ', normalize-space(@class), ' '),' type ')]">
+				<xsl:variable name="notType">
+					<xsl:for-each select="node()">
+						<xsl:if test="not(descendant-or-self::*[contains(concat(' ', normalize-space(@class), ' '),' type ')])">
+							<xsl:value-of select="."/>
+						</xsl:if>
+					</xsl:for-each>
+				</xsl:variable>
+				<xsl:value-of select="normalize-space($notType)"/>				
+			</xsl:when>
 			<!-- take the value of the child node -->
 			<xsl:otherwise>
 				<xsl:value-of select="normalize-space(.)"/>						
@@ -612,7 +669,6 @@
 	<!-- recursive function to extract headers="id id id" -->
 	<xsl:template name="mf:extract-ids">
 		<xsl:param name="text-string"/>
-
 		<xsl:choose>
 			<xsl:when test="not(substring-before($text-string,' ')) = false()">
 				<xsl:call-template name="mf:get-header">

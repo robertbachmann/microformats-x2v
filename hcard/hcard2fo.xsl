@@ -18,6 +18,9 @@
 
 <xsl:param name="Source" />
 
+<xsl:template name="properties">
+</xsl:template>
+		
 <xsl:template match="/">
 
 <fo:root>

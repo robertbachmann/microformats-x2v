@@ -2,7 +2,7 @@
 <xsl:stylesheet 
 	xmlns:xsl="http://www.w3.org/1999/XSL/Transform" 
 	xmlns:geo="http://www.w3.org/2003/01/geo/wgs84_pos#"
-	xmlns:review="http://www.purl.org/stuff/rev#" 
+	xmlns:review="http://dannyayers.com/xmlns/rev/" 
 	xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" 
 	xmlns:mf="http://suda.co.uk/projects/microformats/mf-templates.xsl?template="
 	xmlns:xhtml="http://www.w3.org/1999/xhtml" 
@@ -245,15 +245,15 @@
 
   <!-- Rating and Rating scale (optional) :: 1 instance -->
   <xsl:for-each select="descendant::*[contains(concat(' ',normalize-space(@class),' '),' rating ')][1]">
-	<review:rating rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"><xsl:call-template name="mf:extractText"/></review:rating>
+	<review:rating rdf:datatype="http://www.w3.org/2001/XMLSchema#float"><xsl:call-template name="mf:extractText"/></review:rating>
   </xsl:for-each>
 
   <!-- check that these are nested in rating! -->
   <xsl:for-each select="descendant::*[contains(concat(' ',normalize-space(@class),' '),' best ')][1]">
-  	<review:maxRating rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"><xsl:call-template name="mf:extractText"/></review:maxRating>
+  	<review:maxRating rdf:datatype="http://www.w3.org/2001/XMLSchema#float"><xsl:call-template name="mf:extractText"/></review:maxRating>
   </xsl:for-each>
   <xsl:for-each select="descendant::*[contains(concat(' ',normalize-space(@class),' '),' worst ')][1]">
-  	<review:minRating rdf:datatype="http://www.w3.org/2001/XMLSchema#integer"><xsl:call-template name="mf:extractText"/></review:minRating>
+  	<review:minRating rdf:datatype="http://www.w3.org/2001/XMLSchema#float"><xsl:call-template name="mf:extractText"/></review:minRating>
   </xsl:for-each>
 
 
