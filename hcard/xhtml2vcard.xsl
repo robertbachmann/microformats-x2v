@@ -26,8 +26,8 @@ brian@suda.co.uk
 http://suda.co.uk/
 
 XHTML-2-vCard
-Version 0.11
-2007-05-29
+Version 0.12
+2008-01-10
 
 Copyright 2005 Brian Suda
 This work is relicensed under The W3C Open Source License
@@ -46,7 +46,7 @@ I'm not an XSLT expert, so there are no guarantees to quality of this code!
 
 
 
-<xsl:param name="Prodid" select='"-//suda.co.uk//X2V 0.11 (BETA)//EN"' />
+<xsl:param name="Prodid" select='"-//suda.co.uk//X2V 0.12 (BETA)//EN"' />
 <xsl:param name="Source" >(Best Practices states this should be the URL the vcard was transformed from)</xsl:param>
 <xsl:param name="Encoding" >UTF-8</xsl:param>
 <xsl:param name="Anchor" />
@@ -117,6 +117,19 @@ Without the correct profile you cannot assume the class values are intended for 
 
 	<xsl:variable name="is-org" select="$fn-val = $org-val and not($fn-val = '')" />
 
+	<!-- check to see if FN is on the same node as any ADR elements -->
+	<xsl:variable name="is-place" select="
+			.//*[contains(concat(' ',normalize-space(@class),' '),' fn ') and contains(concat(' ',normalize-space(@class),' '),' adr ')] = true() or 
+			.//*[contains(concat(' ',normalize-space(@class),' '),' fn ') and contains(concat(' ',normalize-space(@class),' '),' street-address ')] = true() or 
+			.//*[contains(concat(' ',normalize-space(@class),' '),' fn ') and contains(concat(' ',normalize-space(@class),' '),' extended-address ')] = true() or 
+			.//*[contains(concat(' ',normalize-space(@class),' '),' fn ') and contains(concat(' ',normalize-space(@class),' '),' locality ')] = true() or 
+			.//*[contains(concat(' ',normalize-space(@class),' '),' fn ') and contains(concat(' ',normalize-space(@class),' '),' region ')] = true() or 
+			.//*[contains(concat(' ',normalize-space(@class),' '),' fn ') and contains(concat(' ',normalize-space(@class),' '),' country-name ')] = true() or 
+			.//*[contains(concat(' ',normalize-space(@class),' '),' fn ') and contains(concat(' ',normalize-space(@class),' '),' post-office-box ')] = true() or 
+			.//*[contains(concat(' ',normalize-space(@class),' '),' fn ') and contains(concat(' ',normalize-space(@class),' '),' postal-code ')] = true() or 
+			.//*[contains(concat(' ',normalize-space(@class),' '),' fn ') and contains(concat(' ',normalize-space(@class),' '),' label ')] = true()
+		"/>
+
 	<xsl:choose>
 		<xsl:when test="$n-elt">
 			<xsl:for-each select=".//*[contains(concat(' ',normalize-space(@class),' '),' n ')]">
@@ -168,7 +181,7 @@ Without the correct profile you cannot assume the class values are intended for 
 				</xsl:if>
 			</xsl:for-each>
 		</xsl:when>
-		<xsl:when test="$is-org">
+		<xsl:when test="$is-org or $is-place">
 			<xsl:text>&#x0D;&#x0A;N:;;;;</xsl:text>
 		</xsl:when>
 		<xsl:when test="not($n-elt) and not(string-length(normalize-space(.//*[ancestor-or-self::*[local-name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ')])) &gt; 1+string-length(translate(normalize-space(.//*[ancestor-or-self::*[local-name() = 'del'] = false() and contains(concat(' ',normalize-space(@class),' '),' fn ')]),' ','')))">
