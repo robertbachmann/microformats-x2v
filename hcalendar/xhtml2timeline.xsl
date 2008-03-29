@@ -41,7 +41,7 @@ http://www.w3.org/Consortium/Legal/copyright-software-19980720
 
 <!-- Each vCard is listed in succession -->
 <xsl:template match="*[contains(concat(' ',normalize-space(@class),' '),' vevent ') and descendant::*[contains(concat(' ',normalize-space(@class),' '),' dtstart ')]]">
-	<xsl:if test="not($Anchor) or @id = $Anchor">
+	<xsl:if test="not($Anchor) or ancestor-or-self::*[@id = $Anchor]">
 		<xsl:call-template name="mf:doIncludes"/>
 		<xsl:call-template name="properties"/>
 	</xsl:if>

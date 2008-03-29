@@ -65,7 +65,7 @@ I'm not an XSLT expert, so there are no guarantees to quality of this code!
 
 <!-- Add more templates as they are needed-->
 <xsl:template match="*[contains(concat(' ',normalize-space(@class),' '),' vevent ')]">
-	<xsl:if test="not($Anchor) or @id = $Anchor">
+	<xsl:if test="not($Anchor) or ancestor-or-self::*[@id = $Anchor]">
 		<xsl:text>&#x0D;&#x0A;BEGIN:VEVENT</xsl:text>
 
 		<xsl:call-template name="mf:doIncludes"/>

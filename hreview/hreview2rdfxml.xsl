@@ -38,7 +38,7 @@
 		<xsl:for-each select="//*[contains(concat(' ',normalize-space(@class),' '),' hreview ')]">
 			<xsl:if test="
 			(descendant::*[contains(concat(' ',normalize-space(@class),' '),' summary ')] or descendant::*[contains(concat(' ',normalize-space(@class),' '),' item ')]/descendant::*[contains(concat(' ',normalize-space(@class),' '),' fn ')])
-			and (not($Anchor) or @id = $Anchor)
+			and (not($Anchor) or ancestor-or-self::*[@id = $Anchor])
 			">
 				<xsl:element name="Description" namespace="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
 					<xsl:attribute name="about" namespace="http://www.w3.org/1999/02/22-rdf-syntax-ns#">
