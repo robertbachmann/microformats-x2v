@@ -1,6 +1,6 @@
 # Class for using Saxon and Xalan-J via Inline::Java
 #
-# Copyright 2007 Robert Bachmann <rbach@rbach.priv.at>
+# Copyright 2007 Robert Bachmann
 #
 # This work is licensed under The W3C Open Source License
 # <http://www.w3.org/Consortium/Legal/copyright-software-19980720>

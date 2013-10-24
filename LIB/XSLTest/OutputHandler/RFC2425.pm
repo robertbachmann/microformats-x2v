@@ -1,6 +1,6 @@
 # Class for handling RFC2425 test output (like iCal and vCard)
 #
-# Copyright 2006-07 Robert Bachmann <rbach@rbach.priv.at>
+# Copyright 2006-07 Robert Bachmann
 #
 # This work is licensed under The W3C Open Source License
 # <http://www.w3.org/Consortium/Legal/copyright-software-19980720>
