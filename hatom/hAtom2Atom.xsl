@@ -68,12 +68,9 @@
    Use it at your own risk! 
 
                                    SEE ALSO
-
-   For the latest version of this stylesheet: 
-     <http://rbach.priv.at/Microformats/hAtom2Atom/>
-    
-   Mercurial repository:
-     <http://hg.microformats.org/x2v/>
+								   
+   Git repository:
+     <https://github.com/robertbachmann/microformats-x2v>
      
    Information about hAtom:
      <http://microformats.org/wiki/hatom>
